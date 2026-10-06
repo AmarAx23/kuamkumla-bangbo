@@ -1155,7 +1155,7 @@ function renderHome(){
   const today = iso(new Date());
   const act = state.all.filter(active);
   const onToday = act.filter(r => r.dates.includes(today));
-  const pend = state.all.filter(r => r.status === 'รออนุมัติ').sort((a,b)=>a.start.localeCompare(b.start));
+  const pend = state.all.filter(isWaiting).sort((a,b)=>a.start.localeCompare(b.start));
   $('#kToday').textContent = onToday.length;
   $('#kPending').textContent = pend.length;
   $('#kCount').textContent = state.rows.filter(active).length;
