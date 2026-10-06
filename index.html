@@ -269,7 +269,10 @@ details.tv table{margin-top:8px;font-size:13px}
 @media print{
   body.printing > *:not(#printArea){display:none!important}
   body.printing #printArea{display:block}
-  @page{size:A4;margin:16mm 18mm}
+  /* margin:0 = เบราว์เซอร์ไม่พิมพ์หัว/ท้ายกระดาษ (วันที่ ชื่อเว็บ ลิงก์ เลขหน้า) · ระยะขอบจริงใช้ padding แทน */
+  @page{size:A4;margin:0}
+  body.printing #printArea{padding:12mm 18mm 8mm;box-sizing:border-box}
+  body:not(.printing){padding:14mm 16mm}
 }
 .lf{font-family:"Sarabun","TH Sarabun New",serif;font-size:15pt;line-height:1.75;color:#000;background:#fff}
 .lf h1{text-align:center;font-size:17pt;margin:0 0 6px}
