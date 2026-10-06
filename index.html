@@ -1,0 +1,2021 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ระบบควบคุมการลา งานป้องกันปราบปราม สภ.บางบ่อ</title>
+<link rel="icon" type="image/png" href="logo.png">
+<script src="https://cdn.jsdelivr.net/npm/motion@14.0.0/dist/motion.js" async></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Bai+Jamjuree:wght@500;600;700&family=Sarabun:wght@400;500;600;700&family=Noto+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  /* ===== ตั้งค่า: วาง URL ของ Apps Script Web App (ลงท้าย /exec) ตรงนี้ =====
+     ถ้าเว้นว่าง หน้าเว็บจะเปิดในโหมดตัวอย่าง (ข้อมูลสมมติ ไม่บันทึกจริง) */
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyvA77uO7cWUb0Z_Q2sEXd2McXqDoR2Zd0675n2kVjHGIIAq5OHEC2h9nfyMNeNeVry/exec';
+</script>
+<script>
+  try { localStorage.removeItem('font'); } catch (e) {}  // ใช้ฟอนต์ทางการ (Sarabun) สำหรับทุกคน
+</script>
+<style>
+:root{
+  --f-body:"Sarabun",system-ui,sans-serif; --f-head:"Sarabun",system-ui,sans-serif;
+  --bg:#f4f5f7; --surface:#fff; --surface-2:#f8f9fb; --text:#1b2230; --muted:#5d6676; --line:#e1e4ea;
+  --brand:#1f3a68; --brand-2:#2c5296; --brand-ink:#fff; --accent:#c9a227;
+  --ok:#1e7a46; --ok-bg:#e3f4ea; --warn:#9a6a00; --warn-bg:#fdf3d6; --bad:#b3261e; --bad-bg:#fbe5e3; --off:#6b7280; --off-bg:#eceef1;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08); --r:12px;
+  --c-cur:#2a78d6; --c-prev:#eb6834;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f141c; --surface:#171e29; --surface-2:#1d2533; --text:#e7ebf2; --muted:#9aa4b5; --line:#2a3445;
+  --brand:#3b66b0; --brand-2:#5583d4; --accent:#e0bd4a;
+  --ok:#5fd394; --ok-bg:#16352a; --warn:#f0c55a; --warn-bg:#3a2f12; --bad:#ff8a80; --bad-bg:#3d1c1a; --off:#a3abb8; --off-bg:#262e3b;
+  --shadow:none; --c-cur:#3987e5; --c-prev:#d95926;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f141c; --surface:#171e29; --surface-2:#1d2533; --text:#e7ebf2; --muted:#9aa4b5; --line:#2a3445;
+  --brand:#3b66b0; --brand-2:#5583d4; --accent:#e0bd4a;
+  --ok:#5fd394; --ok-bg:#16352a; --warn:#f0c55a; --warn-bg:#3a2f12; --bad:#ff8a80; --bad-bg:#3d1c1a; --off:#a3abb8; --off-bg:#262e3b;
+  --shadow:none; --c-cur:#3987e5; --c-prev:#d95926;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--f-body)}
+button,input,select,textarea{font:inherit;color:inherit}
+header{background:var(--brand);color:var(--brand-ink);border-bottom:3px solid var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+.top{display:flex;align-items:center;gap:12px;padding:14px 0;flex-wrap:wrap}
+.top h1{font-size:19px;margin:0;font-weight:700;letter-spacing:.2px}
+.top .sub{font-size:13px;opacity:.8}
+.top .sp{flex:1}
+.top select,.top .btn-ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 10px}
+.top select option{color:#000}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav.tabs button{background:none;border:0;color:#fff;opacity:.75;padding:10px 14px;border-radius:8px 8px 0 0;cursor:pointer;white-space:nowrap}
+nav.tabs button.on{opacity:1;background:var(--bg);color:var(--text);font-weight:600}
+main{padding:20px 0 60px}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;font-size:14px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
+.kpi .v{font-size:30px;font-weight:700;line-height:1.1}
+.kpi .l{color:var(--muted);font-size:13px}
+h2{font-size:16px;margin:0 0 12px}
+.two{grid-template-columns:1fr 1fr}
+@media (max-width:800px){.two{grid-template-columns:1fr}}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0}
+.list .who{flex:1;min-width:0}
+.list .who small{display:block;color:var(--muted)}
+.empty{color:var(--muted);padding:8px 0}
+.pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;font-weight:600;white-space:nowrap}
+.s-อนุมัติ{background:var(--ok-bg);color:var(--ok)}
+.s-รออนุมัติ{background:var(--warn-bg);color:var(--warn)}
+.s-ไม่อนุมัติ{background:var(--bad-bg);color:var(--bad)}
+.s-ยกเลิก,.s-none{background:var(--off-bg);color:var(--off)}
+.team{background:var(--surface-2);border:1px solid var(--line);color:var(--muted);font-weight:500}
+/* สีประจำชุด (ใกล้เคียงสีดรอปดาวน์ในชีต) */
+.team{font-weight:600}
+.team.t1{background:#fdf0c2;color:#6b4f00;border-color:transparent}
+.team.t2{background:#d6f0dc;color:#1b6331;border-color:transparent}
+.team.t3{background:#d8e7fb;color:#1d4a8f;border-color:transparent}
+.team.tadm{background:#fde0cc;color:#8f4210;border-color:transparent}
+.team.tsvp{background:#f9d7d7;color:#9b2424;border-color:transparent}
+.team.trad{background:#3b3f46;color:#ffffff;border-color:transparent}
+.team.tsib{background:#1f3a68;color:#ffffff;border-color:transparent}
+.team.tdep{background:#e6defa;color:#4f358f;border-color:transparent}
+.team.tx0{background:#d3f1ee;color:#0f5f58;border-color:transparent}
+.team.tx1{background:#fadbe9;color:#8c2457;border-color:transparent}
+.team.tx2{background:#ece3d6;color:#5d4630;border-color:transparent}
+.team.tx3{background:#e4e7ec;color:#3d4654;border-color:transparent}
+@media (prefers-color-scheme: dark){
+:root:not([data-theme="light"]) .team.t1{background:#4a3b0a;color:#f6d77a}
+:root:not([data-theme="light"]) .team.t2{background:#173d24;color:#8fdca6}
+:root:not([data-theme="light"]) .team.t3{background:#162f52;color:#9cc3f5}
+:root:not([data-theme="light"]) .team.tadm{background:#4a2a14;color:#f5b48a}
+:root:not([data-theme="light"]) .team.tsvp{background:#4a1c1c;color:#f2a3a3}
+:root:not([data-theme="light"]) .team.trad{background:#5a606b;color:#ffffff}
+:root:not([data-theme="light"]) .team.tsib{background:#3b66b0;color:#ffffff}
+:root:not([data-theme="light"]) .team.tdep{background:#2f2650;color:#c8b6f5}
+:root:not([data-theme="light"]) .team.tx0{background:#143f3b;color:#86dbd2}
+:root:not([data-theme="light"]) .team.tx1{background:#47192f;color:#f1a6c9}
+:root:not([data-theme="light"]) .team.tx2{background:#3a3026;color:#d9c3a5}
+:root:not([data-theme="light"]) .team.tx3{background:#2c323c;color:#c4cbd6}
+}
+:root[data-theme="dark"] .team.t1{background:#4a3b0a;color:#f6d77a}
+:root[data-theme="dark"] .team.t2{background:#173d24;color:#8fdca6}
+:root[data-theme="dark"] .team.t3{background:#162f52;color:#9cc3f5}
+:root[data-theme="dark"] .team.tadm{background:#4a2a14;color:#f5b48a}
+:root[data-theme="dark"] .team.tsvp{background:#4a1c1c;color:#f2a3a3}
+:root[data-theme="dark"] .team.trad{background:#5a606b;color:#ffffff}
+:root[data-theme="dark"] .team.tsib{background:#3b66b0;color:#ffffff}
+:root[data-theme="dark"] .team.tdep{background:#2f2650;color:#c8b6f5}
+:root[data-theme="dark"] .team.tx0{background:#143f3b;color:#86dbd2}
+:root[data-theme="dark"] .team.tx1{background:#47192f;color:#f1a6c9}
+:root[data-theme="dark"] .team.tx2{background:#3a3026;color:#d9c3a5}
+:root[data-theme="dark"] .team.tx3{background:#2c323c;color:#c4cbd6}
+@media print{.team{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters input,.filters select,.f input,.f select,.f textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.filters input{flex:1 1 200px}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--brand-2)}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+.btn.sm{padding:4px 9px;font-size:13px;font-weight:500}
+.btn.ok{background:var(--ok)} .btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:var(--surface-2);font-weight:600;color:var(--muted);font-size:13px;white-space:nowrap;cursor:pointer;user-select:none}
+td.num,th.num{text-align:right}
+tr:last-child td{border-bottom:0}
+.acts{display:flex;gap:4px;flex-wrap:wrap}
+.muted{color:var(--muted)}
+.cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.cal-head h2{margin:0;flex:1}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .dow{font-size:12px;color:var(--muted);text-align:center;padding:4px 0}
+.cal .d{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:92px;padding:5px;font-size:12px;overflow:hidden}
+.cal .d.out{background:transparent;border-style:dashed;opacity:.45}
+.cal .d.today{outline:2px solid var(--accent)}
+.cal .d .n{font-weight:700;font-size:13px;display:flex;justify-content:space-between}
+.cal .d .n span{font-weight:500;color:var(--muted)}
+.cal .chip{display:block;border-radius:4px;padding:1px 4px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.cal .d{min-height:58px}.cal .chip{display:none}.cal .d.has .n span{color:var(--brand-2);font-weight:700}}
+.f{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+.f label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.f .full{grid-column:1/-1}
+.f .lbl{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.dp{position:relative}
+.dp-show{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--text);font-size:15px}
+.dp-show.empty{color:var(--muted)}
+.dp-show::after{content:"📅";float:right;opacity:.7}
+.dp-pop{position:absolute;z-index:20;top:calc(100% + 4px);left:0;width:290px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;color:var(--text)}
+.dp-head{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.dp-head b{flex:1;text-align:center;font-size:15px}
+.dp-nav{background:none;border:1px solid var(--line);border-radius:6px;width:30px;height:30px;cursor:pointer;color:var(--text)}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.dp-grid .w{font-size:12px;color:var(--muted);padding:4px 0}
+.dp-grid button{background:none;border:0;border-radius:6px;padding:6px 0;cursor:pointer;color:var(--text);font-size:14px}
+.dp-grid button:hover{background:var(--surface-2)}
+.dp-grid button.o{color:var(--muted);opacity:.5}
+.dp-grid button.t{outline:1px solid var(--accent)}
+.dp-grid button.s{background:var(--brand);color:#fff}
+.dp-grid button.r{background:var(--surface-2)}
+.dp-grid button:disabled{opacity:.25;cursor:default}
+.dp-foot{display:flex;justify-content:space-between;margin-top:6px}
+.dp-foot button{background:none;border:0;color:var(--brand-2);cursor:pointer;font-weight:600;padding:4px 6px}
+@media (max-width:600px){.f{grid-template-columns:1fr}}
+.preview{background:var(--surface-2);border:1px dashed var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.warnbox{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:10px 12px;font-size:14px}
+.bar{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;background:var(--brand-2);border-radius:99px}
+dialog{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--text);padding:18px;width:min(420px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:9}
+#toast.show{opacity:1}
+.loading{opacity:.55;pointer-events:none}
+[hidden]{display:none!important}
+.cal .d.wk{background:var(--surface-2)}
+.cal .d.hol{background:var(--bad-bg)}
+.cal .d.hol .n{color:var(--bad)}
+.cal .hn{display:block;font-size:11px;color:var(--bad);line-height:1.25;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bal td{vertical-align:top}
+.bal.no-ks .ks{display:none}
+/* ฟอร์มยื่นใบลา: เต็มความกว้าง แบ่ง 2 ส่วน */
+.newgrid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.newgrid{grid-template-columns:1fr}}
+.newform{padding:26px 28px}
+.newside{position:sticky;top:16px;padding:22px 24px}
+.newside .preview{line-height:1.8}
+.newside .warnbox{margin-top:12px}
+.nf{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 20px;grid-template-areas:"name name name name" "team team type type" "start start end end" "note note note note" "btn btn btn btn"}
+@media (max-width:600px){.nf{grid-template-columns:1fr;grid-template-areas:"name" "team" "type" "start" "end" "note" "btn"}}
+.a-name{grid-area:name}.a-team{grid-area:team}.a-type{grid-area:type}.a-start{grid-area:start}.a-end{grid-area:end}.a-note{grid-area:note}.a-btn{grid-area:btn}
+.nf label,.nf .lbl{font-size:15px;gap:6px}
+.nf input,.nf select,.nf .dp-show{padding:12px 14px;font-size:17px;border-radius:10px}
+.nf .dp-pop{width:320px}
+.btn-lg{padding:12px 28px;font-size:17px}
+/* ความกว้างคอลัมน์หน้ารายการลา */
+.lst{table-layout:fixed}
+.lst th,.lst td{padding:12px 16px}
+.lst th:nth-child(1),.lst td:nth-child(1){width:72px;text-align:center}
+.lst th:nth-child(2),.lst td:nth-child(2){width:22%}
+.lst th:nth-child(3),.lst td:nth-child(3){width:16%;white-space:nowrap}
+.lst th:nth-child(4),.lst td:nth-child(4){width:64px;text-align:center}
+.lst th:nth-child(5),.lst td:nth-child(5){width:12%;text-align:center}
+.lst th:nth-child(6),.lst td:nth-child(6){width:14%;text-align:center}
+.lst td:nth-child(7){color:var(--muted);font-size:14px;line-height:1.45}
+.lst .nt{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lst th:nth-child(8),.lst td:nth-child(8){width:132px;text-align:center}
+body.is-admin .lst th:nth-child(8),body.is-admin .lst td:nth-child(8){width:340px;text-align:right}
+.lst td:nth-child(2){font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lst .acts{flex-wrap:nowrap;justify-content:center}
+body.is-admin .lst .acts{justify-content:flex-end}
+body.is-admin .lst th,body.is-admin .lst td{padding-left:10px;padding-right:10px}
+body.is-admin .lst th:nth-child(1),body.is-admin .lst td:nth-child(1){width:56px}
+body.is-admin .lst th:nth-child(2),body.is-admin .lst td:nth-child(2){width:18%}
+body.is-admin .lst th:nth-child(3),body.is-admin .lst td:nth-child(3){width:14%}
+body.is-admin .lst th:nth-child(4),body.is-admin .lst td:nth-child(4){width:48px}
+body.is-admin .lst th:nth-child(5),body.is-admin .lst td:nth-child(5){width:9%}
+body.is-admin .lst th:nth-child(6),body.is-admin .lst td:nth-child(6){width:10%}
+body.is-admin .lst .acts{gap:4px}
+body.is-admin .lst .acts .btn.sm{padding:4px 8px;font-size:13px;white-space:nowrap}
+.lst td{vertical-align:middle}
+/* ความกว้างคอลัมน์หน้าวันลาคงเหลือ: ชื่อพอดีชื่อ ช่องตัวเลขกว้างเท่ากัน */
+.bal th,.bal td{padding:12px 14px}
+.bal th:first-child,.bal td:first-child{width:19%;min-width:180px}
+.bal th:nth-child(2),.bal td:nth-child(2){width:8%}
+.bal th:nth-child(n+3):nth-child(-n+6),.bal td:nth-child(n+3):nth-child(-n+6),.bal .mat{width:13%;min-width:112px}
+.bal .bar{max-width:150px}
+.bal th{vertical-align:bottom;line-height:1.35}
+.bal td.ks,.bal th.ks{width:11%}
+.bal .q{font-size:13px;white-space:nowrap}
+.bal .q b{font-size:15px}
+.bal .q small{display:block;color:var(--muted)}
+.bal .neg{color:var(--bad);font-weight:700}
+.bal tr.det td{background:var(--surface-2);font-size:13px}
+.bal tr.pr{cursor:pointer}
+.bal tr.pr:hover td{background:var(--surface-2)}
+.src{font-size:11px;color:var(--muted)}
+.set{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media (max-width:800px){.set{grid-template-columns:1fr}}
+.set label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.set input,.set select,.set textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--text)}
+.set textarea{min-height:320px;font-size:13px;line-height:1.6}
+.set label.radio{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text)}
+.set label.radio input{margin-top:4px;flex:none}
+.chart-box{position:relative;height:300px}
+.chart-row{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media (max-width:900px){.chart-row{grid-template-columns:1fr}}
+details.tv summary{cursor:pointer;color:var(--brand-2);font-size:13px;margin-top:8px}
+details.tv table{margin-top:8px;font-size:13px}
+.kchg{font-size:13px;margin-top:4px}
+.mode-note{font-size:12px;color:var(--muted);margin:-4px 0 12px}
+/* เพดานกำลังพล */
+.cal .d.over{outline:2px solid var(--bad);outline-offset:-2px;background:var(--bad-bg)}
+.cal .ov{display:block;font-size:11px;font-weight:700;color:var(--bad);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.warn-tag{display:inline-block;font-size:12px;font-weight:700;color:var(--bad);background:var(--bad-bg);border-radius:6px;padding:1px 6px;margin-left:4px}
+.caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+/* ตรวจข้อมูล */
+.chk h2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chk h2 .cnt{font-size:13px;font-weight:600;background:var(--warn-bg);color:var(--warn);border-radius:99px;padding:1px 9px}
+.chk h2 .cnt.zero{background:var(--ok-bg);color:var(--ok)}
+.chk .why{font-size:13px;color:var(--muted);margin:-6px 0 10px}
+.chk td select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color:var(--text)}
+.chk tr.done td{opacity:.45}
+/* ใบลา (พิมพ์) */
+#printArea{display:none}
+@media print{
+  body.printing > *:not(#printArea){display:none!important}
+  body.printing #printArea{display:block}
+  @page{size:A4;margin:16mm 18mm}
+}
+.lf{font-family:"Sarabun","TH Sarabun New",serif;font-size:15pt;line-height:1.75;color:#000;background:#fff}
+.lf h1{text-align:center;font-size:17pt;margin:0 0 6px}
+.lf .r{text-align:right}
+.lf .ind{text-indent:2.5cm}
+.lf .f{display:inline-block;border-bottom:1px dotted #000;min-width:2.2cm;text-align:center;padding:0 4px;line-height:1.2}
+.lf .f.w{min-width:6cm}.lf .f.s{min-width:1.2cm}.lf .f.xl{min-width:9cm}
+.lf .box{display:inline-block;width:12px;height:12px;border:1px solid #000;margin:0 4px 0 10px;vertical-align:-1px;text-align:center;font-size:11px;line-height:11px}
+.lf .sig{margin-left:50%;text-align:center}
+.lf table{border-collapse:collapse;width:100%;font-size:14pt}
+.lf th,.lf td{border:1px solid #000!important;padding:2px 6px;text-align:center;background:#fff;color:#000;font-size:14pt;font-weight:400;cursor:default}
+.lf th{font-weight:700}
+.lf .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px;align-items:start}
+.lf .small{font-size:13pt}
+.lf p{margin:0}
+/* ===== ชั้นตกแต่ง: ฟอนต์ + หัวเว็บ + กระดานตัวเลข ===== */
+:root[data-font="modern"]{ --f-body:"Anuphan",system-ui,sans-serif; --f-head:"Bai Jamjuree","Anuphan",system-ui,sans-serif; }
+:root[data-font="looped"]{ --f-body:"Noto Sans Thai Looped",system-ui,sans-serif; --f-head:"Noto Sans Thai Looped",system-ui,sans-serif; }
+body{font-size:16.5px}
+:root[data-font="modern"] body,:root[data-font="looped"] body{font-size:15px}
+:root{ --bg:#eef1f6; --navy:#13284a; --gold:#c9a227; --r:14px; --shadow:0 1px 0 rgba(19,40,74,.04),0 2px 8px -4px rgba(19,40,74,.12); }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0d121a; --navy:#0b1830; --shadow:none; } }
+:root[data-theme="dark"]{ --bg:#0d121a; --navy:#0b1830; --shadow:none; }
+h1,h2,.kpi .v,.dp-head b,.cal-head h2,#halfTitle{font-family:var(--f-head)}
+.num,.kpi .v,.list .who small,td.num,.q b{font-variant-numeric:tabular-nums}
+header{background:var(--navy);border-bottom:0;box-shadow:inset 0 -3px 0 var(--gold),inset 0 -5px 0 var(--navy),inset 0 -6px 0 rgba(201,162,39,.55)}
+.top{padding:18px 0 10px}
+.top h1{font-size:23px;font-weight:600;letter-spacing:.1px;line-height:1.2}
+.top .sub{font-size:13px;opacity:.72;margin-top:2px}
+.top select,.top .btn-ghost{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);border-radius:10px}
+.top .btn-ghost:hover,.top select:hover{background:rgba(255,255,255,.16)}
+nav.tabs{gap:2px;padding-bottom:6px}
+nav.tabs button{opacity:.7;padding:10px 12px 9px;border-radius:0;position:relative;font-weight:500}
+nav.tabs button:hover{opacity:1}
+nav.tabs button.on{background:none;color:#fff;opacity:1;font-weight:600}
+nav.tabs button.on::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--gold)}
+nav.tabs button:focus-visible,.btn:focus-visible,.btn-ghost:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+main.wrap{padding-top:26px;padding-bottom:64px}
+.card{border-radius:var(--r);padding:18px 20px}
+h2{font-size:17px;font-weight:600;margin-bottom:12px}
+/* กระดานตัวเลข: แถวเดียว แบ่งด้วยเส้น แทนการ์ดแยก */
+section[data-view="home"] > .kpis{gap:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;grid-template-columns:repeat(4,1fr)}
+section[data-view="home"] > .kpis .kpi{border:0;border-radius:0;box-shadow:none;padding:18px 22px;border-left:1px solid var(--line)}
+section[data-view="home"] > .kpis .kpi:first-child{border-left:0;background:linear-gradient(90deg,var(--gold) 0 4px,transparent 4px)}
+@media (max-width:700px){ section[data-view="home"] > .kpis{grid-template-columns:1fr 1fr} section[data-view="home"] > .kpis .kpi:nth-child(3){border-left:0} section[data-view="home"] > .kpis .kpi:nth-child(n+3){border-top:1px solid var(--line)} }
+.kpi .v{font-size:36px;font-weight:600;line-height:1.05;letter-spacing:-.5px}
+.kpi .l{font-size:13.5px;margin-top:4px}
+section[data-view="home"] > .kpis .kpi:first-child .v{color:var(--brand-2)}
+.list li{padding:11px 0}
+.list .who{font-weight:600}
+.list .who small{font-weight:400;font-size:13px;margin-top:1px}
+.pill{font-weight:600;letter-spacing:.1px}
+.btn{border-radius:10px}
+.tbl-wrap{border-radius:var(--r)}
+th{font-family:var(--f-body)}
+.top .fontsel{max-width:140px}
+.top .yearbox{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;opacity:1}
+.top .yearbox select{font-size:20px;font-weight:700;padding:6px 14px;min-width:112px;border-radius:10px;font-family:var(--f-head)}
+.top{align-items:center}
+.top .yearbox select{height:46px;text-align:center;text-align-last:center;padding-left:22px}
+.top .yearbox select option{text-align:center}
+.top .corner{display:flex;flex-direction:column;gap:4px;padding-left:16px;margin-left:4px;border-left:1px solid rgba(255,255,255,.18);height:46px;justify-content:space-between}
+.top .corner .btn-ghost{width:100px;white-space:nowrap;height:21px;padding:0 8px;font-size:12px;line-height:19px;opacity:.8;display:flex;align-items:center;justify-content:center;gap:4px;border-radius:7px}
+.top .corner .btn-ghost:hover{opacity:1}
+.top .corner .row2{display:flex;gap:4px}
+.top .corner .row2 .btn-ghost{width:48px;font-size:13px}
+.top .corner .row2 .theme-mini{font-size:17px}
+.top .sound-mini.off{opacity:.45}
+.top .theme-mini:hover{opacity:1}
+.top .admin-mini:hover{opacity:1}
+body.is-admin .top .admin-mini{opacity:1;background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
+
+/* หน้าต่างอนุมัติ */
+.apdlg{width:min(480px,94vw)}
+.apgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.apgrid label{display:grid;gap:6px;font-size:14px;color:var(--muted)}
+.apgrid input{font-size:20px;font-weight:700;padding:10px 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);color:var(--text)}
+.apgrid input:focus{outline:none;border-color:var(--gold);box-shadow:var(--ring)}
+.aphead{line-height:1.7}
+#apCalc{line-height:1.8}
+.cf{color:var(--ok);font-size:12px;font-weight:700;margin-right:4px}
+/* ===== ชั้นปรับโฉม (ทันสมัย) ===== */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --surface-2:#f6f8fb; --line:#e3e8ef; --line-2:#d5dce6;
+  --text:#152033; --muted:#5c6779; --navy:#0f2347; --navy-2:#173468; --brand:#1b3b74; --brand-2:#2a58a8;
+  --ring:0 0 0 3px rgba(201,162,39,.35);
+  --shadow:0 1px 2px rgba(15,35,71,.04),0 4px 16px -8px rgba(15,35,71,.14);
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0b1018; --surface:#131a25; --surface-2:#18202d; --line:#243041; --line-2:#2e3c50; --text:#e8ecf3; --muted:#98a3b5;
+  --navy:#0a1730; --navy-2:#11234a; --brand:#4a78c8; --brand-2:#6a95e0; --shadow:none; } }
+:root[data-theme="dark"]{
+  --bg:#0b1018; --surface:#131a25; --surface-2:#18202d; --line:#243041; --line-2:#2e3c50; --text:#e8ecf3; --muted:#98a3b5;
+  --navy:#0a1730; --navy-2:#11234a; --brand:#4a78c8; --brand-2:#6a95e0; --shadow:none; }
+body{background:var(--bg) linear-gradient(180deg,rgba(15,35,71,.06),transparent 260px) no-repeat}
+::selection{background:rgba(201,162,39,.35)}
+
+/* หัวเว็บ: ติดด้านบนเมื่อเลื่อน */
+header{position:sticky;top:0;z-index:30;background:linear-gradient(180deg,var(--navy-2),var(--navy) 70%)}
+.top h1{font-size:24px;letter-spacing:0}
+nav.tabs{scroll-snap-type:x proximity}
+nav.tabs button{font-size:15.5px;transition:opacity .15s}
+
+/* การ์ดและหัวข้อ */
+.card{border-color:var(--line);box-shadow:var(--shadow)}
+h2{font-size:18px;letter-spacing:0}
+.card > h2:first-child{margin-bottom:14px}
+
+/* ปุ่ม */
+.btn{background:var(--brand);border-radius:10px;padding:9px 16px;font-weight:600;transition:background .15s,box-shadow .15s,transform .05s;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 1px 2px rgba(15,35,71,.18)}
+.btn:hover{background:var(--brand-2)}
+.btn:active{transform:translateY(1px)}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--line-2);box-shadow:0 1px 2px rgba(15,35,71,.05)}
+.btn.sec:hover{background:var(--surface-2);border-color:var(--muted)}
+.btn.ok{background:#1e7a46}.btn.ok:hover{background:#228a50}
+.btn.bad{background:#b3261e}.btn.bad:hover{background:#c62f26}
+.btn.sm{border-radius:8px}
+.btn:focus-visible,.btn-ghost:focus-visible,nav.tabs button:focus-visible{outline:none;box-shadow:var(--ring)}
+
+/* ช่องกรอก */
+.filters input,.filters select,.f input,.f select,.f textarea,.set input,.set select,.set textarea,.dp-show{border:1px solid var(--line-2);border-radius:10px;background:var(--surface);transition:border-color .15s,box-shadow .15s}
+.filters input,.filters select{height:44px;padding:0 14px}
+.filters input:focus,.filters select:focus,.f input:focus,.f select:focus,.set input:focus,.set select:focus,.set textarea:focus,.dp-show:focus{outline:none;border-color:var(--gold);box-shadow:var(--ring)}
+.filters .btn{height:44px}
+.filters input{background:var(--surface) no-repeat 14px 50%/16px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c6779' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");padding-left:40px}
+
+/* ตาราง */
+.tbl-wrap{border-color:var(--line);box-shadow:var(--shadow)}
+th{background:var(--surface-2);color:var(--muted);font-size:13.5px;font-weight:600;border-bottom:1px solid var(--line)}
+th[data-sort]:hover{color:var(--text)}
+td{border-bottom:1px solid var(--line)}
+tbody tr{transition:background .12s}
+tbody tr:hover td{background:rgba(42,88,168,.045)}
+tr:last-child td{border-bottom:0}
+
+/* ป้ายสถานะ: มีจุดสีนำหน้า */
+.pill{padding:3px 10px 3px 9px;font-size:12.5px;border-radius:999px}
+.pill[class*="s-"]::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px;opacity:.85}
+.team{padding:3px 10px}
+
+/* รายการในการ์ด */
+.list li{padding:12px 0}
+.list li + li{border-top-color:var(--line)}
+
+/* ปฏิทิน */
+.cal{gap:6px}
+.cal .d{border-radius:12px;padding:7px 8px;border-color:var(--line);transition:border-color .12s}
+.cal .d:hover{border-color:var(--line-2)}
+.cal .d.today{outline:2px solid var(--gold);outline-offset:-1px}
+.cal .chip{border-radius:6px;padding:2px 6px;margin-top:3px;font-size:12px}
+.cal .dow{font-weight:600}
+
+/* กล่องข้อความ / ตัวอย่าง / เตือน */
+.preview{border-radius:12px;border-style:solid;border-color:var(--line);background:var(--surface-2)}
+.warnbox{border-radius:12px}
+.banner{border-radius:12px}
+
+/* ปฏิทินเลือกวันที่ */
+.dp-pop{border-radius:16px;border-color:var(--line);box-shadow:0 12px 32px -8px rgba(15,35,71,.28)}
+.dp-grid button{border-radius:8px}
+.dp-grid button.s{background:var(--brand)}
+
+/* หน้าต่าง / แจ้งเตือน */
+dialog{border-radius:18px;border-color:var(--line);box-shadow:0 24px 64px -16px rgba(15,35,71,.4);padding:22px}
+dialog::backdrop{background:rgba(10,20,40,.45);backdrop-filter:blur(2px)}
+#toast{border-radius:999px;padding:11px 20px;box-shadow:0 10px 30px -8px rgba(0,0,0,.35);font-weight:500}
+#toast.show{transform:translateX(-50%) translateY(-4px)}
+
+/* แถบเลื่อน */
+*{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+@media print{header{position:static!important}header nav,.btn,.filters select,#adminBtn,#themeBtn,#soundBtn,.banner,#toast{display:none!important}body{background:#fff}.card{box-shadow:none;break-inside:avoid}details.tv{display:none}}
+
+/* ---- ปุ่มเมนูแบบ Ripple · โทนฟ้านุ่ม ---- */
+nav.tabs{gap:8px;padding:6px 2px 12px}
+nav.tabs button{color:#BFDBFE;background-color:rgba(59,130,246,.10);border:1px solid rgba(147,197,253,.35);border-radius:6px;padding:7px 16px;opacity:1;font-weight:500;
+  box-shadow:none;background-position:center;transition:background .8s,color .2s,border-color .2s}
+nav.tabs button:hover{background:#3B82F6 radial-gradient(circle,transparent 1%,#3B82F6 1%) center/15000%;color:#fff;border-color:#3B82F6}
+nav.tabs button:active{background-color:rgba(147,197,253,.45);background-size:100%;transition:background 0s}
+nav.tabs button.on{background-color:#3B82F6;color:#fff;font-weight:600;border-color:#3B82F6}
+nav.tabs button.on::after{display:none}
+#toast{left:0;right:0;margin-inline:auto;width:max-content;max-width:90vw;transform:none}
+#toast.show{transform:none}
+button[data-ent]{white-space:nowrap}
+
+
+/* ---- โลโก้ + ชื่อหน่วย ---- */
+.top .brand{display:flex;align-items:center;gap:14px;min-width:0}
+.top .brand .logo{height:67px;width:auto;flex:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))}
+.top h1{line-height:1.25}
+.top h1 .org{display:block;font-size:15px;font-weight:500;opacity:.88;letter-spacing:0;margin-top:2px}
+@media (max-width:640px){ .top .brand .logo{height:50px} .top h1{font-size:19px} .top h1 .org{font-size:13px} }
+
+/* ---- หน้าต่าง "เข้าสู่ระบบสำเร็จ" ---- */
+.okpop{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(15,23,42,.35);backdrop-filter:blur(3px);animation:okFade .2s ease-out}
+.okpop[hidden]{display:none}
+.okpop.out{animation:okFadeOut .25s ease-in forwards}
+.okcard{background:var(--surface);color:var(--text);border-radius:18px;padding:30px 44px 26px;text-align:center;min-width:300px;max-width:calc(100vw - 32px);box-shadow:0 24px 60px -12px rgba(0,0,0,.35);animation:okPopIn .45s cubic-bezier(.2,1.3,.4,1)}
+.okmark{width:84px;height:84px;display:block;margin:0 auto 14px}
+.okmark .ring{fill:none;stroke:#e6efe6;stroke-width:3}
+.okmark .tick{fill:none;stroke:#7cc576;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:okDraw .5s .25s cubic-bezier(.65,0,.35,1) forwards}
+.okcard h3{margin:0 0 6px;font-size:23px;font-weight:700}
+.okcard p{margin:0;color:var(--muted);font-size:15px}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .okmark .ring{stroke:rgba(124,197,118,.22)} }
+:root[data-theme="dark"] .okmark .ring{stroke:rgba(124,197,118,.22)}
+@keyframes okDraw{to{stroke-dashoffset:0}}
+@keyframes okPopIn{from{opacity:0;transform:scale(.85) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes okFade{from{opacity:0}}
+@keyframes okFadeOut{to{opacity:0}}
+@media (prefers-reduced-motion: reduce){ .okpop,.okcard{animation:none} .okmark .tick{animation:none;stroke-dashoffset:0} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <img class="logo" src="logo.png" alt="ตราสถานีตำรวจภูธรบางบ่อ" width="58" height="67">
+        <div>
+          <h1>ระบบควบคุมการลา <span class="org">งานป้องกันปราบปราม สถานีตำรวจภูธรบางบ่อ</span></h1>
+          <div class="sub" id="sub">กำลังโหลดข้อมูล…</div>
+        </div>
+      </div>
+      <div class="sp"></div>
+      <label class="yearbox">ปีงบประมาณ <select id="year"></select></label>
+      <select id="fontSel" class="fontsel" title="เลือกแบบตัวอักษร" aria-label="แบบตัวอักษร" hidden>
+        <option value="">Aa ทางการ</option><option value="modern">Aa ทันสมัย</option><option value="looped">Aa มีหัว</option>
+      </select>
+      <div class="corner">
+        <button class="btn-ghost admin-mini" id="adminBtn" title="เข้าสู่โหมดผู้อนุมัติ">ผู้อนุมัติ</button>
+        <div class="row2"><button class="btn-ghost theme-mini" id="themeBtn" title="สลับโหมดสว่าง/มืด" aria-label="สลับโหมดสว่าง/มืด">◐</button><button class="btn-ghost sound-mini" id="soundBtn" title="เปิด/ปิดเสียง" aria-label="เปิด/ปิดเสียง">🔔</button></div>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="home" class="on">ภาพรวม</button>
+      <button data-tab="cal">ปฏิทิน</button>
+      <button data-tab="list">รายการลา</button>
+      <button data-tab="people">สรุปรายบุคคล</button>
+      <button data-tab="balance">วันลาคงเหลือ</button>
+      <button data-tab="charts">กราฟสรุป</button>
+      <button data-tab="new">ยื่นใบลา</button>
+      <button data-tab="check" class="adm-tab" hidden>ตรวจข้อมูล</button>
+      <button data-tab="settings" class="adm-tab" hidden>ตั้งค่า</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="banner" id="demoBanner" hidden>โหมดตัวอย่าง — ยังไม่ได้ตั้งค่า <b>API_URL</b> ข้อมูลที่เห็นเป็นข้อมูลสมมติและจะไม่ถูกบันทึก (ดูวิธีตั้งค่าใน README)</div>
+
+  <!-- ภาพรวม -->
+  <section data-view="home">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="v" id="kToday">–</div><div class="l">ลาวันนี้ (ทุกปีงบฯ)</div></div>
+      <div class="card kpi"><div class="v" id="kPending">–</div><div class="l">รออนุมัติ</div></div>
+      <div class="card kpi"><div class="v" id="kCount">–</div><div class="l">รายการลาในปีงบฯ</div></div>
+      <div class="card kpi"><div class="v" id="kDays">–</div><div class="l">วันลารวมในปีงบฯ</div></div>
+    </div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><h2>ลาวันนี้ <span class="muted" id="todayLabel" style="font-weight:400"></span></h2><ul class="list" id="todayList"></ul></div>
+      <div class="card"><h2>รออนุมัติ</h2><ul class="list" id="pendList"></ul></div>
+    </div>
+    <div class="card" id="capCard" style="margin-top:14px;border-color:var(--bad)" hidden><h2 style="color:var(--bad)">⚠ วันที่ลาเกินเพดานกำลังพล (60 วันข้างหน้า)</h2><ul class="list" id="capList"></ul></div>
+    <div class="cal-head" style="margin:18px 0 10px">
+      <button class="btn sec sm" id="halfPrev" aria-label="เดือนก่อน">‹</button>
+      <h2 id="halfTitle" style="flex:0 0 auto;margin:0 6px"></h2>
+      <button class="btn sec sm" id="halfNext" aria-label="เดือนถัดไป">›</button>
+      <button class="btn sec sm" id="halfNow">เดือนนี้</button>
+    </div>
+    <div class="grid two">
+      <div class="card"><h2 id="h1Title">ลาวันที่ 1–15</h2><ul class="list" id="half1"></ul></div>
+      <div class="card"><h2 id="h2Title">ลาวันที่ 16–31</h2><ul class="list" id="half2"></ul></div>
+    </div>
+  </section>
+
+  <!-- ปฏิทิน -->
+  <section data-view="cal" hidden>
+    <div class="cal-head">
+      <button class="btn sec sm" id="calPrev">‹</button>
+      <h2 id="calTitle"></h2>
+      <button class="btn sec sm" id="calNext">›</button>
+      <select id="calTeam" class="btn sec sm"><option value="">ทุกชุด</option></select>
+    </div>
+    <div class="cal" id="cal"></div>
+    <p class="muted" style="font-size:13px">แสดงเฉพาะรายการที่ไม่ถูกยกเลิก/ไม่อนุมัติ · กรอบสีทอง = วันนี้ · พื้นสีแดงอ่อน = วันหยุดราชการ · พื้นเทา = เสาร์-อาทิตย์ · กรอบแดง ⚠ = ชุดนั้นลาเกินเพดานที่ตั้งไว้</p>
+  </section>
+
+  <!-- รายการ -->
+  <section data-view="list" hidden>
+    <div class="filters">
+      <input id="q" placeholder="ค้นหาชื่อ / หมายเหตุ">
+      <select id="fTeam"><option value="">ทุกชุดปฏิบัติการ</option></select>
+      <select id="fMonth"><option value="">ทุกเดือน</option></select>
+      <select id="fStatus"><option value="">ทุกสถานะ</option><option>อนุมัติ</option><option>รออนุมัติ</option><option>ไม่อนุมัติ</option><option>ยกเลิก</option><option value="none">รอดำเนินการ</option></select>
+      <button class="btn sec" id="exportBtn">ส่งออก CSV</button>
+    </div>
+    <div class="tbl-wrap"><table class="lst">
+      <thead><tr><th data-sort="seq" class="num" title="ลำดับในปีงบประมาณ (เรียงตามวันที่เริ่มลา)">ลำดับ</th><th data-sort="name">ชื่อ</th><th data-sort="start">วันที่ลา</th><th data-sort="count" class="num">วัน</th><th data-sort="team">ชุด</th><th data-sort="status">การดำเนินการ</th><th>หมายเหตุ</th><th>จัดการ</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <p class="muted" style="font-size:13px" id="listFoot"></p>
+  </section>
+
+  <!-- สรุปรายบุคคล -->
+  <section data-view="people" hidden>
+    <div class="filters">
+      <input id="pq" placeholder="ค้นหาชื่อ">
+      <select id="pTeam"><option value="">ทุกชุดปฏิบัติการ</option></select>
+      <label class="muted" style="display:flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="pApproved"> นับเฉพาะที่อนุมัติแล้ว</label>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>ชื่อ</th><th>ชุด</th><th class="num">ครั้ง</th><th class="num">วันลารวม</th><th></th><th>ครั้งล่าสุด</th></tr></thead>
+      <tbody id="ptbody"></tbody>
+    </table></div>
+  </section>
+
+  <!-- วันลาคงเหลือ -->
+  <section data-view="balance" hidden>
+    <div class="filters">
+      <input id="bq" placeholder="ค้นหาชื่อ">
+      <select id="bTeam"><option value="">ทุกชุดปฏิบัติการ</option></select>
+    </div>
+    <p class="mode-note" id="balNote"></p>
+    <div class="tbl-wrap"><table class="bal">
+      <thead><tr><th>ชื่อ</th><th>ชุด</th><th>ลาพักผ่อน<br>ประจำปี</th><th>ลาพักผ่อน<br>สะสม</th><th>ลาพักผ่อน<br>คงเหลือรวม</th><th title="วันลาพักผ่อนที่เหลือ ซึ่งจะยกไปเป็นวันลาสะสมของปีงบประมาณถัดไป">ลาสะสม<br>ยกไปปีหน้า</th><th class="ks">ลากิจ</th><th class="ks">ลาป่วย</th><th class="mat">ลาคลอดบุตร</th><th>อื่น ๆ</th><th class="adm"></th></tr></thead>
+      <tbody id="btbody"></tbody>
+    </table></div>
+    <p class="muted" style="font-size:13px">"ลาสะสม ยกไปปีหน้า" = วันลาพักผ่อนที่เหลือซึ่งจะเป็นวันสะสมของปีงบฯ ถัดไป (ยกไปได้ไม่เกินตัวเลขหลัง /) · * = ปีถัดไปเป็นปีเริ่มนับใหม่ ยังไม่ยกไปอัตโนมัติ ใช้ตัวเลขนี้กรอกที่ปุ่ม "แก้สิทธิ์" ได้<br>กดที่ชื่อเพื่อดูรายการลาของคนนั้น · วันสะสม "คำนวณจากปี…" = วันลาพักผ่อนที่เหลือของปีก่อน โดยประจำปี + สะสม ไม่เกิน 20 วัน (30 วันถ้ารับราชการ 10 ปีขึ้นไป) · ผู้อนุมัติกรอกวันสะสมยกมาและวันเริ่มรับราชการตามทะเบียนประวัติได้ที่ปุ่ม "แก้สิทธิ์"</p>
+  </section>
+
+  <!-- กราฟสรุป -->
+  <section data-view="charts" hidden>
+    <div class="filters">
+      <label class="muted" style="display:flex;gap:6px;align-items:center;font-size:14px">เทียบกับปีงบฯ <select id="cmpYear"></select></label>
+      <select id="cStatus"><option value="active">ทุกรายการ (ไม่นับยกเลิก/ไม่อนุมัติ)</option><option value="ok">เฉพาะที่อนุมัติแล้ว</option></select>
+      <button class="btn sec" id="printBtn">พิมพ์ / บันทึก PDF</button>
+    </div>
+    <p class="mode-note" id="chartNote"></p>
+    <div class="grid kpis" id="cKpis"></div>
+    <div class="card" style="margin-top:14px">
+      <h2 id="cMonthTitle">วันลารายเดือน</h2>
+      <div class="chart-box"><canvas id="cMonth" role="img" aria-label="กราฟวันลารายเดือน"></canvas></div>
+      <details class="tv"><summary>ดูเป็นตาราง</summary><div class="tbl-wrap" id="tMonth"></div></details>
+    </div>
+    <div class="chart-row" style="margin-top:14px">
+      <div class="card"><h2>วันลาแยกตามชุดปฏิบัติการ</h2><div class="chart-box"><canvas id="cTeam" role="img" aria-label="กราฟวันลาแยกตามชุด"></canvas></div>
+        <details class="tv"><summary>ดูเป็นตาราง</summary><div class="tbl-wrap" id="tTeam"></div></details></div>
+      <div class="card"><h2>วันลาแยกตามประเภท</h2><div class="chart-box"><canvas id="cType" role="img" aria-label="กราฟวันลาแยกตามประเภท"></canvas></div>
+        <details class="tv"><summary>ดูเป็นตาราง</summary><div class="tbl-wrap" id="tType"></div></details></div>
+    </div>
+  </section>
+
+  <!-- ตรวจข้อมูล (ผู้อนุมัติ) -->
+  <section data-view="check" hidden>
+    <div class="filters" style="align-items:center">
+      <label class="muted" style="display:flex;gap:8px;align-items:center;font-size:15px">ตรวจปีงบประมาณ <select id="chkYear"></select></label>
+      <span class="muted" id="chkSum" style="font-size:14px"></span>
+    </div>
+    <p class="mode-note">ปุ่ม "แก้" จะเขียนค่าที่แนะนำลงชีตทันที ตรวจค่าที่แนะนำก่อนกด · รายการที่แก้แล้วจะหายไปเมื่อโหลดข้อมูลใหม่ · รายการที่ไม่ได้ใส่ปีงบฯ แสดงทุกปี</p>
+    <div id="chkBody" class="grid" style="gap:14px"></div>
+  </section>
+
+  <!-- ตั้งค่า (ผู้อนุมัติ) -->
+  <section data-view="settings" hidden>
+    <form id="setForm" class="set">
+      <div class="card" style="display:grid;gap:12px;align-content:start">
+        <h2 style="margin:0">การนับวันลา</h2>
+        <label class="radio"><input type="radio" name="countMode" value="law"> <span><b>ตามระเบียบการลา (แนะนำ)</b><br><span class="muted">ลาพักผ่อน ลากิจ ลาป่วย ลาช่วยภริยาคลอด นับวันทำการ · ลาคลอดบุตร ลาอุปสมบท นับวันปฏิทินรวมวันหยุด</span></span></label>
+        <label class="radio"><input type="radio" name="countMode" value="calendar"> <span><b>นับวันปฏิทินทุกประเภท</b><br><span class="muted">นับทุกวันรวมเสาร์-อาทิตย์และวันหยุด</span></span></label>
+        <label class="radio"><input type="radio" name="countMode" value="work"> <span><b>นับวันทำการทุกประเภท</b><br><span class="muted">ไม่นับเสาร์-อาทิตย์และวันหยุดราชการ</span></span></label>
+        <h2 style="margin:8px 0 0">สิทธิ์ลาตามระเบียบ</h2>
+        <p class="src" style="margin:-6px 0 0">ค่าเริ่มต้นตามระเบียบสำนักนายกรัฐมนตรีว่าด้วยการลาของข้าราชการ พ.ศ. 2555 ซึ่งใช้กับข้าราชการตำรวจ</p>
+        <label>ลาพักผ่อนประจำปี (วันทำการ/ปีงบฯ)<input type="number" name="annualDays" min="0" max="60"></label>
+        <label>ประจำปี + สะสม รวมไม่เกิน — รับราชการไม่ถึง 10 ปี (วัน)<input type="number" name="carryCap" min="0" max="90"></label>
+        <label>ประจำปี + สะสม รวมไม่เกิน — รับราชการ 10 ปีขึ้นไป (วัน)<input type="number" name="carryCap10" min="0" max="90"><span class="src">ต้องกรอก "วันเริ่มรับราชการ" รายคน ระบบจึงรู้ว่าใครใช้เพดาน 30 วัน และใครยังรับราชการไม่ครบ 6 เดือน (ยังไม่มีสิทธิ์ลาพักผ่อน)</span></label>
+        <label>ยศตั้งแต่นี้ขึ้นไป ถือว่ารับราชการ 10 ปีขึ้นไป (ใช้เพดาน 30 วัน)<select name="seniorRank"><option value="">ไม่ใช้ (ดูจากวันเริ่มรับราชการเท่านั้น)</option><option>ส.ต.ต.</option><option>ส.ต.ท.</option><option>ส.ต.อ.</option><option>จ.ส.ต.</option><option>ด.ต.</option><option>ร.ต.ต.</option><option>ร.ต.ท.</option><option>ร.ต.อ.</option><option>พ.ต.ต.</option><option>พ.ต.ท.</option><option>พ.ต.อ.</option></select><span class="src">ใช้เมื่อยังไม่ได้กรอกวันเริ่มรับราชการของคนนั้น</span></label>
+        <label>วันลาสะสมตั้งต้นในปีเริ่มนับ สำหรับยศข้างบน (วัน)<input type="number" name="seniorBaseCarry" min="0" max="30"><span class="src">เว้นว่าง = 0 · กรอกรายคนที่ปุ่ม "แก้สิทธิ์" จะใช้ค่านั้นแทน</span></label>
+        <label>วันลาสะสมตั้งต้นในปีเริ่มนับ สำหรับยศต่ำกว่า (วัน)<input type="number" name="juniorBaseCarry" min="0" max="20"><span class="src">เว้นว่าง = 0 · กรอกรายคนจะใช้ค่านั้นแทน</span></label>
+        <label>ใช้วันลาพักผ่อนส่วนไหนก่อน<select name="useOrder"><option value="annual">ใช้วันประจำปีก่อน แล้วค่อยใช้วันสะสม</option><option value="carry">ใช้วันสะสมก่อน แล้วค่อยใช้วันประจำปี</option></select></label>
+        <label>แสดงช่องลากิจ / ลาป่วย ในหน้าวันลาคงเหลือ<select name="showKijSick"><option value="0">ซ่อนไว้ก่อน</option><option value="1">แสดง</option></select></label>
+        <label>ลากิจส่วนตัว (วันทำการ/ปี)<input type="number" name="quotaKij" min="0" max="365"></label>
+        <label>ลากิจ ในปีแรกที่เข้ารับราชการ (วันทำการ)<input type="number" name="quotaKijFirst" min="0" max="365"></label>
+        <label>ลาป่วย (วันทำการ/ปี ที่ผู้บังคับบัญชาอนุญาตได้ตามปกติ)<input type="number" name="quotaSick" min="0" max="365"></label>
+        <label>ลาคลอดบุตร (วันปฏิทิน/ครั้ง)<input type="number" name="quotaMat" min="0" max="365"></label>
+        <label>ลาไปช่วยเหลือภริยาที่คลอดบุตร (วันทำการ/ครั้ง)<input type="number" name="quotaPat" min="0" max="365"></label>
+        <label>รายการที่ไม่ระบุประเภท ให้ถือเป็น<select name="defaultType"><option>ลาพักผ่อน</option><option>ไม่นับเป็นวันลาพักผ่อน</option></select></label>
+      </div>
+      <div class="card" style="display:grid;gap:10px;align-content:start">
+        <h2 style="margin:0">วันหยุดราชการ</h2>
+        <p class="muted" style="margin:0;font-size:13px">หนึ่งบรรทัดต่อหนึ่งวัน รูปแบบ <b>วว/ดด/ปปปป(พ.ศ.) ชื่อวันหยุด</b> เช่น <code>13/10/2569 วันนวมินทรมหาราช</code> · เพิ่มวันหยุดพิเศษตามมติ ครม. หรือวันหยุดเฉพาะจังหวัดได้</p>
+        <textarea name="holidays" spellcheck="false"></textarea>
+        <span class="src" id="holCount"></span>
+      </div>
+      <div class="card" style="display:grid;gap:10px;align-content:start">
+        <h2 style="margin:0">เพดานการลาพร้อมกันต่อชุด</h2>
+        <p class="muted" style="margin:0;font-size:13px">จำนวนคนสูงสุดที่ลาพร้อมกันได้ในวันเดียวกัน (นับรายการรออนุมัติด้วย) · เว้นว่าง = ไม่จำกัด · วันที่เกินจะขึ้นแดงในปฏิทินและฟอร์มยื่นลาจะเตือน</p>
+        <div class="caps" id="capInputs"></div>
+        <label>ชุดอื่นที่ไม่ได้กำหนด (คน)<input type="number" name="capDefault" min="0" max="99" placeholder="ไม่จำกัด"></label>
+      </div>
+      <div class="card" style="display:grid;gap:10px;align-content:start">
+        <h2 style="margin:0">ข้อมูลสำหรับพิมพ์ใบลา</h2>
+        <label>เขียนที่ (ชื่อหน่วย/สถานที่)<input name="printPlace" maxlength="120" placeholder="เช่น สภ.บางพลี"></label>
+        <label>สังกัด<input name="orgName" maxlength="120" placeholder="เช่น งานป้องกันปราบปราม สภ.บางพลี"></label>
+        <label>เรียน (ผู้มีอำนาจอนุญาต)<input name="toWhom" maxlength="120" placeholder="เช่น ผกก.สภ.บางพลี"></label>
+        <span class="src">เว้นว่างได้ ใบลาจะเป็นเส้นประให้เขียนเอง</span>
+      </div>
+      <div class="card" style="grid-column:1/-1;display:grid;gap:10px">
+        <h2 style="margin:0">เริ่มนับสิทธิ์ลาพักผ่อนใหม่</h2>
+        <p class="muted" style="margin:0;font-size:13px">วันลาสะสมจะเริ่มคำนวณต่อเนื่องตั้งแต่ปีงบฯ ที่เลือก ในปีนั้นวันสะสมยกมาของทุกคนเป็น 0 จนกว่าจะกรอกตัวเลขจากทะเบียนประวัติ (หน้าวันลาคงเหลือ › แก้สิทธิ์) ข้อมูลการลาเดิมในชีตไม่ถูกลบ</p>
+        <label style="max-width:320px">ปีงบประมาณที่เริ่มนับ<select name="baseFy"></select></label>
+        <div><button class="btn bad" type="button" id="entReset">ล้างสิทธิ์ลาที่กำหนดรายคนทั้งหมด</button> <span class="src">ล้างแท็บ "สิทธิ์ลา" (วันสะสม วันประจำปี และวันเริ่มรับราชการที่กรอกไว้) กลับไปใช้ค่าตามระเบียบ</span></div>
+      </div>
+      <div style="grid-column:1/-1;display:flex;gap:8px"><button class="btn" type="submit" id="setSave">บันทึกการตั้งค่า</button><button class="btn sec" type="button" id="setReset">คืนค่าวันหยุดเริ่มต้น</button></div>
+    </form>
+  </section>
+
+  <!-- ยื่นใบลา -->
+  <section data-view="new" hidden>
+    <div class="newgrid">
+      <div class="card newform">
+        <h2 id="formTitle">ยื่นใบลา</h2>
+        <form class="f nf" id="form" autocomplete="off">
+          <label class="a-name">ยศ ชื่อ สกุล<input name="name" list="names" required placeholder="เช่น ส.ต.ท.สมชาย ใจดี"></label>
+          <label class="a-team">ชุดปฏิบัติการที่<input name="team" list="teams" required placeholder="เช่น 1, 2, 3, ธุรการ ป"></label>
+          <label class="a-type">ประเภทการลา<select name="type"><option>ลาพักผ่อน</option><option>ลากิจ</option><option>ลาป่วย</option><option>ลาคลอดบุตร</option><option value="ลาช่วยภริยาคลอด">ลาไปช่วยเหลือภริยาที่คลอดบุตร</option><option value="ลาบวช">ลาอุปสมบท / ลาประกอบพิธีฮัจย์</option><option>อื่น ๆ</option></select></label>
+          <div class="lbl a-start">ตั้งแต่วันที่<div class="dp" data-name="start"><button type="button" class="dp-show">เลือกวันที่</button><input type="hidden" name="start"></div></div>
+          <div class="lbl a-end">ถึงวันที่<div class="dp" data-name="end"><button type="button" class="dp-show">เลือกวันที่</button><input type="hidden" name="end"></div></div>
+          <label class="a-note">หมายเหตุ / เหตุผลการลา<input name="note" maxlength="200" placeholder="ไม่บังคับ"></label>
+          <div class="a-btn" style="display:flex;gap:10px">
+            <button class="btn btn-lg" type="submit" id="submitBtn">ส่งใบลา</button>
+            <button class="btn sec btn-lg" type="button" id="cancelEdit" hidden>ยกเลิกการแก้ไข</button>
+          </div>
+        </form>
+      </div>
+      <aside class="card newside">
+        <h2>ตรวจก่อนส่ง</h2>
+        <div class="preview" id="preview">เลือกวันที่เพื่อดูตัวอย่างข้อมูลที่จะบันทึกลงชีต</div>
+        <div class="warnbox" id="overlap" hidden></div>
+        <p class="muted" style="font-size:14px;margin:12px 0 0">ใบลาที่ส่งจะมีสถานะ "รออนุมัติ" จนกว่าผู้อนุมัติจะตรวจ</p>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<datalist id="names"></datalist><datalist id="teams"></datalist>
+
+<div id="okPop" class="okpop" hidden role="status" aria-live="polite">
+  <div class="okcard">
+    <svg class="okmark" viewBox="0 0 80 80" aria-hidden="true"><circle class="ring" cx="40" cy="40" r="36"/><path class="tick" d="M24 41 l11 11 l21 -23"/></svg>
+    <h3 id="okTitle">เข้าสู่ระบบสำเร็จ</h3>
+    <p id="okSub">กำลังเปลี่ยนเส้นทางไปยังโหมดผู้อนุมัติ…</p>
+  </div>
+</div>
+<dialog id="pinDlg">
+  <form method="dialog" id="pinForm" style="display:grid;gap:12px">
+    <h2 style="margin:0">โหมดผู้อนุมัติ</h2>
+    <p class="muted" style="margin:0;font-size:14px">ใส่รหัสผู้อนุมัติเพื่ออนุมัติ แก้ไข หรือลบรายการ</p>
+    <input type="password" id="pinInput" inputmode="numeric" placeholder="รหัส" class="f" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn sec" value="cancel" type="button" onclick="pinDlg.close()">ยกเลิก</button>
+      <button class="btn" id="pinOk" type="submit">ยืนยัน</button>
+    </div>
+  </form>
+</dialog>
+<dialog id="entDlg">
+  <form id="entForm" style="display:grid;gap:12px">
+    <h2 style="margin:0" id="entTitle">สิทธิ์ลาพักผ่อน</h2>
+    <p class="muted" style="margin:0;font-size:14px" id="entSub"></p>
+    <label class="f" style="display:grid;gap:4px;font-size:13px;color:var(--muted)">วันเริ่มรับราชการ (วว/ดด/ปปปป พ.ศ.)<input name="start" placeholder="เช่น 01/04/2558" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--text)"><span class="src" id="entSvc"></span></label>
+    <label class="f" style="display:grid;gap:4px;font-size:13px;color:var(--muted)">ลาพักผ่อนสะสมยกมา (วัน)<input type="number" name="carry" min="0" max="60" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--text)"><span class="src" id="entCarryHint"></span></label>
+    <label class="f" style="display:grid;gap:4px;font-size:13px;color:var(--muted)">ลาพักผ่อนประจำปี (วัน)<input type="number" name="annual" min="0" max="60" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--text)"><span class="src">เว้นว่าง = ตามระเบียบ (10 วัน หรือ 0 ถ้ารับราชการยังไม่ครบ 6 เดือน)</span></label>
+    <label class="f" style="display:grid;gap:4px;font-size:13px;color:var(--muted)">หมายเหตุ<input name="note" maxlength="120" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface);color:var(--text)"></label>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn sec" type="button" onclick="entDlg.close()">ยกเลิก</button>
+      <button class="btn" type="submit">บันทึก</button>
+    </div>
+  </form>
+</dialog>
+<dialog id="apDlg" class="apdlg">
+  <form id="apForm" style="display:grid;gap:14px">
+    <h2 style="margin:0">อนุมัติการลา</h2>
+    <div class="aphead" id="apHead"></div>
+    <div class="apgrid">
+      <label>ลาครั้งนี้รวม (วัน)<input type="number" name="td" min="0" max="400" step="0.5" required></label>
+      <label>เป็นวันทำการ (วัน)<input type="number" name="wd" min="0" max="400" step="0.5" required></label>
+    </div>
+    <div class="preview" id="apCalc"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn sec" type="button" onclick="apDlg.close()">ยกเลิก</button>
+      <button class="btn ok" type="submit" id="apOk">อนุมัติและบันทึก</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast"></div>
+<div id="printArea"></div>
+
+<script>
+/* ================== วันที่ / ภาษาไทย ================== */
+const MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const MONTHS_FULL = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+const monthIdx = s => MONTHS.indexOf(String(s||'').replace(/\s/g,'')) ; // 0-11 or -1
+const ceYear = (fy, m0) => (m0 >= 9 ? fy - 544 : fy - 543);          // ปีงบฯ เริ่ม ต.ค.
+const fyOf = d => (d.getMonth() >= 9 ? d.getFullYear() + 1 : d.getFullYear()) + 543;
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const fromIso = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const thShort = d => `${d.getDate()} ${MONTHS[d.getMonth()]} ${String(d.getFullYear()+543).slice(2)}`;
+function rangeDays(a, b){ const out=[]; for(let d=a; d<=b && out.length<400; d=addDays(d,1)) out.push(iso(d)); return out; }
+
+/* ================== ตั้งค่า / วันหยุด / ประเภทการลา ================== */
+// วันหยุดราชการเริ่มต้น (ต.ค. 2566 – ก.ย. 2570) ผู้อนุมัติแก้ได้ในหน้า "ตั้งค่า" — ปี 2570 ควรตรวจกับประกาศ ครม. อีกครั้ง
+const DEFAULT_HOLIDAYS = [["2023-10-13", "วันนวมินทรมหาราช"], ["2023-10-23", "วันปิยมหาราช"], ["2023-12-05", "วันชาติ/วันพ่อแห่งชาติ"], ["2023-12-10", "วันรัฐธรรมนูญ"], ["2023-12-11", "ชดเชยวันรัฐธรรมนูญ"], ["2023-12-29", "วันหยุดพิเศษ (มติ ครม.)"], ["2023-12-31", "วันสิ้นปี"], ["2024-01-01", "วันขึ้นปีใหม่"], ["2024-01-02", "ชดเชยวันสิ้นปี"], ["2024-02-24", "วันมาฆบูชา"], ["2024-02-26", "ชดเชยวันมาฆบูชา"], ["2024-04-06", "วันจักรี"], ["2024-04-08", "ชดเชยวันจักรี"], ["2024-04-12", "วันหยุดพิเศษ (มติ ครม.)"], ["2024-04-13", "วันสงกรานต์"], ["2024-04-14", "วันสงกรานต์"], ["2024-04-15", "วันสงกรานต์"], ["2024-04-16", "ชดเชยวันสงกรานต์"], ["2024-05-04", "วันฉัตรมงคล"], ["2024-05-06", "ชดเชยวันฉัตรมงคล"], ["2024-05-10", "วันพืชมงคล"], ["2024-05-22", "วันวิสาขบูชา"], ["2024-06-03", "วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี"], ["2024-07-20", "วันอาสาฬหบูชา"], ["2024-07-21", "วันเข้าพรรษา"], ["2024-07-22", "ชดเชยวันอาสาฬหบูชา"], ["2024-07-28", "วันเฉลิมพระชนมพรรษา ร.10"], ["2024-07-29", "ชดเชยวันเฉลิมพระชนมพรรษา ร.10"], ["2024-08-12", "วันแม่แห่งชาติ"], ["2024-10-13", "วันนวมินทรมหาราช"], ["2024-10-14", "ชดเชยวันนวมินทรมหาราช"], ["2024-10-23", "วันปิยมหาราช"], ["2024-12-05", "วันชาติ/วันพ่อแห่งชาติ"], ["2024-12-10", "วันรัฐธรรมนูญ"], ["2024-12-30", "วันหยุดพิเศษ (มติ ครม.)"], ["2024-12-31", "วันสิ้นปี"], ["2025-01-01", "วันขึ้นปีใหม่"], ["2025-02-12", "วันมาฆบูชา"], ["2025-04-06", "วันจักรี"], ["2025-04-07", "ชดเชยวันจักรี"], ["2025-04-13", "วันสงกรานต์"], ["2025-04-14", "วันสงกรานต์"], ["2025-04-15", "วันสงกรานต์"], ["2025-04-16", "ชดเชยวันสงกรานต์"], ["2025-05-01", "วันแรงงานแห่งชาติ"], ["2025-05-04", "วันฉัตรมงคล"], ["2025-05-05", "ชดเชยวันฉัตรมงคล"], ["2025-05-09", "วันพืชมงคล"], ["2025-05-11", "วันวิสาขบูชา"], ["2025-05-12", "ชดเชยวันวิสาขบูชา"], ["2025-06-02", "วันหยุดพิเศษ (มติ ครม.)"], ["2025-06-03", "วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี"], ["2025-07-10", "วันอาสาฬหบูชา"], ["2025-07-11", "วันเข้าพรรษา"], ["2025-07-28", "วันเฉลิมพระชนมพรรษา ร.10"], ["2025-08-11", "วันหยุดพิเศษ (มติ ครม.)"], ["2025-08-12", "วันแม่แห่งชาติ"], ["2025-10-13", "วันนวมินทรมหาราช"], ["2025-10-23", "วันปิยมหาราช"], ["2025-12-05", "วันชาติ/วันพ่อแห่งชาติ"], ["2025-12-10", "วันรัฐธรรมนูญ"], ["2025-12-31", "วันสิ้นปี"], ["2026-01-01", "วันขึ้นปีใหม่"], ["2026-01-02", "วันหยุดพิเศษ (มติ ครม.)"], ["2026-03-03", "วันมาฆบูชา"], ["2026-04-06", "วันจักรี"], ["2026-04-13", "วันสงกรานต์"], ["2026-04-14", "วันสงกรานต์"], ["2026-04-15", "วันสงกรานต์"], ["2026-05-01", "วันแรงงานแห่งชาติ"], ["2026-05-04", "วันฉัตรมงคล"], ["2026-05-13", "วันพืชมงคล"], ["2026-05-31", "วันวิสาขบูชา"], ["2026-06-01", "ชดเชยวันวิสาขบูชา"], ["2026-06-03", "วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี"], ["2026-07-28", "วันเฉลิมพระชนมพรรษา ร.10"], ["2026-07-29", "วันอาสาฬหบูชา"], ["2026-07-30", "วันเข้าพรรษา"], ["2026-08-12", "วันแม่แห่งชาติ"], ["2026-10-13", "วันนวมินทรมหาราช"], ["2026-10-23", "วันปิยมหาราช"], ["2026-12-05", "วันชาติ/วันพ่อแห่งชาติ"], ["2026-12-07", "ชดเชยวันชาติ/วันพ่อแห่งชาติ"], ["2026-12-10", "วันรัฐธรรมนูญ"], ["2026-12-31", "วันสิ้นปี"], ["2027-01-01", "วันขึ้นปีใหม่"], ["2027-02-20", "วันมาฆบูชา"], ["2027-02-22", "ชดเชยวันมาฆบูชา"], ["2027-04-06", "วันจักรี"], ["2027-04-13", "วันสงกรานต์"], ["2027-04-14", "วันสงกรานต์"], ["2027-04-15", "วันสงกรานต์"], ["2027-05-01", "วันแรงงานแห่งชาติ"], ["2027-05-03", "ชดเชยวันแรงงานแห่งชาติ"], ["2027-05-04", "วันฉัตรมงคล"], ["2027-05-20", "วันวิสาขบูชา"], ["2027-06-03", "วันเฉลิมพระชนมพรรษา สมเด็จพระราชินี"], ["2027-07-18", "วันอาสาฬหบูชา"], ["2027-07-19", "วันเข้าพรรษา"], ["2027-07-20", "ชดเชยวันอาสาฬหบูชา"], ["2027-07-28", "วันเฉลิมพระชนมพรรษา ร.10"], ["2027-08-12", "วันแม่แห่งชาติ"]];
+const DEFAULT_SETTINGS = { countMode:'law', annualDays:10, carryCap:20, carryCap10:30, useOrder:'annual', quotaKij:45, quotaKijFirst:15, quotaSick:60, quotaMat:90, quotaPat:15, defaultType:'ลาพักผ่อน', showKijSick:'0', seniorRank:'จ.ส.ต.', seniorBaseCarry:20, juniorBaseCarry:10, baseFy: fyOf(new Date()), capDefault:'', printPlace:'', orgName:'', toWhom:'' };
+const SET_KEYS = ['seniorRank','seniorBaseCarry','juniorBaseCarry','showKijSick','annualDays','carryCap','carryCap10','useOrder','quotaKij','quotaKijFirst','quotaSick','quotaMat','quotaPat','defaultType','baseFy','capDefault','printPlace','orgName','toWhom'];
+let CFG = { ...DEFAULT_SETTINGS, holidays: new Map(DEFAULT_HOLIDAYS), holidaysCustom: false, entitlements: [] };
+function applyConfig(c){
+  const st = (c && c.settings) || {};
+  CFG = { ...DEFAULT_SETTINGS, entitlements: (c && c.entitlements) || [] };
+  for (const k of Object.keys(DEFAULT_SETTINGS)) if (st[k] !== undefined && st[k] !== '') CFG[k] = typeof DEFAULT_SETTINGS[k] === 'number' ? Number(st[k]) : st[k];
+  CFG.teamCaps = {};
+  for (const k of Object.keys(st)) if (k.startsWith('cap:') && st[k] !== '') CFG.teamCaps[k.slice(4)] = Number(st[k]);
+  CFG.holidaysCustom = !!(c && c.holidays);
+  CFG.holidays = new Map(CFG.holidaysCustom ? c.holidays : DEFAULT_HOLIDAYS);
+}
+const isWorkday = k => { const d = fromIso(k).getDay(); return d !== 0 && d !== 6 && !CFG.holidays.has(k); };
+// ตามระเบียบ: ลาคลอดบุตรและลาอุปสมบทนับวันปฏิทิน (รวมวันหยุด) ประเภทอื่นนับวันทำการ
+const CALENDAR_TYPES = ['ลาคลอดบุตร','ลาบวช'];
+const usesWorkdays = type => CFG.countMode === 'work' || (CFG.countMode === 'law' && !CALENDAR_TYPES.includes(type));
+const countedDates = (dates, type) => usesWorkdays(type) ? dates.filter(isWorkday) : dates;
+const countDays = (dates, type) => countedDates(dates, type).length;
+const modeLabel = () => CFG.countMode === 'work' ? 'นับวันทำการทุกประเภท' : CFG.countMode === 'calendar' ? 'นับวันปฏิทินทุกประเภท (รวมเสาร์-อาทิตย์และวันหยุด)' : 'นับตามระเบียบ: ลาพักผ่อน/ลากิจ/ลาป่วย นับวันทำการ · ลาคลอด/ลาอุปสมบท นับวันปฏิทิน';
+const LEAVE_TYPES = ['ลาพักผ่อน','ลากิจ','ลาป่วย','ลาคลอดบุตร','ลาช่วยภริยาคลอด','ลาบวช','อื่น ๆ'];
+function typeOf(r){
+  const t = String(r.note||'') + ' ' + String(r.days||'');
+  if (/ป่วย/.test(t)) return ['ลาป่วย', false];
+  if (/กิจ/.test(t)) return ['ลากิจ', false];
+  if (/ภริยา|ภรรยา/.test(t)) return ['ลาช่วยภริยาคลอด', false];
+  if (/คลอด/.test(t)) return ['ลาคลอดบุตร', false];
+  if (/บวช|อุปสมบท|ฮัจย์/.test(t)) return ['ลาบวช', false];
+  if (/พักผ่อน/.test(t)) return ['ลาพักผ่อน', false];
+  if (/อื่น/.test(t)) return ['อื่น ๆ', false];
+  return [CFG.defaultType === 'ลาพักผ่อน' ? 'ลาพักผ่อน' : 'ไม่ระบุ', true];
+}
+// ตัวระบุบุคคล: ตัดยศและช่องว่างออก เพื่อให้คนเดิมที่เลื่อนยศแล้วนับรวมกัน
+const pkey = n => String(n||'').replace(/^([ก-๙]{1,4}\.+)+\s*/, '').replace(/[\s.]+/g, '');
+
+/** แปลงแถวในชีต (วันที่ลา + เดือน + ปีงบฯ + หมายเหตุ) เป็นรายการวันจริง */
+function parseDates(r){
+  const fy = parseInt(r.fy, 10);
+  if (!fy) return [];
+  // 1) ช่วงข้ามเดือนที่ระบุชื่อเดือน เช่น "28 ก.ค.- 2 ส.ค." (ในหมายเหตุ หรือในช่องวันที่ลา)
+  const M = '([ก-๙]{1,3}\\.\\s?[ก-๙]{1,2}\\.?)';
+  const re = new RegExp('(\\d{1,2})\\s*' + M + '\\s*(?:\\d{2,4})?\\s*[-–]\\s*(\\d{1,2})\\s*' + M);
+  for (const src of [r.note, r.days]){
+    const mm = String(src||'').match(re);
+    if (!mm) continue;
+    const m1 = monthIdx(mm[2]), m2 = monthIdx(mm[4]);
+    if (m1 < 0 || m2 < 0) continue;
+    const a = new Date(ceYear(fy, m1), m1, +mm[1]);
+    let b = new Date(ceYear(fy, m2), m2, +mm[3]);
+    if (b < a) b = new Date(b.getFullYear()+1, m2, +mm[3]);
+    return rangeDays(a, b);
+  }
+  // เดือน: ปกติ "ต.ค." หรือแบบสองเดือน "มิ.ย.-ก.ค."
+  const ms = String(r.month||'').split(/\s*[-–]\s*/).map(monthIdx).filter(m => m >= 0);
+  if (!ms.length) return [];
+  const m0 = ms[0], mEnd = ms[ms.length-1];
+  const y0 = ceYear(fy, m0), yEnd = ceYear(fy, mEnd) + (mEnd < m0 && mEnd >= 9 ? 1 : 0);
+  // 2) แยกหลายส่วนด้วย "," หรือ "กับ" เช่น "17 , 21-22" / "28 กับ 30"
+  const out = [];
+  for (const part of String(r.days||'').split(/,|กับ|และ/)){
+    const t = part.trim(); if (!t) continue;
+    const rg = t.match(/^(\d{1,2})\s*[-–]\s*(\d{1,2})$/);
+    if (rg){
+      const d1 = +rg[1], d2 = +rg[2];
+      if (ms.length > 1) out.push(...rangeDays(new Date(y0, m0, d1), new Date(yEnd, mEnd, d2)));
+      else if (d2 >= d1) out.push(...rangeDays(new Date(y0, m0, d1), new Date(y0, m0, d2)));
+      else out.push(...rangeDays(new Date(y0, m0 - 1, d1), new Date(y0, m0, d2))); // "26-9" = เริ่มเดือนก่อน
+    } else {
+      (t.match(/\d{1,2}/g)||[]).map(Number).filter(n => n>=1 && n<=31).forEach(n => out.push(iso(new Date(y0, m0, n))));
+    }
+  }
+  return [...new Set(out)].sort();
+}
+
+/** แปลงวันที่จากฟอร์มเป็นรูปแบบคอลัมน์ในชีต */
+function toSheetFormat(startIso, endIso){
+  const a = fromIso(startIso), b = fromIso(endIso);
+  const sameMonth = a.getMonth()===b.getMonth() && a.getFullYear()===b.getFullYear();
+  const days = (iso(a)===iso(b)) ? String(a.getDate()) : `${a.getDate()}-${b.getDate()}`;
+  return {
+    days,
+    month: MONTHS[a.getMonth()],
+    fy: String(fyOf(a)),
+    span: sameMonth ? '' : `${a.getDate()} ${MONTHS[a.getMonth()]}-${b.getDate()} ${MONTHS[b.getMonth()]}`,
+    count: rangeDays(a, b).length
+  };
+}
+
+/* ================== ข้อมูล / API ================== */
+const DEMO = !API_URL;
+let state = { tabs: [], all: [], years: [], year: '', rows: [], tab: 'home', admin: sessionStorage.getItem('pin') || '', sort: {k:'seq', dir:1}, cal: null, editing: null };
+
+function demoData(){
+  const fy = fyOf(new Date());
+  const ppl = [['ร.ต.อ.สมมติ หนึ่ง','1'],['ด.ต.ตัวอย่าง สอง','2'],['จ.ส.ต.ทดลอง สาม','3'],['ส.ต.ท.ข้อมูล สี่','1'],['ส.ต.อ.สาธิต ห้า','ธุรการ ป'],['ด.ต.เดโม หก','วิทยุ']];
+  const t = new Date(); const rows = []; let no = 1;
+  const push = (p, a, b, st, note='') => { const f = toSheetFormat(iso(a), iso(b)); rows.push({row:no+2,no:String(no++),name:p[0],team:p[1],days:f.days,month:f.month,fy:f.fy,status:st,note:f.span || note}); };
+  push(ppl[0], addDays(t,-20), addDays(t,-17), 'อนุมัติ');
+  push(ppl[1], addDays(t,-1), addDays(t,2), 'อนุมัติ');
+  push(ppl[2], t, t, 'อนุมัติ');
+  push(ppl[3], addDays(t,5), addDays(t,8), 'รออนุมัติ');
+  push(ppl[4], addDays(t,10), addDays(t,11), 'รออนุมัติ', 'ลากิจ');
+  push(ppl[5], addDays(t,-40), addDays(t,-36), 'อนุมัติ');
+  push(ppl[0], addDays(t,25), addDays(t,29), 'รออนุมัติ');
+  return { years: [String(fy)], year: String(fy), rows };
+}
+
+async function api(method, payload){
+  if (DEMO) return demoApi(method, payload);
+  let res;
+  if (method === 'GET'){
+    res = await fetch(API_URL + '?' + new URLSearchParams(payload).toString());
+  } else {
+    // ส่งเป็น text/plain เพื่อไม่ให้เกิด CORS preflight กับ Apps Script
+    res = await fetch(API_URL, { method:'POST', body: JSON.stringify(payload) });
+  }
+  const j = await res.json();
+  if (!j.ok) throw new Error(j.error || 'เกิดข้อผิดพลาด');
+  return j;
+}
+let demoStore = null;
+function demoApi(method, p){
+  demoStore = demoStore || demoData();
+  if (method === 'GET' && p.action === 'config') return Promise.resolve({ ok:true, settings: demoStore.settings || {}, entitlements: demoStore.ent || [], holidays: demoStore.holidays || null });
+  if (method === 'GET') return Promise.resolve({ ok:true, ...demoStore, rows: demoStore.rows.map(r=>({...r})) });
+  if (p.action === 'saveConfig'){ if (p.settings) demoStore.settings = p.settings; if (p.holidays) demoStore.holidays = p.holidays; return Promise.resolve({ok:true}); }
+  if (p.action === 'resetEntitlements'){ demoStore.ent = []; return Promise.resolve({ok:true}); }
+  if (p.action === 'saveEntitlement'){ demoStore.ent = (demoStore.ent||[]).filter(e => !(e.name===p.name && e.fy===p.fy)).concat([{name:p.name,fy:p.fy,annual:p.annual,carry:p.carry,note:p.note,start:p.start}]); return Promise.resolve({ok:true}); }
+  if (['status','edit','delete','login'].includes(p.action) && p.pin !== '1234') return Promise.reject(new Error('รหัสผู้อนุมัติไม่ถูกต้อง (โหมดตัวอย่างใช้ 1234)'));
+  const R = demoStore.rows;
+  if (p.action==='add') R.push({row:R.length+3,no:String(R.length+1),name:p.name,team:p.team,days:p.days,month:p.month,fy:p.fy,status:'รออนุมัติ',note:p.note});
+  if (p.action==='status') Object.assign(R.find(r=>r.row===p.row), { status: p.status, td: p.status==='อนุมัติ' ? (p.td ?? '') : '', wd: p.status==='อนุมัติ' ? (p.wd ?? '') : '' });
+  if (p.action==='edit') Object.assign(R.find(r=>r.row===p.row), {name:p.name,team:p.team,days:p.days,month:p.month,fy:p.fy,status:p.status,note:p.note});
+  if (p.action==='delete') demoStore.rows = R.filter(r=>r.row!==p.row);
+  return Promise.resolve({ ok:true });
+}
+
+const numOrNull = v => (v === '' || v == null || isNaN(Number(v))) ? null : Number(v);
+/** จำนวนวันที่ใช้หัก: ถ้าผู้อนุมัติกรอกไว้ตอนอนุมัติ ใช้ค่านั้น (วันทำการ หรือวันรวม ตามประเภท) ไม่งั้นคำนวณจากวันที่ */
+function countFor(r){
+  const td = numOrNull(r.td), wd = numOrNull(r.wd);
+  if (r.status === 'อนุมัติ' && (td !== null || wd !== null)){
+    if (usesWorkdays(r.type)) return wd !== null ? wd : countDays(r.dates, r.type);
+    return td !== null ? td : countDays(r.dates, r.type);
+  }
+  return countDays(r.dates, r.type);
+}
+function enrich(r){
+  const dates = parseDates(r).sort();
+  const [type, assumed] = typeOf(r);
+  const o = { ...r, dates, type, typeAssumed: assumed, start: dates[0] || '', end: dates[dates.length-1] || '' };
+  o.confirmed = o.status === 'อนุมัติ' && (numOrNull(o.td) !== null || numOrNull(o.wd) !== null);
+  o.count = countFor(o);
+  return o;
+}
+function recount(){ state.all.forEach(r => { const [t,a] = typeOf(r); r.type = t; r.typeAssumed = a; r.count = countFor(r); }); }
+/** รายการที่หักวันลาได้: ไม่นับรออนุมัติ ไม่อนุมัติ ยกเลิก (รายการเก่าที่ช่องการดำเนินการว่างยังนับ) */
+// ตั้งแต่ปีเริ่มนับ (baseFy) ขึ้นไป หักเฉพาะที่ "อนุมัติ" แล้ว · ช่องว่าง (รอดำเนินการ) ยังไม่หัก
+const deducts = r => active(r) && r.status !== 'รออนุมัติ' && (r.status === 'อนุมัติ' || Number(r.fy) < Number(CFG.baseFy));
+const STATUS_OK = ['อนุมัติ','รออนุมัติ','ไม่อนุมัติ','ยกเลิก'];
+const active = r => r.status !== 'ยกเลิก' && r.status !== 'ไม่อนุมัติ';
+
+/* โหลดทุกแท็บปี แล้วแบ่งตาม "ปีงบประมาณ" ในคอลัมน์ F (ไม่ใช่ชื่อแท็บ) */
+async function load(fy){
+  document.getElementById('main').classList.add('loading');
+  try{
+    const [cfg, first] = await Promise.all([
+      api('GET', { action: 'config' }).catch(() => null),   // Apps Script เวอร์ชันเก่าไม่มี config → ใช้ค่าเริ่มต้น
+      api('GET', { year: '' })
+    ]);
+    applyConfig(cfg);
+    const tabs = first.years || [];
+    const others = await Promise.all(tabs.filter(t => t !== first.year).map(t => api('GET', { year: t })));
+    state.tabs = tabs;
+    const all = [first, ...others].flatMap(j => (j.rows||[]).map(r => enrich({ ...r, sheet: j.year, key: j.year + ':' + r.row })));
+    // รายการเดียวกันที่อยู่ทั้งแท็บปีและแท็บอื่น (เช่น ต้นฉบับ) นับครั้งเดียว โดยใช้แถวในแท็บปี
+    const sig = r => [r.name.replace(/\s+|\.+/g,''), r.start, r.end].join('|');
+    const seen = new Set(all.filter(r => /^\d{4}$/.test(r.sheet)).map(sig));
+    state.all = all.filter(r => /^\d{4}$/.test(r.sheet) || !seen.has(sig(r)));
+    // ลำดับแยกตามปีงบประมาณ: เริ่ม 1 ใหม่ทุกปี เรียงตามวันที่เริ่มลา (ถ้าวันเดียวกันเรียงตามลำดับเดิมในชีต)
+    const byFy = new Map();
+    state.all.forEach(r => { if (!byFy.has(r.fy)) byFy.set(r.fy, []); byFy.get(r.fy).push(r); });
+    byFy.forEach(list => list.sort((a, b) => (a.start || '9').localeCompare(b.start || '9') || a.sheet.localeCompare(b.sheet) || a.row - b.row).forEach((r, i) => { r.seq = i + 1; }));
+    const cur = fyOf(new Date());
+    state.years = uniq([cur-2, cur-1, cur].map(String).concat(state.all.map(r => r.fy))).filter(y => /^\d{4}$/.test(y)).sort();
+    if (fy) state.year = String(fy);
+    if (!state.years.includes(state.year)) state.year = String(cur);
+    setYear(state.year);
+    document.getElementById('sub').textContent = DEMO ? 'โหมดตัวอย่าง' : `อัปเดต ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`;
+  }catch(e){
+    toast('โหลดข้อมูลไม่สำเร็จ: ' + e.message, 8000);
+    document.getElementById('sub').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message + ' (กด F5 เพื่อลองใหม่)';
+  }
+  finally{ document.getElementById('main').classList.remove('loading'); }
+}
+
+function setYear(y){
+  state.year = String(y);
+  state.rows = state.all.filter(r => r.fy === state.year);
+  renderYears(); renderAll();
+}
+
+/* ================== UI helpers ================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pill = s => `<span class="pill s-${esc(s||'none')}">${esc(s||'รอดำเนินการ')}</span>`;
+function teamClass(t){
+  const k = String(t||'').replace(/\s+/g,'');
+  if (k === '1') return 't1'; if (k === '2') return 't2'; if (k === '3') return 't3';
+  if (/ธุรการ/.test(k)) return 'tadm';
+  if (/สวป/.test(k)) return 'tsvp';
+  if (/วิทยุ/.test(k)) return 'trad';
+  if (/สิบเวร/.test(k)) return 'tsib';
+  if (/รอง|ผกก/.test(k)) return 'tdep';
+  let h = 0; for (const c of k) h = (h * 31 + c.codePointAt(0)) >>> 0;
+  return 'tx' + (h % 4);
+}
+const teamPill = t => t ? `<span class="pill team ${teamClass(t)}">${/^\d+$/.test(t) ? 'ชุด ' + esc(t) : esc(t)}</span>` : '';
+function rangeText(r){
+  if (!r.start) return esc(`${r.days} ${r.month}`);
+  const a = fromIso(r.start), b = fromIso(r.end);
+  if (r.start === r.end) return thShort(a);
+  if (r.dates.length !== rangeDays(a,b).length) return r.dates.map(d=>fromIso(d).getDate()).join(', ') + ' ' + MONTHS[a.getMonth()] + ' ' + String(a.getFullYear()+543).slice(2);
+  return (a.getMonth()===b.getMonth() ? a.getDate() : `${a.getDate()} ${MONTHS[a.getMonth()]}`) + ` – ${thShort(b)}`;
+}
+/* ---- เสียง: สร้างด้วย Web Audio ไม่ต้องโหลดไฟล์ · เปิด/ปิดที่ปุ่ม 🔔 มุมขวาบน ---- */
+let soundOn = true; try { soundOn = localStorage.getItem('sound') !== 'off'; } catch (err) {}
+let actx = null;
+function audio(){
+  if (!actx){ const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
+  if (actx.state === 'suspended') actx.resume().catch(()=>{});
+  return actx;
+}
+// เบราว์เซอร์ยอมให้เล่นเสียงหลังผู้ใช้แตะหน้าเว็บครั้งแรกเท่านั้น
+['pointerdown','keydown'].forEach(ev => document.addEventListener(ev, () => { if (soundOn) { audio(); clip('click'); clip('success'); } }, { once:true, capture:true }));
+function tone(freq, start, dur, { type='sine', vol=.18, to=null } = {}){
+  const c = audio(); if (!c) return;
+  const t = c.currentTime + start, o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .02);
+}
+const SFX = {
+  tap:  () => tone(1200, 0, .035, { vol:.05, type:'triangle' }),                          // กดปุ่ม
+  login: () => playClip('success', .4),                                               // เข้าระบบผู้อนุมัติสำเร็จ (ไฟล์เสียง success)
+  tab:  () => playClip('click', .2),                                                   // คลิกแท็บเมนู (ไฟล์เสียง mouse click)
+  ok:   () => { tone(660, 0, .12); tone(990, .09, .2); },                                   // สำเร็จ
+  no:   () => { tone(520, 0, .12, { vol:.14 }); tone(390, .1, .2, { vol:.14 }); },           // ไม่อนุมัติ / ลบ
+  err:  () => { tone(220, 0, .16, { type:'square', vol:.06 }); tone(180, .17, .22, { type:'square', vol:.06 }); }, // ผิดพลาด
+  bell: () => { [0, .22].forEach(s => { tone(1318, s, .9, { vol:.16 }); tone(1976, s, .6, { vol:.05 }); }); tone(1047, .5, 1.1, { vol:.14 }); } // ใบลาใหม่
+};
+/* ไฟล์เสียงฝังในหน้าเว็บ (ไม่ต้องอัปโหลดไฟล์แยก) ถอดรหัสครั้งเดียวแล้วเล่นซ้ำได้ทันที */
+const CLIPS = { success: 'data:audio/mpeg;base64,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BwzEvBSANACZ//OExOIrgypwptvVjC11dQ6AmGARmAESBLgCALNSXxpaaYiS6qeDnU8QGgEwECKCgwhWPRGjDQJKp1kX0rYXnWhiE7zT9AwGhuKGQ8SNnh2NbdNfToF07lBAcU7dovmc8JdVxpq85WlkflREpkB5qblAxoqblw+Vp48ao1rfqTdZicKA4jT+v0jo0l////////nS0kMls3LM6SBIRQU0kc6MmkzJbVlpEFmkHgtlgFsMhC2KXXocUwBeBSGj6jAm//OExOcuqypgAObk3AtHgR03eMBDXUS8FiMyt+DjRqsugdd0RjUmQxGQVBEPCw8Vp+IjNnjTfNieVrEeit23HVh0EakC9NR62a2ESUZII75GY+bvXz/v7QtaiXxEgSecAidwNSYm3/92pE/Y21nWYeYcYPwvGr/9Q1////////iOORPPUzfi03GFNjVjhxHlXBrAwBhiR3KgKMH0gxOCjCkIAgofZFW2k8YDNhrcOmIw6JFVH0kngYQFSIEeGVEo//OExN8oOypsBNvViE8xy05v83h8YIIHrPSIS8SGWETkEAUYQpHD92XGPBvQrGt91+Oy0mO3UlE3UEyO5iTYABum679QNLIYSWLU41nEjMO8k3aaUU9+mqUcZk0SlNBXp6CZEksoqTmt5639bK7jy7qSUtSmqZkUVRdFFBFf/1hxv///////9Y1nlQMkFWmoYflLi0sPQ7TCATNpHiIwQ2YKaiOjTgaDDG9DAQXIjJNAYkEaKLtQGMjAQFCQjYvB//OExPEu0ypgAuaa/CMCwUMEKICqQjETiFsxsMHhF3EU043rUwhAcGlk1gjDC445ICBUtsgHa8uV7WaKxua680sAztZQyFgAXRYQ5UEuoo3XsiQW+1NHpXLTiihgheVIUTY2OKL4RlJItgq40yqykTqbHloptoJa7XVdJW7DtQ2/86Nl////////rHSYqpQ/L5q1DFSWyh6IOb9eZojarldBYHQBVq7MnkQM4sGfdBdWwC0JkxEgvOKYq9U7myEA//OExOgtSypkBNploBUmDgyFPCY7DCxyv6Hofe2GpiMKYEoaqmFT4wRVLrBgkpUx95aSLWsn4Xut243JAGIBmXNtLFdZULpUKZEpuzsBRlwTi5lFU1Ere+WyICThFgD4NTzHq6R6783pO90U7WRZCxdvX/1OMl////////OvE4jNXRYFHm7ULWUhiEBEQKIAIIX4XWS9CwJMoFMBPYAREaScRRfBgSMMhMxArTsRCMAAgABJLllzYWYlQBmUSaqY//OExOUouypoAtploGAQYEBZgt6hQPgUBTqjZeBJNapakFBkCgEcAxkMKHjSSDk2XNAQbS3irxz9SMMqgh/OxJBCZE4dcySBVWRiKQOsK+hphLFa85AuURf+WR53Hxzu54frLVicjUPThnyt+UxmZyxs6ot0mH/5jZJqCLLRbRQUHIJde1S/7ApJ9W3//////+dPqkUb/zsVq5QY+sZehsUAGIusEtfL/GQYQ8JlDiTUzVE+25F2TECg4hJAxIXx//OExPUyCypYAuabbE3FyKoxgqiTXGR4CXgrAYKGKmOStuLK2aLhtlkAqDMACMB9Od8LjjIhIaLtc3PN2kOp9VrRX6f8kAGRFKy/FYTb9u5EnaHbua9JZdUbFNzqVZbpTUunTQATFUxc4m5o1bL7sgpSNetqVlC6JNb//qFlXI///8nVlGpG4kPMWfpuMUcJIAsAMxgsC5TRQgIGX1QZUAIIZhi0ZQwiYDhuwICKY00Dx4WluW+Urc5McvgIh0X5//OExN8oimJkAt6i9GmmAwQZESRg8AIqEQDLkOErUgBh1ZhbUv+YeFx/4MmPBUh1JgQvBLVhZMyAYNctNN5I+mIxo0/M0R03G/poCikGlUT7vtM6+UVaCcoNfM3tz0vmJyHs3+oY0DcyvUxNa5yz/6y//NQw50ZzHsqmFzAYCmnJb/oANO7///////7F1cUMzK45DMHv3OxpnjQ8jF18aHVnEIOY/GmOBZhq0ZwJJmt65qJhhCwYOHmHBbVLq64p//OExO8vEypcAOYVbGREIDoWHBjcVkBDuBi0WBeQwztmjfRBWF3i1JLBGUxoGEEt4blDQqScrtVfODZaIgF2F5kI+XcT7qxX6sNSwWFY/NXP4+SluNiuEOM7JE6sjwIQdW60FIn3/1Ir6F612cvEmjVb/oDqej///yJrEkiDP5qHmIO+/aWisSYRrAELB6PJhYqcRTnCmJraCecel2C+RhIChgKBJeOEgEukDQI84jBCHZnQ0IzA4jCAUYACYQGT//OExOUnumJoAtmloCIZzGgBAwHiqyk3k4lJgwAg4GCINmGAKYJJB+sDFQCjQQAwDJAGsaH1vsxcxMR42hMLSMU5CxrgsGgQvjIqRylVRGCnBYRJaNrcmj0Ll03A37l0Uv2nqh6fr2yDD5IUIE5PlEtzhNl0iT/n3TTOVqZNakFqTRGfEmdX/8UOl3///////zj1Qinh13Hekd96nGkz7tFJAMz8Fiy9VYCphGejAE4QMalyl0CQeqcRCp75C9IC//OExPky2ypUAN8o3AMvay6GWVy9u4sEqqJWCAlSSWclA9CgbkWpekwlqXuBJGZWdLYSyYkoxEaeib+SO+6jS3je9RpOAzAQEkspFtScBwSVylrMQmKdWNx1uD3UJ6FchKAIckULKt6DbuqtR3boOtY3R3M1//j8/b///////OKVU8Td4dW+7M60uVIYULgiEAmljSJF9MdBCZTRwYmTICFNJgESDr6PyXMMXpM4CcDC4DMxCwMEjQKonGCIJNLF//OExOAoEypkBNsjhADEstKgYaEoqUrjepIMQAyGxgIDIjAgb0djEk0buTAgp3nRIhZ5GhZSqNP+09/zBAMEggiBiE8Dr1dy21evI6reBUAKAN7Ksf7Ln+d+C4vPbrQiYqv9uWy+VWB7JMvAATKBeJYmmOF3zc9WYsZvagk+ZVIIDXPmqKn69tzIUKaJ7///////5xk0AYyyxK7Moh2FvtG6jHTM5gOMEslVjKY0sABlTgZ+AIhtESRBAUAGU0gy//OExPIxsypUAubm+C/qwzQFqqXqdzZoi+EB6qxgwoixMJxQUhEvV0ZFWSRWBGjm2R4kiqoOi2rcXqfrKpDD+ter5vqzIq+MwWEV61DNuVZa5GH0t0dDjal+NmfnZPc19itas1yoXBzwAQwQlplJN0V5qtJubM350xGgijo7I2rRcOSTM2K6v//5BTAeprz9XobVggFm6PrtPIAQWYkp4GJICEpgEEGeFyVnEw6sAEvUBimj9qqBc+gNCmMxeHDD//OExN4qImpgBt4hMKzbJqkoaCToyy8JB5ZAJEDd3cLigsGzrK34VARAIVDQUSjwQgLBAEdywjUGYKFQsu009+YGQPEYAXdQCqxJ2r7eIwmMHQt15vN/ajp2kbXZbR8519X/h69O8gmhkc2/si5urjYLJNOB6SLCRA1XcnD0nEETbMjNHWyLLPrWgtZ8wDwlZe61/saBhEupIT///////+o8xesQ9amNUscj/XgLLgRuBweo6SgYqhA0AMHDh6hW//OExOgyeypQBObm+KvKqumEJBpSoQy/KqjOYOcBBECs7iSb1nhKj/EGmvW6Tpu6u9PlkJdYxsz9uGlkmmrt3eWd22kall28nkw9UojeNAxg7I4OlU7LoJVNN26XlMcSMS/Wqt2uibGqkCwCkbm6kbImukyOyakmRoIoOtlJIJIDIpN/9RYH01FuzyxWBaSQu0tCRvyv1KgyypXZSvBgHMEjQHCQxmwzKgndZ/RQEGDQaYcOx0AXmAAmu4BAyg76//OExNEmemJkAt5g9jMhGFGGG4KT0hyUsAuIYARIJ1WIKJgIhJwrfQVTJBRGYmgnqOQciCwOnIhIUEYNOQ63Wh5NUD7pOmAkxMqggGpnJlubsSsaLas1U5HL87nS0Vq5MVJbjb72xmfJIzAKAutUX3Nz+yMypOi3Mktl6eaKSX/6CQ1tSjApHaiEhp4BkUccZubuEoYNIEIxGCksX0EgmZWChg6IjxLRwW8iIIwcwf6NNYy6yuy7wsFcZEAQQydy//OExOorqmJYAOba+AEFGGA4QIms5pM0JMsvL2K+f5uEHtovYCCJiTUdw5iySqNYrLbkNSJmSuXvr09WPqsMXQjExFVqRr5wuGVnRJo9FOY3rNeRzV/O9RRemoLe5dMc0PZBgBDKnzqstTSVatIzSWtbLSrXtH0pdf+1QnxvXVQA9T5RZ0oMb9xqCKO7OBcAGlUsY6AKYsAGBQiYOBZmQ4DUnWwv8GgMFAwxOhji5BGg0SgMQgMIASiCcy3ASOxQ//OExO4rKmZYBOba3BaQRh0DGSg2YhD5ZB4kJCgiKj6ILlpRkAs5MEgM5eI1fLPfoeBDMWhLBSFojYIFZtBrKGgIvjQIIgOup9JO6kF8QOi73Rp93pSTVCjYaJVLFm6rTi0w6eyOAGpEZMvHlJYvx//5yKTUOKOUITn4GSxImSf9g4NHiyAhiLNTdvKejUZi+SgilJnxTgIKq6FgUCCCEAAwZFjAoGZO2CBTBgWMMhUDqoDAgSBnNIgRfKuYaM3N//OExPQuQmJYBuPVpYRBwCHEbDS04ABwWAVE2YrefxKoMB0+HMMGBDDmMwWUStHAtAdATtUTWJYxqAXhX4rajSFgQGhBggCst9ZmWu3C2DK8ep+o/MUXM8bmONmURrCvqljdNkaGRIgBvQLC+XXZU+7odTukg7s9atbqYSFfodCpjEN5GuRDhRKxEJPGpZD7bO27AWCBjNxGJAcw9JEED4dApksQGfAGLAtBQwAAGuGBYyanJhiADskQxU9J1ZDA//OExO4tAmJYBOba+0BTGguAAYLsFYFMSq8kAqHktZ+kaxFMZQ8aAMoMDhoKAQ7UFA4chUFNLRnXutROlg7tX1rTy2XEGAgFyQVQcXalscywf16R4Hd1d5gBjyY2HDaRrjwYFKHD1KxCg6CMqTU6l6LdTsmqprTtJ0HFwkU3/1MudElTRLIfn2nM6p+ShurcVMEOph2NhAhQUQGmCyJBRi14hCUBwWT4UiAgcQRU0MLBogJssYJgBAQu2OGYtZiR//OExO0sQmJYAuGbohqDEwmcIsAanDgFWl+VjN0fZbytA6FlgpFeA4aXMBDBoHfVQJr6qdhgktasxC84rDQsBAEEHhRXL2t7CMoGYskxLIekFjk7hYwlNDdq3ox3dFety4mi0PsBOdNXu6bvdRozJPzy188i/F8NNZtt9tjooYzckTPGUwGxNrdDNtDd8QgNBAaiZBEGkbSIFEg+MMBQKSUxqM0KIu37RTDiJOgDEiMD6qDg4ItoGA0KARCWYtAh//OExO8r+l5UAubg+mRUBNWgoyABDCIDCAq3VStR1Etu40JQCBiUFmAmAcHKxl8DAwAsygddLyP+WtcFsa2VTp/qwg0DCgWFjCkXi19pk/AKvE5aSWzkZog6mmgnVsHxtRWiCaAipiTIAmIqXqlP6KKT0XQqopqeik+oawgZP/f0R8tTZYt2ibypDrqtrJ1YEw0LTZYVHhausvIYtBhkwImchqaRCyJK0gYAEhgs1jjw0LkJXMEdiYcYdTHIoAIe//OExPItemJQAOJjoBg4wDs/mtdowGMGJViWGVtmh0GGEBYuWAClBu5wtTAhRPNaqKIkKs9gdo6trTeoyhw40RMWskoBpMIk7lRlNZqcF0t+XyGpDD/ymtTYV6mFJUpKSdpSaHCNYGiSJiy07df6SlqUupXmCieFuR2/64+Ga9DrSLk29EVbm2Z1y7pgMBm5E+Y3DYsDjCQVMEMktGZE0Bi8REwAYeLAlmIrZDhyXKgUgYChSFU+gjLjnaqYKBTD//OExO8rQmJQAOag+AamhKObQAApZtTBgZaMOHTBgEGABgwEYSEGbsB+QkAjJuq1ggDUNbGiykAzNulWjmpkCiIUAww0CAinjMJjkVZyAhyfn5Rag2kikxPUsaoOV5fEpyZl/9MR+KgDMYFyY3ZdA6l20FMy017NuJ+MpH/+sSdDWGK0UBw7PP3K2sv0mTETUb6MMBxDIweCTFgMMdgEy/BBJsF/4NFgYqD5iOQeOSmchQXCysTBQk9rCyoNnIGj//OExPUtQl5MAOba+FRdBhg+DDEwcRS6s2RwIXkhMSNLWBYOUHMKqDnCIw4gRNa6lW36myQQVAYfYjK42gSWUnuYYLAIZXeXouQdWlb4PK9tM+mcYLhvogw9DuOFL5yozHe4oSRIEB2O0yNTsU1psvc/sqJe593FffvEUfJqP//33YCl0ERppckpniaY1mO1ocJgMKCcxRFeCQRMHgYxM4jCYiMrxsmfBhcNCQZBw0OAJQNj+sAhx4BwNWFcFEsK//OExPMt+mJQAubW2AcaabGZBcBJkGoCRgQwkgsx6n9h9MBW0vAJAYiBRV2ODVwxMGg9QKopiorUYc3ZuaaEnUnPKHgALM9BE6oHdiYjzgsQlEBs7j8jkkSmuy2ZuVq1zKpLeWcNE0yIgGYQCTWYPR03W96K3XopevWTRaNV/qUpYW/TgqDqz3SyMs6f6nSEU3AoMMlNYMAZc8wgATJ5WBzAMcUczWB2AohmDAEgJMKp0nSQNCKSajieLAHoDAOZ//OExO4semJQAuba3BSuY0Cyg4wCiIvgIYgYDlUANdXaoQpIkAI0CFAgQCigDkXPAoYUph6A4i3POkXUji5sqkqTDHgSOAADhoWrBTkMQ876hzzxOBoIv7JFjyia1EKk8kRo3S04SIBRkuZHzekp63Y326u7Jr7sYkip1f/WJI1CRPOS6Lxya0zNgz8PAicOBM0moUTBYPmDA+ZJj5lgYmcBAHboICqNwEA5gEFGH3KcbEAkBgKDgYZRQBQG+AMD//OExO8r6mJQAOGboMNFSQBMfEWxmlVYKpx0IgGDYPZuX6IAMeCR0KBAEYbHmUNEaEgpJuLsBQuSaQjVyuGGKKOiIBkBgKMFjdAFI2utdbg8rCFewPCJuYkM/SUGElhqfq0381L7Ge7NeKggCluVzeH1+3suX7X3GkqXaqvua0qY3bRvqAPWmmAhiy8MUeNwlmtDu2FUDA4PNREwWGY8JQcMzQS3NHi0xVeChdmBAeCACAiMcChi7N+UBQZaYiyH//OExPIuYmJMAubU/A4yJTERgZuYyDhxIsxUFMCvhGCGAApQDqUr4W6xEGAaAEwwBEY2kSeAFhxqW+Tzg5RtyYwzJOtqi9YEglDAZADCRcMbi6UUfWUNnZUsAyl95ByPuTKMJNdq1q8PZ6jtuepdZpqKgVkuEKTXo6nTXomiK6KdaU4tJJZoP5BNm9X6kwqB+iqBwIuw2T092rEnZkrJF5NAMwlQAAFlKqRj5/AIRmRVMDj4sdAKTABMcqEk5QCT//OExOsvEmJMBOba3A8GhGALMMdZMxRzTqHVVE3FgzWmjTE011Tv0XeROSNhCPilpcUQkTz8wxsGEo9hFGAQA3Cja0/TmI/uKsYYDkT+bbK2suiEMwOLAqk7SY01rKnv2dfhnar7wrXuWLckXlRVOYZb/XL+OsO6MU3MO2ocjTgPLEt//UA9qo5L3XcdeT7zbvK2rmQRJ+GcmeUAtPNGEy68jNQMMspEzsGQcE4IFgCYKEZj4qC8cMLAMwoFEbBo//OExOEqEmJUpOaO/AaWj4jg0AIvCDGRDAGC0ZcoGCSAZKFNAHCExUO7IUuAMnSmBl057QfXyqHkB7/y1hCbEAu60xjqbb2DoYxiQyJBitaAXha0+0VBQSQvJXtyPGdpJZ2gzs3rdPbvfZ1XxiS5ZNqhs673LPD/3hdZVQxFbdWexw6HWv/8GXLSBf9mc88apVsJZREkAQwBAwwlUgwxCZIEkFcx9dcyyBEExGZXgSjcCAGFgvHQbKqXGeSFmAYd//OExOssul5MAOaPNA8mMHIltRZE8Egpu98CjwmBDLQE8qQNhRlUkmUEjTUhC6oEBS0IJCwCfAX/PmYAEGpTg4DQHKJl9CYEV+laLCadEcJAVMx7DDyQ29FVhTnuNga7JJIYEBv++Erb6JwNJX4hPIMj1FL6Oznd3q+UDpDgDoeC0xNGJSUmWqHoJVKuptJ6KDDqGRSN//zg2kpwJqPuk422YUjJGvrMYOlWZBN6uVhUjzODPMrgkzwRzY4AIgwi//OExOsxal5AAO7g+FKXioBMaQo4+BSgCUw4EwCCUEUTbwxkMxoICMALAGVVkBgY/8qUk2iyUGxgFluUfBGBxUHmnDCBhZEslN5MoNDyokF4gwuQ8gtOYvuYlAYdTGhKkH0rj6CfQpHOL3SKUltqzxawd/LJR5SGnzOAYXDbbDrrMfdL/5yXKPLFLN98QAdV8z/lAGQpbUQS0izBt92ph5E213I5gQCGVlUECh5REBjNT6M+hkytcgFFhIHmBwUX//OExNgrql5MBOPViEIoY/awfSgqAgMKgYCVblWqFoAhJHAYpMlAQgMfNsxgD1OZ1masjFFTjo0vSYQOUDRHNOyEDECcqwyh7BWKLYZo+jisFXgxhK1MUxygmVtfQ1jrKXJhxda4MI7FNUW4XbfqmyketZyT70xK7Azh8ZYEaiCK9SO6b1OyqbqT6t6h9JpIL/+cGk5wICgWLPzPXm8mGsKQgEFAwzaVwERVfgIcmWXsZMEBj2IGeBAWjDgovUs8//OExNwsOmJIAuanMs9CWkCQawRHlwl5ppSwKDIaBKC4sGTIQUMEgJPTrIYdeslAKg6ii2QYCwAjTXIDBwpgFwmpwO6NVuKmkE4KdRFTVWYwyZBIZJOvrDNJEn7ZjG43ZjtJmNrsozkK80teahTBTTHyC4HWTrdkLru+uaPaukgjnUx1GC//ruNBCkRGD2tUymkXacylizbIwAUDmKhSPA1EAAhUwu4w5IGdZGbSBTU0LzC4PEYDMUyEwKWjFYGa//OExN4qImJMBOJloOGBgoEBAWAyZAVCBgdpmRx6IgkDA0YxKBhMKGDADDSY6KQWACDpddHAWEwABRheQmfiALGyWpso3INrge2iVIzCkwYQJAUqB8kIwONTVEqWB0r1s0VvSAijgRJ9cQjBEsDjmCPJa5CixZAjQugNnIqaypQNt1mJQeiswbqzL6x8DvTf/U2ZDTpDXpbLnLfd6WVtFTrjKgIwBpiKAhhGAAJAYCguYCp6YbhcY6N6Yfh+YDAU//OExOgvIl5EAuInojwPohCMJDC5WTgYeBoqBCBi+A0HVVVhjAYFMctwyOCBgJjALCAeYcD6wySwUAThpEgYEgIHgwKoIwQHAqnz0hGMfBADD4uuv5TdGV5JURAeOskuxlHYMCBgwSmXQOhA4qznla44yDHHQcidmX6dBNkpub9EutjpJ0ZAAvBaTIuuk9ZUrvMlMbz92ntnnjIaS0terRpusZiWMB/WpOq0x/YIUaS6WDjCLBMEjPArByOZajQZ//OExN4wsl5AAu8m98gqY5ApiYKC2iMSAkvALAkt6YuQZ74qmAAIDgQZHHRLKLyKCQwwTBw4FwMaKDA4xRiC4S1xBMhpHQELpAgoQaOFkg6KjMCMgETw2qojw3JAkh6imwmI0ZKAM0YeYKFmdhCg40AO/m1lhqj0alMgp4R8zN08dJE09egiSRsOcB7GbN/R+tKtJVuuquR5JItstXtQSFzsczKaMCFUz+u80x/lnvcsE4LC06TE7YQTvqpMkkAs//OExM4somJEBObm9EEx9aB59q+Tzk6TIgMgLUq4DDQCMDgYFA8OCMoSQMYlEeDbogUDmHnWAhGCQWjUspaKlaYpcdJBiauTEgqOmpMoKZhkEMJUAZ/m8822rWmGQMsKk8tg+aLhlYZdBE2yCC1FitUenoYp5IgePFtqRofy1QnhzSIChQPGQPNqQT/321bqbVH2Tivt6noEgN1VMBtXWtw69MlrPHDrMV+kIJMRQ0eBZZZahmUxBkIM/vgycHls//OExM4qWl5EBOYlZLHi7QQBzEi4MpA8ZAqSgsJ1hobEYBayYDSxacAgEwuMDJkYCB+VAEmesIi4/DAQCBwYAgSBwSEzEKZOAmQFEIFAsZAq5VBVL2bqCMehtOqebsmgFSDFDPJOZDCH4NgNJFZAHXKnqdnHZBiMj+fdanoZwosTxEiKgE6YJvy+f/o9t/143SRU2r/rGTOsSjAZurMz+s97I39ZGp3AyChQBTOkIMKhAqAIQiUxnlTJQJNllTth//OExNcsKmJEBOYlZNSqRFGhAhGQDiH4jpEWxMYAxQATEaCVQQQoJhAAme24SlGfCi6AcArxZDCQ4PAoCo8NCQqECKHNigDOiIFAZVAVfJ2Vl/KvgcRgD4QI3dEVzhUQMCH3Waw15uNaUp1gUAa270NWoIcmj5AS2P5um8j9IvKIILJFJgOkRUnqmWYv/85/6Mho8JtqWrvpmAuA2XVwJbBPYbk8AQiSRiqsIyMxac1lvkVAuZgAY0mzA8lHAyDQ//OExNktmmZABObmvENzh0BAgwQGzp5RHjugLSrSSb5CYMhUxSDh4IK9VOSKcLgtQtMDrWViKbJDsUbiTAtBcyMZRYcQExhry92x4JxMUfhrrC1E2IxQwADExoGoHUmn3kzejwJhzeP+gJEgZxdoNud+YaWsfALEumtJeYf6FB+h/ma1r//iVkQ+6z+0rLWETDeL6Y0hEtY0AHzEoKLyhUKGMYgAiCHMwz6BR0BkgGMHhswYFAqyz6YuGiGGBBiw//OExNUnOl5MBOGboLlqImj8IgIzIXLglqjFxY0DEA00IwBCwKg5EBJqwUXLUMIgkqgplSsdWOBABIQqBShnrwyseBFPMAhqU7WSNABZcwIlaBJm0yfh99Mr7RTFFel8ku0HYzD8Qlcb5+6W95FC+ZgRxNzpRNELukym71PTSXrfrm6KX/8glWAbM4FmTOFAsdZZAEwzgDBAzKrBoCPk/ZlclmXAGYMqxhkVLnIgKmiCAcF4GZ3IRiABoMCwgmwz//OExOssml5EAubi+BTnIQY18JAAghgYwAAs3M+CjAQMeAnxfNkoiAAsCpODgOOiAqenPtQGMCABgZqqgDFmhyBi8MP7ixyjTVMSS07W7w7Dt9/2mCACTkm4pUh2fp5bM5UFnPPC/Yp6fK7onrH4AoSYkdUm6BtWaJt06VSSV/1pF5L3/0RK9SpD9q1SaC36kMLm1ywtegkBDDjVQIkIAhJjJBlUKmKVUCpYW4rmBgcYJCQIQZSSCYqF8wwIHgAs//OExOssymJEBOba+LlgLCweVTcFBpgAcVQE1wbMrGS9S+G5MGaOh2VTuBQJT1MnNjlBgeKUanfbVCcpQx2XrTeKGri4nJYoAiUwkAV0pN7ZrbO4aTJcSTR6Fb5jN1pvUrq1qbu7OF+gPLTALioTtSSPootprZf/6zE1Uj/9SYuFJW0ac5S63oep5nxXwvNZ61jF74R5SfJhcYIGwMAhhNqlaWCgFRGSyMDgUw4TjvAXMLBMwAkw5RAOLFEdQguH//OExOoq6l5EAubg+3wBJxGCFBBrfgEGCQmaWO0VdJcBVe+yAMGGImGXYpjQwqYwA5SK8IGY2pCCaSAjDhHtakFSZngS2HFgSM33USEWtEHlo41J4tKc70V1TU1NjzcRobk0R5MlcAdpocKRxvVmbVM6LrSa7+ucHYr//IM6a+0N07ECQY3zEF4PKHCIgC5lGNkAAccwsDTN4MM1A0x8+RICmCggMAsFEoFAEx5LhP8A4mGAgoYMBgKESZ6dxVDJ//OExPErqmJAAOam+IxOBiIACQhMIBUHDMyMC1qmDAGWqBwQa000cBZVAimYIGZiI1HlyeZHADXElQoBxoLBgZn3pMQNi0kmioQraIYQo2YTpCCtFPFwoJposyF3YdiMi8Z0iRscNv1F4zLqJSKRZBFjTIMbFf96Letz62X+lGcHa6//44Zdil6+11uKsVhM2u8LgECQHQMMnBoBQhscBAKmKhQiQwmOQ/GdYImDQDg0CzCgBgcDQFmIxkHUycAc//OExPUusl44AOZpZCA6JCOyGBIRg4wGRgNXAUZRIUmBCyFAIYbBhh0AEIUMBhEDAEwEBg4DCIIoymCAqYyBBi9rnN10ZTAhgIGCMBjgHAIGEgK6r/lylglNJwsAoCBsuCWsNXhUwGBi87TbCvkxGjCwipHOZdKIwRx9dSzMvum97OTJEg9UDaCCcWyT////rrFMJ9aW3r6MZp4wJt24ZdjJddI0pXbWXaS6Jj+DhClGYNAIWSEGmMGEJDhdgNAi//OExO0x8mIwAO8o9M8HBEwS4jg43MAg0OEwKCuMTASBQ4GFaODj1pJgAaKCjKWCvqnOnYtBoBblVUuhIAwGOQFAEMFUNSPUvbZ32grlgx+3FZWypDuiuY6KmpgiNa4Y9B0y7zCS5FLas5QzL7mBqs0NU2Nj3lJZRABuWMd////bqSIbf99URl6aICDFYnfaY/LA4NXQsRpiK7MDOhnDgkRABQwx2Ig46mX0wULwiApMDDB4EMCCgyCIgHpljrJC//OExNgoYmJEBOba9OGvM5DYkB4WLUri+oKGSRVATeYGHuO9b4I+QWKAIWE4DGBAKOB6hWDhlPmzBC71oLCqCypiFAgwkIw8tqITkwUKAwWo3DdA770SAFAMxEsJ+eq15uWyrP61Juzux+HCVKSYAwSyZ5vrQU22y3t9nsmNpFuz1t1OHxTgoSl66oOiyF1IMazUX6wR2C4YcLlDDINeHjK/JiYVmCXiJLIxayzPQRQGmBwWHDFL8x/azf7IMQiM//OExOks0mJABObg+sFiUWCpQPUMyqByAGGBwKYsB5hENkwyMsIQwyPHySbAAGXHJjCIEMHANaIhBgQMjKEUN+m0RhIaDcdV+iXKnmfdASga0yLQyDAqhuIlqZLDDd2Vw/IIs8dGPBdnUPxOVRoNl3zKTMbIaRfMbHS2YkYByosH+tFT5qYJKQTU9O9JJFMh5AkW//WOS1XC+ll1GJq6cJ2nbZi2FDwhARlCcmMA8WiWHMrDMFM4lb5iUksMUZgU//OExOgvymI0AuJloFgSAcSNl0woAy3boEQVUVT3AArMindvjBYOUcMMiAONw0VEYCEBOijawoDAUgASuhoFmNwkdPFRiEVO6i2tlOYdAKiihMjWATpGAAWbYlD5g1BmBQAoovqK8fVmS0xIAQ1jHp2DCFg6wIEkJmlDDiLWdWPgAYDxPMU/b+6CXpVfkiNv/r1qJz19KsTtAps1pYNyHkZii2sYDBUweQjIzQLnI8GBwAYXUT2mHFMNJ4Eh0xIB//OExNssWmI4AuGboFBGYbABi54nehCZbDqUYiHDCQNA+AgMDhmibCABhqARs4IrMpMjDAhR9S4UAGCp8GACaa4yCjo2YMSGMUhi4miMWmLAUW1kooCigCmg97hKnSWEgBGMEB4Yug4OfxqbfuLIm7AgDZRE4/ObicQu0FSMSaVV9ZUFFVobRNHxmgBZaZH9zv9A1WYMcL71rWgvXLpmqrQR6kGWP9CvVUN2WHwj7supKJPGo0RAZgggAuMKAbEQ//OExNwxKmI0Aubk+iAYhOA4pMEpiscHgJprogUDFEU/A8CwIgIU0JgIRgaehhYcYEOEwesKYGEGrNxlQe7wqAO0irAsTAgGAQNIx3xQSO0BS7ZcvMtWr+L3KakuW6txNdHElCS848ggQj4rkQXCMHB4zXSc24tS6WY/mcXsb5QNTMDCPmZ9VaS/99a7tSpqa5PP2/7raSDK8CijViMzM6zZp802CClNjFBZCAOzpmJjEjjRYMRhUx4AhIHJBxAK//OExMoommJAAtsbhoCMMKw4gSwUMVG1HnmakvYugYwMYcpLSACftKHCW7rBrpc3rks5R1W+mIAYB015pSCCyii8k64PtUErd/eppsStaW0QXzD0slcVdtfTN5NV//FcnHwiTBx2dI6cRC0cYpwUJIY6MrP/Z1uchvTOeGIwP/9TcS9NQwpkjHnIr+70DtadigHBMYfYAQIkZjDonMhU8wWJzAbPMZCEMCwUBy9AqJTENQMPJcCC5eZgMEFAmBgA//OExNonamJEBOaU9FOizRnkPGHQaX9CgBNoR8MLyF7+igBQfCACsKDACk4DQKKg8VJJRbgEogwfEILQiYQymMxpBMrqalBKAGEEIJBI0AQ6AcBPGFHnEvIooo6DkZNKhWQDtWbox9aRG4/+CIUyaE2PlEtRak396rqU3UtXOm6T2++ppU6wKRrzbsNWQzl6Ze0GyyxYQxSaRIgFqVBzMx2KyuY6A4s3hYPDwDAw3MKCkwq2js6BBQaL9gEBrbTU//OExO8tOmI0AuPbhGnCQdAo3FAcWyMFhAwO4DDoRBwsTesJqOqMgo8koRQMYxBVpOzwBIMxYmX9TBiibsBrIb2eTLVSaYzYLiskQk3WQvVDNKKgPfEotHnlbAOcxcT82o6SXoHSaXQlSj/0/UYmpm1FvWjuZrQfdlroM+49TReHeBgs1SLuiTvJqxFzbUva8WrVASg6YLgsYCgMQgakIYVKwYgAeYCEQBAgJQGGQDUZBwOGLpsnIIhBwOGtAmgK//OExO0samI4BOZbLbFEAibz0ndOA0EUJBJYdfCbkKDB5EQcBEOIoygQTSlgGrcZi6ZvWThRZEhSDgbv0FqC0xXttSnRYABh8CIzlEkzpx/3Ddx95xX8Ny+akctFBkmkOA6pBOt76jRIgIIp2OerRfbWv/+XDBL//Nm/vZaQswWQVPo9HSqSK3vRgnAgHQEu8lUwIwIBVNTMx4C4DFgeYED5ukNmzASaRMRk41GFBeAjgYcHSNJhXsm71EGKUOdp//OExO4s2p40Au6g9JAOohgFDU0E84gsx79Vhq0Z0kotiCEwjJNcHgTXkoAaZHlYIPgUQDX52CKBpnCYwBbEPH5Hefy9ytkOllAF3mqLA6SXFpYNbdI1q7FiAQ5LfUl6rDUMRzK1Bl2392BoJv1MPm47tJGzYpL+HM713drvbvupF/qei7LSIwW12+ptmQWTqu697XC8ABzVhD0MO7LbcqYi5jL3EbVdIkOwcRV5luwtMQgdiryAoULgTfkQcOgh//OExO0xSposAOai/IBegJcmUjnKZKnuIgdSsyIFL2EwCIAEyeUKC5pSz2qyB51spHwRQkIeIzMYBEJCCSlhpc3aBi8Ysz9u7EImFywMTkSru5FjRxRmOU1jjNjw0gJ3UsPGU1HRZhAQBfHGUt2ZzuiWX/zChYmO//kzf/YKIEIuhMU8ZdN4XeapLk8V/Ikl1THrkxUBXSjmdMggODMbyzKx8lB08x4mAROY5On1EypULmDo/LHTlHQI3UoCo6xU//OExNomup5AAubUvoBU1axMAGi48MjQKWAdJ5AeCgctMIQMsiOA5qaylsXNf4DB6ZtumQnMAQ/UyvJ+AwIBgEY6HAJWCA5fkq1P22zJhY3pVl4BxSsJimmEboFP5NdK2xSUXFN3f3pN/P5lU2d6avGQ1//4q//uC4CAWlXF6mVAoDmjK6U4aTAi6E5EqTDw0gwWzAoHzBwUDFiljAEFDDgZjJcUAKAYcEJhYAI6GZi0Vx2QaBj0CBYAMBBgy8GA//OExPIrcp40AtpVpElsBGBBhYSRhQCDOzAYCDFRFjB0IzAwDIfYEAQJ74cJR1mEBCqoZFRm+ORhiJIlAiYnWK78CtdVsbZwWsFBWYKAig4MOZg4kWRDBxWOXQ2sMOAzTXbgiBJLDCxuQFbffn/KYzf7nhYzgLj/hwE+s5dp8MbV+pSU3cf9kFIu9aD9a8vKbvq28mkvu7+F4ADmhCERSS00N0lC7tfJpI8CGhgKSim0NG6hpRwmEzwECkrFjscQ//OExPc0spooAO7jNAIIxjun0mBFNBYiTXQ0aMIyM0tRAxIxEKgxqMKlerY1mIvdKaN213PwmOYGOGkDIQDN391mUXoUoO4TmS6GZpSpQA23B2k72Qz2N2Zg6NxqinJmdTNy65hqMUDh13aZqL4KT/9LmK1M6NaXtrMCEi3/9f/7DuEyN2Jvu/r+y9OVz3GGABecDACCQKMOAvBgHQoqCeY5TODQlMVx5MOA3FABIgDMLwEFQfMDGgN5xtAw/GBC//OExNcnAp5ABN4bZIEFwYTFxDCQoCo4SgmXnJg4oAgI3S7HpYcAZWFAcChS3Xkh9D0iCC9oWFTnYM1UOFgIwgBUFLrtrThwIpi4jrWrjeA0WMEXzcCwaAGdNXfyVLkk4KCJXp2pc+taNyuMO3S0k1Xl8X/GzjXUopAH5Enz6DetD9J0ta70FVqQJNHfrr+c0/RVQ5jNU6GAQNTIhJGKKrHRJLANGO5XGGgBgQBQwHDIwQwg+zE9OygQy3AEANIg//OExO4wCmIsAO7i+LiGFpOHA4UmGoJISiEDZAicMACDhkJCGMHgeLnCoLGB6QGNoHEQHmIhUAoTV2tyGg5mJEEAQFMGKTLUoGFRWFg4nT5T1cGKwc7kosReUIZFoAIwnPA4cQqcLPc5+4WowDiWKwqS91T/3VvVu5Lc5r5ydp9EjPgFCXCwexSW/o+pJl9P9SMzIf62v6Q/v6GDztbfZt1ZZDZUlOigBDASUCowihxIWqsAQQGK4DQ0ZYdposMj//OExOAusmIwAu7bMEHS0Rh4DmJwsSkU5eRDAwxMFhsMFIsAMVKTAoHMrmExcHxITmFBWHRsMQjX0OKoGfwMgUlOXDgUsBwwYWzgg0MsAILhF+0tUZGFRRONW5SyKJ6FxEeVsAUdm0AQBQRCn8h1/pQIwEi1AlBADhw8PEjxNoWP4sfHRUmaM4XDIvg/IJTpc/9Nay690/UldiNIk6H/7kcqQ8nbCgLXE+IitVusbRzLqGHvQKAQgGLLAcCH1U2C//OExNguSl4wAuJjosDWy4w4FJRIwcdFB8CK5GQFgISYTwQALiEYCIwUTRACEAoUMNBTLiEGloCHygBYYjbAY4EIdWPP6CS8wSuPCTx6UAIEgSayXTVAjw0loTHId2qRVFSBihGZEDlAaryBoKtRxmqlEFy+7fn9FymZWPObWcOlyryVOmYPCdWo6m10/6auv9XWVFNbr1dEdaPJ6fy4rcQ+3suYdGqPkMsNgdVYRAYCK1LHOGQswzLNQHRDMG/B//OExNEsKmIwAtsho4ECqYqtYAGGFcnaaBCxeBKGjQcCDBJgwh2SwgCEyEtSamYI4A4EbCzdqDsIDGAsndZYQC1DXGRAECotG9XqmMBT21hXbWBYE30rQ4gkkyZNSDYeed6IAb6G4Hj2WPEk2QQszpvZEyUgaF0GY0Nt+e/fZVb0erRWUUv/8kFIh55S4iECDLEI287KXAEITmAw7GHAfMoMLg1MTjnMnxFM+SHNXBPMGQLEACmDgEEwJmJBtnGg//OExNMm8l44At6a2AQQSBiIZMFMIBIvyYcCxgoSgwMAIImIQWYyBQEJJmIjg4+uUiGKAkVA5aB3GfjgRMAgEyPNjwJIHiCYeCCt4YFW4sdi80zpTsAA0MEU4SA0IIJhUHGUg+DhLALXOJ5OMlqhs5yzGivfEXDmIxL2zabe312KO4/dWW6ICbi2AXomVCR9SX6KTJ3Y2Y652fz6KDqTt7qUuoZelanEdXaVZxZXYcBKXqBqhCulvqWonF20F0jz//OExOo1wl4gAO8m+AdOswrE0UBgwZBIxwOQypJYxKnUwkJ0wKAgOEsAhAMgiYJDUfsAmCiYBIIMDgwgAabwXFCeZhRzmIxIYUDZhkGGww2aDBxk8ClYcFQKCgIFgGrl/DCoZCoNBosMwME/SGzCgHaWXGeVdjby6HHTaetFOmmIACOBMxOMzNgEC4LMJgOUQ08SMjB0BrjsVhcte99nOhElijyTMu3Kr+qbv5jLE4OAA8ZYIb//SpJIdlvo6zEk//OExMY1UmIgAO8m+NNXX3XtJx/7g0Bch6nviRXDxTzSHogNvbDJH3dsvUr4y4XARelYDAIwegNaADIBk7ELAwAmmYSAAoSMojjgKUyciAAIJGSLaPK6gsGmTuQsFpKpUhYxQlLOcNEhTFw5UslhTEwcFA0BPuRg4OStUMDAuZVOtB6moxDXLr7pCiRUEEjDIBi70O9Bb7x6T0kkiMiVTLpUmRv/osYBYYg8/538ybv/8aMdtrUStkA+VXAgFwrD//OExKMncmI0AtwLpr8OQVALivGrBPAgHmV08YGACHcBAEzKGzEwGMdLYzSAAoB3WEAFJAOYVEg+UzDwOMADSz6EtSYKCwUKGzCocEI8GACYqemyiJhQbDMO2UwFXRlwhYHKguYZQH2EoOLoZXMjO4U5p9XJh2rzaAlNkwIHWqpYhvB8PTUBJtIUNMeid/hDWYj+PrKSf7LL6Q1AB+bK//rT//6yxXU13ZrOskEF3xI4nSqDMm7uE4MFNjcFez1N//OExLgqimI0BOba9WHwHQqY6WosDwsADFY1MMRMmH5lViBAdQAJPGEAMYIBgNSZzkEmDgGLAIhBLCEASPYCBRgNLmAQaUA0SGRjCLGMw40+BoLnlLlXwxFFjFrDDKuNZlcAgQCg1R9saxX5k+e7uu5LmRABoGCCepu3eu4bxO+XmMBgHOFyKS4kxSKASBJ/si6G4YyBWAUw8kf/60lrfs+pnzhBbb/6f/6B0Ycl1V8p2L+X0IAWX0UqDAShgnWA//OExMAruqIwAuGboELo2ijSMegUGA0wGCTXDWN1hQ1emTeAiJiOYYBwqEwoIhWrn7xYNKEwuFDC4TMTBMFCIGgYwWBjMbcCE8CgMHEA5WEDZAZMgDQBA4KBECQFAUKjCgECgiwAccGHnh3OQFQwQgCsTzsFp4TqzD8nlsAp6mNjRjYgdGAixkw9x2YKeVxcMnCFL3HbHHbuVmW1rWsv+ta3jS3qxeFiGaAzVLCT//3QOTF0fUlygWlJd/UyeXNa//OExMQ1Yp4gAObnMJaCVdfAEYIv1u/8lSBHz742tYQE/rTrMWgxgKhr/7LXuuHIYtWFAKAiSZjZhjcbGG7aEB0HCIMGZg0Al3DE7LNvggFCMhAAIBKaoAAiUgwEjB6VJgc+5IEzEj3KgzAQPjgkD1C0VC1AoDSYJCgEBAuMQHA40GB4oA4PpjoDJBEJZNu2//dXG4misItTzgBTLfyCSvqytd5QxFofgpuFtRF10K/+SiyHAdC//9VJ0quqh1HF//OExKEsEp4sAuZjZK2/39//0ygKCIlr+j+r+pXDBZ6011739zh6wzBLcGDYVXzEwJU4JDzGcMWgDYLMe9lQozgohFBgxrLNoaBJcMYCREAJiLwMIDlBTVYAFH5gYiACI2yOMGBBIWTqjxKBl8VOl0ioApySCZiJcGQ4kMCABJAVNWiVXicTaBGsIbbE/ygQAGQ4rQ7vXKZLEK7AFN5felNFJx2Hi6xDBxyfWeMAClv/+r7/8sEmi2+z7ay6tbco//OExKMpMl4wAtjhov+plBYzLHmjjdGhuVRUrAi6ooJTKSMCDnFAqCDHweMbi8y5NgUti2KwAKBKBxhAaHfAgYCCYYMKEKooll8BEYg5EFSCYAgkdWCltAwdHgBhSAKM/ULZKuLsg5KOtIDDwYtEqm9NLJd3Ydpd5x4vOtYYATUCpTVzmhVuw6zsvlVllJK6NSt82W+pSSZNG6gC52p+/R003ZeqtTVMpjg9nve+1X9z57x3UqQmG3lEMR5n9JKY//OExLEpaiYwBObg9HY0keDhBnSCRcrJDJyIt8afoGMCReoSBh4KViMitj4mcdBgUCJFo1oUl/y5oiSUR2qCoObRDg4LWD2x5PWXzjTWFICElDKH82I2AoEkbRw9fv2f7vHKs7TcwQClbgrQ0l7LsZuwgiCXNvUE7eCIHgLoMGcmdZE1YBlKqjT/voqUirovWhWjWTxp+6nerNGjOtSvoT/TCT8JdLnXrwXSSJ66ecspvnPqKAsOER5r/t3OOc8h//OExL4n+l40BNjhoNGaRuQkEYTeHppoKGyQDdRNduKlZQAA1WDhheSxhluVlTkZyuaXMiXzRtPfQssCRsW5IcLRO5TRW/rn87/YhSCIQCCVcrNpTDdG0lbDI5mktVaJFS0XzU/+xysCsbMh9P/f7r/rJVf62V2m7rMsrIoUKsrwaF1LlRylTEFNRQkjjs5qjeh+Ifj0H1IYZaXTNoQBIETjLNhiyZWHmUWJQns6YcRDLjgVEPNLkL2Qo+tYrq3o//OExNEl4mI8FM7a2IQIO1GFSwwDjgGijv5R14aXDOVNWGgYBAp1BGJFSa7vK+c29rCpu3/tEdoAERZFQpoENQtircIMZvF4tzPrqQWUsyP/zqJdASBqn62/oT9Ptqpv9PII++pvUyWW6w91Cj73TNrelCEjWulyuopDUCug7jwQI+y9F8nBhIkuQsoATDcxLwA0wHTbsuIeDmCMGVYGjNBY+hJHgKeCiw8LNGZNypMmASTMWmMZ2OEeQvijsw20//OExOgm8l44FttFpEjLvpJJDCpE2847cM1KJP11Vg26s9d+eZfPwA7bWm2AoQwrAWMkoRpjaS+md13FAIerzlyXIKOpmJig6C3m+xNGxKASy4t913b5xv19S1rWU0n/9uZ8W89xKz74i1Dj0q4kWsUe20JfjBVKYXDsfgMtEIQQk4CgIYYDZsilmUxCghFiAZxMpmYemuKwbJFS7wcDDBoJHgeY1TpnkOGARBDRhQDBUCGBAQxkwkHTZjYMDBhm//OExP8sql4wDt6gvIIB4bNSJog7jgEAgeMHARSLGXBb4mC4BBJhEKhg0fYSDxEKaAgSAZXQGAsrAJVgOCaRR5OulVgBIBIlmDZFSMGACgNVsVjWW8DdB4CYi90i252N7OZs/uOzPOarVOU5AXIqB5Cok2W1JJetHu3//Wff//NOSnPoGIsSZ1CVzKjgFBA3khMJQwQgYt4YDEJLVwM4jA2uMaDIaFYUAo0GQUJTI8VCwRMgBAFBkwgGFjpoloCY//OExP8wMl4cAOdjTA5pkrJXFkQAUDQDxBIYTXWBVO0xYZ93HYeDhiYABhiqCnSmkQCVEhBVJJrrLisALwaPIXkza+nU0Yw8UigzGBgK7bLJe7jijgAZe5D+RO7MAgRgiQcwid/2TLFEsWDmACmkat/r6Lf/9NP/X6pff6r/kEEiqjrqzKAtYWFe5n6aRMChAAzbItMkBQwCCCEEmnAEcPCxpcMmkAWYvDTSjCQSxMBwk+oIDDA3MLAISELKWBgI//OExPEsAl4kAOGboAwoDzGBHMZAsCjYCmIyNGDMgJQksqkDP5TIYzF1NC8ZgyP5wcEZhsFi2ZCv1qruRaKO5FaaXTTcBACBgyMRh8BMdXmxWGGVtEZ2TAtDUY5ZkIth7oGSQupoHn1F43niQHeAsDlND5k360ujS66epe50lP11oW1FxkxdFyF9rXqUm9lLNTFsqRspyVVoJHI4tIcVet3i7sQ+sIBAAo/Y07yjQBnACPCLfAAKXba8qNQ0wAQP//OExPQyyl4gAOdbLKAkHHCbyaS73fSsBIIbgVCAAaCQCxsMWJAitaiKx4xG4knXYC4MAJTJmj3oxUAja09xKlJIoIh/Du6ijTZAQSMEFYc/fxumlsmahRWcc+ObaCKS/XuZzIGM3en9v1t60vfoGv60V70Z/PmVu3SSr3UKg3Z4F0QK16NP/DRbZXJchR4SuYwIyUFKjMuj40cAjSwVBVeMHBQGA1YFOkwVBAAhxIQGNhBhYCEEb8spMGCz7wgy//OExNsmGl40BN6bLABSYath5gWBJKAhA1roorPWklmPGZgICHKhpmGceiAgVT4AoGDQN7IXVGQRWyGIheiAsHDwSAhkyckDgpklfk25S11F2tcjFWXzluv2Q6m8d7v38u41Wj7AqEkZVvW6SdTLs613sjo19Kh/tXzR4qv1f//f8pUiyWptrDS7Drv7HIdlTvjIicpNhBm3MwEDBO6Z8PmVUxtZQYIDpxgIthwUiD7xgmUG4hgSno5yt46Fm6O5//OExPUt2l4kAubg+BDwXBjCgoznKDgBp6jLFVpOQo087P0kQSQGEsp4gUpUKhbIUTpflOzsKdRpdmSNPsl2wyDeZcrNaKVwJBCOVmQSuT2wYPpNMaq/OuYgFCXkf/f9kO97WdR7X+/qP9N6dnrqVVmP/6G0pONNnQ4OWuUuwzt5RUBokAlUGOwcCQCFw6aYlpucWmV9xQPBAAAgoMTyhBBy2dKMGNiKRQXA0LFDSALMbABVKMhCAoMmMFJrqedc//OExPAo8l4sDNlboBwVAi1pbMiG48TEDpCw2IAMEgpiZKZgvgAkBgM+q1y0CfDYHEdplLWYPaYpelWYkRmegyqbXp2AYs7zD2WwDambcSGWUy6gkXXSZZCN6kECpTAA2UplN+z600K6alIqpp6RkaNV7/zVq7v//9T/6nhRNfeVP04amjEUdodJQWVAMDSSCi8LAAGBgzdbjQIMMZjYaZAkIAcFTBIGihiEunLxCZHBhhYiKhZECl9XTQmiFYHB//OExP8uwl4gAObavLBwuRGBw1maQDkRjKFBi5sGM1kKdqIAKBzBg8wB1S5WTBrOXPFgHGUzuVLZlSj6xDARs0IAUi8sehiWv7DS4n5ppFZkJKFxMqHGyzFljxIGXzyKJNAApPF+bt+k+mpTMZW2Nzynzhqv+l9j6ThR9LWPt2If7I28Iv3fpYguuG4/BDT35Ubj8LJQSJC4zM7BUKI+FzDQcCMxBwwqtRJWgoLgEDNSBgHMjvs2aUjAYTLxgZaW//OExPcvsl4gAOba9EYGMCGEjJ+IIIDFQCMEAD2MSWVxJ6i5lrKucRNoIZAVGKBztiRwgFCLH5mW5d13CrWKAzsigkGBROa19x2oy2Nz0HuVFbEO1K9+Z3Gu1a3LVye1z7Nc8dRBCi0uf/1rVfdqWl1GzP51cN67r/1N6ae3RL45TdisPIst1S2YCxRlMGqKlzDTLNMVAeBiENma6qbYGZhtymAQ2Ai6JDFeoCH5i6pnLjQYECgQZCIOEhEwEACo//OExOsq8iIgAOaa+BGPhRtJmDCYMKyoImGM5uyWRBsUu0T7hYOIgRRQwEIEAQYCTnyjxgw4pUr6FvLI5XrPDOa5NEgCYkIBF6zxVeFvrA7dWYSppM1OzFcliMTLyRLVOl1JS6YwGyYl3//qS5r/0nUr61VWdZep20Vrov5HzmRp4uqLKraWrXXkYS6aZTX2tM/RySfM2AbIAFLes7MhFnMQQLMXgoMOwPEg8CwJpWgkDzCgbTgoYzAYTSY3BAO9//OExPItimIUAObi9CsJJQ40McKltx8iBzAaEWExGKtmxa2/RYFhoNC4soQYWQGHKJ6AkVlVqxADTKciKtZf+O6BR0wccMKGWO3JVAErnmtPw+0jiNDDRiamZK0in9aaalOPwIpLLntZr/b9/21v/V7LWYuvQuljESTCu72u4WYHCCqv026t0a1G4Ma9TvSypa66SQUPbyjCAxU6KBpmAdCLmR4gqVhcISiFgICEpqFgdhImClhb0WIigSV0oKls//OExO4sul4QAO7a9Gam5gQRLiQHMwSgw/fQhBoOTVTOJRBGlkLHQKEmZyxi6iJDg8J4qKJow7vfN95doE2zJ4DHSqh+Zild6YwhrA1Dcq3+UViAc7/86vtk8GocxNy06tq2EiwmAyQZpuAV1955EO5q0u7y6m1vbB4UlW+pjVd9HSdZrrvuCX9eaRDodNBRkHB0wiBjA4cMbyow0NjIqkMVCJH9EWOgIsmJXoc7G5ggPhgDSFGhEIAOUAAGgcxA//OExO4q8ZYIAN4XZAsCAUwKAWJmExQOCEFAWIvwXWTqS+ihCBFtiQhMRDY6mOhYDtGedW5B6R5/dh/K9dbqoOSE4HJuSR6R2rUTX0pK3TUdXEmQec/6CMSYw5gXFSuc3/d8+kVk8mbBhExZlSJ0Ci6ZRXbWsagaR9pA9Gd71j4+hx16jt+niS8VqQO114YqxcLhApBBheyolCzL283oEADSbMCstfl71QGPwB+LkFh1PsCAV+BYW11KkQqwaWbq//OExPUuKhn8AOHHpCQIdWGYFDSLL9T9WMyEQCREOMyrMPcDgsK7PS2jkz3yV+HfbjT0g6AMeQDsyVLiX4lFZTFLXanc6U4SXlBeW8t5IkPAtIs82Z+27Tqb86zmsh7PSpuY+dNMPRVMqcprVN9cdqW7UulcOElibWdWAQ0/GLqu9j9RqHpdIIDflohaJBAZCbgZIWBMSLzpvU24ZMiWTKA1S1NJNMvoYyuD3OZcHxlhr2LzXA/7EEawsAGFBZjk//OExO8rosHwAN6O9GgbZS+Y/ljMtelKVRallQANTsn0EBxQFyCYoY5D0uhmxALXbaXpeYEiQKPoHhp+q1JPvUwarZr2dUSnMebNp967q5pEbgDidtjRSNaj37adSpIXLOzqYMuhqmUsss21VZRqFLq/RDdU8udHUtSo/5DepZjPCl0/bDVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVegAFJbLawPbVbB8zK4ujrEP//OExPMuK6HUANrFpEB4gq3bTtBKR9rFwwtLMA0ApT169MNFAAQjV//zQwoUab8pcomFAWgJjKAshuFEobdVKWZ6ATAQrarTPNDClUpQFnvVqGVjBizGhWoAkAjGfyl6lL6GeoE/ytXKQM5TP/q3p8KAiWXLluQPMulHpGVMhdi4l0tKbq8DvvLFosxFSpjLSHbfyG30fhmyxWVOCuZASMiJSo7qAMvdRLrKue2jK1TJlSI84SdE9HyLMNMghTnD//OExMQd46XxXmIE7mTxgnynGdwaVShxfSZGwdaBUUGm8/5K4aysqqlOE4TzfcNc0QiIZD5ATmD5KKhCNB4jQTq1ipw4upPN/qr/////+xq6r+MorFThxdh7MorJp1OG5v/uGsoiERDIyURsPw1HioqKtpCQuxICFmer+KJMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//OExP8u6wz4AMPTLKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//OExEwAAANIAAAAAKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq', click: 'data:audio/mpeg;base64,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' };
+const clipBuf = {};
+async function clip(name){
+  const c = audio(); if (!c) return null;
+  if (!clipBuf[name]) clipBuf[name] = fetch(CLIPS[name]).then(r => r.arrayBuffer()).then(b => new Promise((ok, no) => c.decodeAudioData(b, ok, no))).catch(() => null);
+  return clipBuf[name];
+}
+async function playClip(name, vol = 1){
+  const c = audio(), buf = await clip(name); if (!c || !buf) return;
+  const src = c.createBufferSource(), g = c.createGain(); g.gain.value = vol;
+  src.buffer = buf; src.connect(g).connect(c.destination); src.start();
+}
+function sfx(name){ if (!soundOn) return; try { SFX[name] && SFX[name](); } catch (err) {} }
+function paintSound(){ const b = $('#soundBtn'); if (!b) return; b.textContent = soundOn ? '🔔' : '🔕'; b.classList.toggle('off', !soundOn); b.title = soundOn ? 'เสียงเปิดอยู่ — กดเพื่อปิดเสียง' : 'ปิดเสียงอยู่ — กดเพื่อเปิดเสียง'; }
+document.addEventListener('click', e => { const b = e.target.closest('button.btn'); if (b && !b.disabled) sfx('tap'); }, true);
+
+/* ---- แจ้งเตือนผู้อนุมัติ: ตรวจใบลาใหม่ทุก 60 วินาทีขณะอยู่ในโหมดผู้อนุมัติ ---- */
+const isWaiting = r => r.status === 'รออนุมัติ' || (!r.status && Number(r.fy) >= Number(CFG.baseFy));
+let seenWaiting = null, pollTimer = null;
+function waitingKeys(rows){ return new Set(rows.filter(isWaiting).map(r => r.key)); }
+function setTitleCount(n){ document.title = (n ? `(${n}) ` : '') + 'ระบบควบคุมการลา งานป้องกันปราบปราม สภ.บางบ่อ'; }
+async function pollNew(){
+  if (!state.admin || DEMO) return;
+  try{
+    const first = await api('GET', { year: '' });
+    const others = await Promise.all((first.years || []).filter(t => t !== first.year).map(t => api('GET', { year: t })));
+    const rows = [first, ...others].flatMap(j => (j.rows||[]).map(r => ({ ...r, key: j.year + ':' + r.row })));
+    const now = waitingKeys(rows), fresh = [...now].filter(k => seenWaiting && !seenWaiting.has(k));
+    setTitleCount(now.size);
+    if (fresh.length){
+      sfx('bell');
+      const who = rows.filter(r => fresh.includes(r.key)).map(r => r.name).slice(0, 3).join(', ');
+      toast(`🔔 มีใบลาใหม่ ${fresh.length} รายการ: ${who}${fresh.length > 3 ? ' …' : ''}`, 7000);
+      if (!document.querySelector('dialog[open]') && !state.editing) await load(state.year);
+    }
+    seenWaiting = now;
+  }catch(err){ /* เงียบไว้ ลองใหม่รอบหน้า */ }
+}
+function startWatch(){
+  clearInterval(pollTimer); pollTimer = null;
+  if (!state.admin || DEMO) { setTitleCount(0); seenWaiting = null; return; }
+  seenWaiting = waitingKeys(state.all); setTitleCount(seenWaiting.size);
+  pollTimer = setInterval(pollNew, 60000);
+}
+
+function toast(msg, ms=2500){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); { const M = MO(); if (M) M.animate(t, { scale:[.85,1] }, { type:'spring', stiffness:500, damping:22 }); } clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), ms); }
+const uniq = a => [...new Set(a.filter(Boolean))];
+const teamSort = (a,b) => { const na=/^\d+$/.test(a), nb=/^\d+$/.test(b); return na&&nb ? a-b : na ? -1 : nb ? 1 : a.localeCompare(b,'th'); };
+
+function renderYears(){
+  const sel = $('#year');
+  sel.innerHTML = state.years.map(y => `<option ${y===state.year?'selected':''}>${y}</option>`).join('') || `<option>${state.year}</option>`;
+}
+
+function fillSelects(){
+  const teams = uniq(state.all.map(r=>r.team)).sort(teamSort);
+  const names = uniq(state.all.map(r=>r.name)).sort((a,b)=>a.localeCompare(b,'th'));
+  for (const id of ['#fTeam','#pTeam','#calTeam','#bTeam']){
+    const el = $(id), v = el.value, first = el.options[0].outerHTML;
+    el.innerHTML = first + teams.map(t=>`<option value="${esc(t)}">${/^\d+$/.test(t)?'ชุด '+esc(t):esc(t)}</option>`).join('');
+    el.value = v;
+  }
+  $('#teams').innerHTML = teams.map(t=>`<option value="${esc(t)}">`).join('');
+  $('#names').innerHTML = names.map(n=>`<option value="${esc(n)}">`).join('');
+  const ms = uniq(state.rows.map(r=>r.month)).sort((a,b)=>((monthIdx(a)+3)%12)-((monthIdx(b)+3)%12));
+  const fm = $('#fMonth'), v = fm.value;
+  fm.innerHTML = '<option value="">ทุกเดือน</option>' + ms.map(m=>`<option>${esc(m)}</option>`).join('');
+  fm.value = v;
+}
+
+function renderAll(){
+  document.body.classList.toggle('is-admin', !!state.admin);
+  $('#adminBtn').textContent = state.admin ? '✓ ผู้อนุมัติ' : 'ผู้อนุมัติ';
+  $('#adminBtn').title = state.admin ? 'กำลังอยู่ในโหมดผู้อนุมัติ — กดเพื่อออก' : 'เข้าสู่โหมดผู้อนุมัติ';
+  document.querySelectorAll('.adm,.adm-tab').forEach(e => e.hidden = !state.admin);
+  if (!state.admin && (state.tab === 'settings' || state.tab === 'check')) switchTab('home');
+  fillSelects(); renderHome(); renderList(); renderPeople(); renderCal(); renderBalance();
+  if (state.tab === 'charts') renderCharts();
+  if (state.tab === 'settings') fillSettings();
+  if (state.tab === 'check') renderCheck();
+}
+
+/* ---- เพดานกำลังพล ---- */
+const teamLabel = t => /^\d+$/.test(String(t)) ? 'ชุด ' + t : String(t || 'ไม่ระบุชุด');
+function capFor(team){
+  if (!team) return null;
+  if (CFG.teamCaps && CFG.teamCaps[team] !== undefined && !isNaN(CFG.teamCaps[team])) return CFG.teamCaps[team];
+  return CFG.capDefault === '' || CFG.capDefault === null || isNaN(Number(CFG.capDefault)) ? null : Number(CFG.capDefault);
+}
+/** วันที่ชุดใดลาเกินเพดาน: Map(วันที่ → [{team, n, cap, names}]) นับคน (ไม่ซ้ำ) ที่ลาอยู่ รวมรายการรออนุมัติ */
+function overCap(){
+  const byKey = new Map();
+  for (const r of state.all){
+    if (!active(r) || !r.team || capFor(r.team) === null) continue;
+    for (const k of r.dates){
+      const id = r.team + '|' + k;
+      if (!byKey.has(id)) byKey.set(id, new Map());
+      byKey.get(id).set(pkey(r.name), r.name);
+    }
+  }
+  const out = new Map();
+  byKey.forEach((people, id) => {
+    const i = id.lastIndexOf('|'), team = id.slice(0, i), k = id.slice(i+1), cap = capFor(team);
+    if (people.size > cap){
+      if (!out.has(k)) out.set(k, []);
+      out.get(k).push({ team, n: people.size, cap, names: [...people.values()] });
+    }
+  });
+  return out;
+}
+
+/* ---- ภาพรวม ---- */
+function liRow(r, extra=''){
+  return `<li><div class="who">${esc(r.name)} ${teamPill(r.team)}<small>${rangeText(r)} · ${r.countText || (r.dates.length ? r.count : '?')} วัน${r.note?' · '+esc(r.note):''}</small></div>${extra || pill(r.status)}</li>`;
+}
+function renderHome(){
+  const today = iso(new Date());
+  const act = state.all.filter(active);
+  const onToday = act.filter(r => r.dates.includes(today));
+  const pend = state.all.filter(r => r.status === 'รออนุมัติ').sort((a,b)=>a.start.localeCompare(b.start));
+  $('#kToday').textContent = onToday.length;
+  $('#kPending').textContent = pend.length;
+  $('#kCount').textContent = state.rows.filter(active).length;
+  $('#kDays').textContent = state.rows.filter(active).reduce((s,r)=>s+r.count,0);
+  $('#todayLabel').textContent = thShort(new Date());
+  $('#todayList').innerHTML = onToday.map(r=>liRow(r)).join('') || '<li class="empty">ไม่มีผู้ลาวันนี้</li>';
+  // ครึ่งเดือน: 1–15 และ 16–สิ้นเดือน
+  if (!state.half){ const n = new Date(); state.half = { y:n.getFullYear(), m:n.getMonth() }; }
+  const { y, m } = state.half, lastDay = new Date(y, m+1, 0).getDate();
+  const mName = `${MONTHS_FULL[m]} ${y+543}`;
+  $('#halfTitle').textContent = mName;
+  $('#h1Title').textContent = `ลาวันที่ 1–15 ${MONTHS[m]}`;
+  $('#h2Title').textContent = `ลาวันที่ 16–${lastDay} ${MONTHS[m]}`;
+  const inRange = (a, b) => act.filter(r => r.dates.some(d => d >= a && d <= b)).sort((p,q)=>p.start.localeCompare(q.start) || p.name.localeCompare(q.name,'th'));
+  const halfLi = (r, a, b) => { const n = countDays(r.dates.filter(d => d >= a && d <= b), r.type); return liRow({ ...r, countText: n === r.count ? '' : `${n} จาก ${r.count}` }); };
+  const a1 = iso(new Date(y,m,1)), b1 = iso(new Date(y,m,15)), a2 = iso(new Date(y,m,16)), b2 = iso(new Date(y,m,lastDay));
+  const L1 = inRange(a1,b1), L2 = inRange(a2,b2);
+  $('#h1Title').innerHTML += ` <span class="muted" style="font-weight:400">· ${L1.length} รายการ</span>`;
+  $('#h2Title').innerHTML += ` <span class="muted" style="font-weight:400">· ${L2.length} รายการ</span>`;
+  $('#half1').innerHTML = L1.map(r=>halfLi(r,a1,b1)).join('') || '<li class="empty">ไม่มีผู้ลา</li>';
+  $('#half2').innerHTML = L2.map(r=>halfLi(r,a2,b2)).join('') || '<li class="empty">ไม่มีผู้ลา</li>';
+  const oc = overCap();
+  const causes = r => r.dates.some(k => (oc.get(k) || []).some(o => o.team === r.team));
+  $('#pendList').innerHTML = pend.map(r=>liRow({ ...r, name: r.name }, (causes(r) ? '<span class="warn-tag">⚠ เกินเพดาน</span> ' : '') + (state.admin ? statusBtns(r) : pill(r.status)))).join('') || '<li class="empty">ไม่มีรายการรออนุมัติ</li>';
+  const lim = iso(addDays(new Date(), 60)), up = [...oc.entries()].filter(([k]) => k >= today && k <= lim).sort((a,b)=>a[0].localeCompare(b[0]));
+  $('#capCard').hidden = !up.length;
+  $('#capList').innerHTML = up.slice(0, 20).map(([k, list]) => list.map(o => `<li><div class="who">${thFull(fromIso(k))} ${teamPill(o.team)}<small>ลา ${o.n} คน (เพดาน ${o.cap}): ${o.names.map(esc).join(', ')}</small></div><span class="warn-tag">เกิน ${o.n - o.cap}</span></li>`).join('')).join('') + (up.length > 20 ? `<li class="empty">และอีก ${up.length-20} วัน</li>` : '');
+}
+function statusBtns(r){
+  return `<span class="acts"><button class="btn ok sm" data-act="status" data-st="อนุมัติ" data-key="${esc(r.key)}">อนุมัติ</button><button class="btn bad sm" data-act="status" data-st="ไม่อนุมัติ" data-key="${esc(r.key)}">ไม่อนุมัติ</button></span>`;
+}
+
+/* หมายเหตุ: แยกแต่ละส่วน (คั่นด้วย ·) เป็นบรรทัดละส่วน และไม่ตัดคำกลางส่วน */
+const noteHtml = n => String(n||'').split('·').map(x => x.trim()).filter(Boolean).map(x => `<span class="nt">${esc(x)}</span>`).join('');
+/* ---- รายการ ---- */
+function filtered(){
+  const q = $('#q').value.trim().toLowerCase(), t = $('#fTeam').value, m = $('#fMonth').value, s = $('#fStatus').value;
+  return state.rows.filter(r =>
+    (!q || (r.name+' '+r.note).toLowerCase().includes(q)) && (!t || r.team===t) &&
+    (!m || r.month===m || r.dates.some(d => fromIso(d).getMonth()===monthIdx(m))) &&
+    (!s || (s==='none' ? !r.status : r.status===s)));
+}
+function renderList(){
+  const {k, dir} = state.sort;
+  const rows = filtered().sort((a,b) => {
+    const va = a[k], vb = b[k];
+    return (k==='seq'||k==='no'||k==='count' ? (parseFloat(va)||0)-(parseFloat(vb)||0) : String(va).localeCompare(String(vb),'th')) * dir;
+  });
+  $('#tbody').innerHTML = rows.map(r => `<tr>
+    <td class="num muted" title="แท็บ ${esc(r.sheet)} ลำดับเดิม ${esc(r.no)}">${r.seq}</td><td>${esc(r.name)}</td><td style="white-space:nowrap">${rangeText(r)}</td>
+    <td class="num" title="${r.confirmed ? `ผู้อนุมัติยืนยัน: รวม ${esc(r.td)} วัน · วันทำการ ${esc(r.wd)} วัน` : 'คำนวณจากวันที่ลา'}">${r.confirmed ? '<span class="cf" aria-label="ผู้อนุมัติยืนยันแล้ว">✓</span>' : ''}${r.dates.length ? (r.count || `<span class="muted" title="ตรงกับวันหยุดทั้งหมด จึงไม่นับเป็นวันทำการ">0</span>`) : '<span class="muted" title="อ่านวันที่ลาไม่ได้">?</span>'}</td><td>${teamPill(r.team)}</td><td>${pill(r.status)}</td>
+    <td class="muted">${noteHtml(r.note)}</td>
+    <td><span class="acts"><button class="btn sec sm" data-print="${esc(r.key)}" title="พิมพ์ใบลา">พิมพ์ใบลา</button>${state.admin ? `${r.status!=='อนุมัติ'?`<button class="btn ok sm" data-act="status" data-st="อนุมัติ" data-key="${esc(r.key)}">อนุมัติ</button>`:''}
+      ${r.status!=='ไม่อนุมัติ'?`<button class="btn sec sm" data-act="status" data-st="ไม่อนุมัติ" data-key="${esc(r.key)}">ไม่อนุมัติ</button>`:''}
+      <button class="btn sec sm" data-act="edit" data-key="${esc(r.key)}">แก้ไข</button>
+      <button class="btn bad sm" data-act="delete" data-key="${esc(r.key)}">ลบ</button>` : ''}</span></td>
+  </tr>`).join('') || `<tr><td colspan="8" class="empty">ไม่พบรายการ</td></tr>`;
+  const days = rows.filter(active).reduce((s,r)=>s+r.count,0);
+  $('#listFoot').textContent = `แสดง ${rows.length} รายการ · รวม ${days} วัน (ไม่นับที่ยกเลิก/ไม่อนุมัติ)`;
+}
+
+/* ---- สรุปรายบุคคล ---- */
+function renderPeople(){
+  const q = $('#pq').value.trim().toLowerCase(), t = $('#pTeam').value, onlyOk = $('#pApproved').checked;
+  const map = new Map();
+  for (const r of state.rows){
+    if (onlyOk ? r.status!=='อนุมัติ' : !active(r)) continue;
+    const p = map.get(r.name) || { name:r.name, teams:new Set(), n:0, days:0, last:'' };
+    p.teams.add(r.team); p.n++; p.days += r.count; if (r.start > p.last) p.last = r.start;
+    map.set(r.name, p);
+  }
+  let ppl = [...map.values()].filter(p => (!q || p.name.toLowerCase().includes(q)) && (!t || p.teams.has(t))).sort((a,b)=>b.days-a.days || a.name.localeCompare(b.name,'th'));
+  const max = Math.max(1, ...ppl.map(p=>p.days));
+  $('#ptbody').innerHTML = ppl.map(p => `<tr><td>${esc(p.name)}</td><td>${[...p.teams].map(teamPill).join(' ')}</td>
+    <td class="num">${p.n}</td><td class="num"><b>${p.days}</b></td><td style="width:22%"><div class="bar"><i style="width:${p.days/max*100}%"></i></div></td>
+    <td class="muted">${p.last ? thShort(fromIso(p.last)) : '-'}</td></tr>`).join('') || `<tr><td colspan="6" class="empty">ไม่มีข้อมูล</td></tr>`;
+}
+
+/* ---- ปฏิทิน ---- */
+const shortName = n => (n.replace(/^([ก-๙]{1,4}\.)+\s*/, '').split(/\s+/)[0]) || n;
+function renderCal(){
+  if (!state.cal){ const n = new Date(); state.cal = { y:n.getFullYear(), m:n.getMonth() }; }
+  const {y, m} = state.cal, team = $('#calTeam').value;
+  $('#calTitle').textContent = `${MONTHS_FULL[m]} ${y+543}`;
+  const first = new Date(y, m, 1), startGrid = addDays(first, -first.getDay()), today = iso(new Date());
+  const act = state.all.filter(r => active(r) && (!team || r.team===team));
+  const oc = overCap();
+  let html = DOW.map(d=>`<div class="dow">${d}</div>`).join('');
+  for (let i=0;i<42;i++){
+    const d = addDays(startGrid, i), k = iso(d);
+    if (i>=35 && d.getMonth()!==m) break;
+    const who = act.filter(r => r.dates.includes(k));
+    const hol = CFG.holidays.get(k), wk = d.getDay() === 0 || d.getDay() === 6;
+    const ov = (oc.get(k) || []).filter(o => !team || o.team === team);
+    const ovTxt = ov.map(o => `⚠ ${teamLabel(o.team)} ลา ${o.n}/${o.cap}`);
+    html += `<div class="d ${d.getMonth()!==m?'out':''} ${k===today?'today':''} ${who.length?'has':''} ${ov.length?'over':hol?'hol':wk?'wk':''}" title="${esc([hol, ...ovTxt, ...who.map(r=>r.name+' ('+(r.status||'รอดำเนินการ')+')')].filter(Boolean).join('\n'))}">
+      <div class="n">${d.getDate()}${who.length?`<span>${who.length} คน</span>`:''}</div>${hol?`<span class="hn">${esc(hol)}</span>`:''}${ovTxt.map(t=>`<span class="ov">${esc(t)}</span>`).join('')}
+      ${who.slice(0,4).map(r=>`<span class="chip s-${esc(r.status||'none')}">${esc(shortName(r.name))}</span>`).join('')}
+      ${who.length>4?`<span class="chip muted">+${who.length-4}</span>`:''}</div>`;
+  }
+  $('#cal').innerHTML = html;
+}
+
+/* ---- ปฏิทินเลือกวันที่ภาษาไทย ---- */
+const thFull = d => `${d.getDate()} ${MONTHS_FULL[d.getMonth()]} ${d.getFullYear()+543}`;
+let dpOpen = null;
+function dpSync(){
+  document.querySelectorAll('.dp').forEach(dp => {
+    const v = dp.querySelector('input').value, b = dp.querySelector('.dp-show');
+    b.textContent = v ? thFull(fromIso(v)) : 'เลือกวันที่';
+    b.classList.toggle('empty', !v);
+  });
+}
+function dpClose(){ if (dpOpen){ dpOpen.pop.remove(); dpOpen = null; } }
+function dpRender(){
+  const { dp, pop, view } = dpOpen;
+  const input = dp.querySelector('input'), sel = input.value, f = $('#form');
+  const min = dp.dataset.name === 'end' ? f.elements.start.value : '';
+  const other = dp.dataset.name === 'end' ? f.elements.start.value : f.elements.end.value;
+  const lo = [sel, other].filter(Boolean).sort()[0], hi = [sel, other].filter(Boolean).sort()[1];
+  const first = new Date(view.y, view.m, 1), start = addDays(first, -first.getDay()), today = iso(new Date());
+  let h = `<div class="dp-head"><button type="button" class="dp-nav" data-nav="-1" aria-label="เดือนก่อน">‹</button><b>${MONTHS_FULL[view.m]} ${view.y+543}</b><button type="button" class="dp-nav" data-nav="1" aria-label="เดือนถัดไป">›</button></div><div class="dp-grid">`;
+  h += DOW.map(d => `<span class="w">${d}</span>`).join('');
+  for (let i = 0; i < 42; i++){
+    const d = addDays(start, i), k = iso(d);
+    if (i >= 35 && d.getMonth() !== view.m) break;
+    const cls = [d.getMonth()!==view.m?'o':'', k===today?'t':'', k===sel?'s':'', lo&&hi&&k>lo&&k<hi?'r':''].join(' ');
+    h += `<button type="button" class="${cls}" data-d="${k}" ${min && k < min ? 'disabled' : ''}>${d.getDate()}</button>`;
+  }
+  h += `</div><div class="dp-foot"><button type="button" data-clear>ล้าง</button><button type="button" data-today>วันนี้</button></div>`;
+  pop.innerHTML = h;
+}
+function dpSet(dp, v){
+  const f = $('#form');
+  dp.querySelector('input').value = v;
+  if (dp.dataset.name === 'start' && v && (!f.elements.end.value || f.elements.end.value < v)) f.elements.end.value = v;
+  dpSync(); dpClose(); updatePreview();
+}
+document.addEventListener('click', e => {
+  const show = e.target.closest('.dp-show');
+  if (show){
+    const dp = show.parentElement;
+    if (dpOpen && dpOpen.dp === dp) return dpClose();
+    dpClose();
+    const v = dp.querySelector('input').value || (dp.dataset.name==='end' && $('#form').elements.start.value) || iso(new Date());
+    const d = fromIso(v), pop = document.createElement('div');
+    pop.className = 'dp-pop'; dp.appendChild(pop);
+    dpOpen = { dp, pop, view: { y: d.getFullYear(), m: d.getMonth() } };
+    dpRender(); return;
+  }
+  if (!dpOpen) return;
+  if (!dpOpen.pop.contains(e.target)) return dpClose();
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.nav){ const v = dpOpen.view; v.m += +t.dataset.nav; if (v.m<0){v.m=11;v.y--;} if (v.m>11){v.m=0;v.y++;} dpRender(); }
+  else if (t.dataset.d) dpSet(dpOpen.dp, t.dataset.d);
+  else if ('clear' in t.dataset) dpSet(dpOpen.dp, '');
+  else if ('today' in t.dataset) dpSet(dpOpen.dp, iso(new Date()));
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') dpClose(); });
+
+/* ---- ฟอร์ม ---- */
+function formData(){
+  const f = $('#form'), v = n => f.elements[n].value.trim();
+  if (!v('start')) return null;
+  const end = v('end') && v('end') >= v('start') ? v('end') : v('start');
+  const s = toSheetFormat(v('start'), end);
+  const note = [s.span, f.elements.type.value, v('note')].filter(Boolean).join(' · ');
+  const count = countDays(rangeDays(fromIso(v('start')), fromIso(end)), f.elements.type.value);
+  return { name:v('name'), team:v('team'), type:f.elements.type.value, days:s.days, month:s.month, fy:s.fy, note, count, start:v('start'), end };
+}
+function updatePreview(){
+  const d = formData(), pv = $('#preview'), ov = $('#overlap');
+  if (!d){ pv.textContent='เลือกวันที่เพื่อดูตัวอย่างข้อมูลที่จะบันทึกลงชีต'; ov.hidden = true; return; }
+  pv.innerHTML = `จะบันทึกเป็น: วันที่ลา <b>${esc(d.days)}</b> · เดือน <b>${esc(d.month)}</b> · ปีงบฯ <b>${esc(d.fy)}</b> · รวม <b>${d.count} วัน</b> <span class="muted">(${usesWorkdays(d.type)?'วันทำการ':'วันปฏิทิน'})</span>${d.note?` · หมายเหตุ "${esc(d.note)}"`:''}`;
+  if (d.name && d.type === 'ลาพักผ่อน'){
+    const b = balanceFor(pkey(d.name), d.fy, state.editing?.key);
+    if (b){
+      const left = b.annual + b.carry - b.used, after = left - d.count;
+      pv.innerHTML += `<br>สิทธิ์ลาพักผ่อนปีงบฯ ${esc(d.fy)} คงเหลือ <b>${left}</b> วัน → หลังลาครั้งนี้เหลือ <b class="${after<0?'neg':''}" style="${after<0?'color:var(--bad)':''}">${after}</b> วัน${after<0?' (เกินสิทธิ์)':''}`;
+    }
+  }
+  const span = rangeDays(fromIso(d.start), fromIso(d.end));
+  const clash = state.all.filter(r => active(r) && r.key !== state.editing?.key && pkey(r.name) !== pkey(d.name) && (!d.team || r.team===d.team) && r.dates.some(x=>span.includes(x)));
+  const cap = capFor(d.team), overDays = [];
+  if (d.team && cap !== null){
+    for (const day of span){
+      const n = new Set(clash.filter(r => r.dates.includes(day)).map(r => pkey(r.name))).size + 1;
+      if (n > cap) overDays.push([day, n]);
+    }
+  }
+  ov.hidden = !clash.length || !d.team;
+  ov.style.background = overDays.length ? 'var(--bad-bg)' : ''; ov.style.color = overDays.length ? 'var(--bad)' : '';
+  ov.innerHTML = (overDays.length ? `<b>⚠ ${esc(teamLabel(d.team))} ลาพร้อมกันได้ไม่เกิน ${cap} คน — ถ้าลาครั้งนี้จะเกินใน ${overDays.length} วัน: ${overDays.slice(0,8).map(([k,n]) => `${thShort(fromIso(k))} (${n} คน)`).join(', ')}${overDays.length>8?' …':''}</b><br>` : '')
+    + `ช่วงนี้มีผู้ลาในชุดเดียวกันแล้ว ${clash.length} รายการ: ` + clash.map(r=>`${esc(r.name)} (${rangeText(r)})`).join(', ');
+}
+$('#form').addEventListener('input', updatePreview);
+$('#form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = formData(); if (!d) return toast('กรุณาเลือกวันที่ลา');
+  if (!state.tabs.includes(d.fy) && !state.editing &&
+      !confirm(`วันลานี้อยู่ในปีงบประมาณ ${d.fy} ซึ่งยังไม่มีแท็บในชีต ระบบจะสร้างแท็บ ${d.fy} ใหม่ ดำเนินการต่อ?`)) return;
+  const btn = $('#submitBtn'); btn.disabled = true;
+  const wasEditing = !!state.editing;
+  try{
+    if (wasEditing){
+      const r = state.editing;
+      await api('POST', { action:'edit', pin:state.admin, year:r.sheet, row:r.row, originalName:r.name, ...d, status:r.status });
+      sfx('ok'); toast('บันทึกการแก้ไขแล้ว');
+    } else {
+      await api('POST', { action:'add', ...d });
+      sfx('ok'); toast('ส่งใบลาแล้ว — สถานะ: รออนุมัติ');
+    }
+    resetForm();
+    await load(d.fy);
+    switchTab('list');
+  }catch(err){ sfx('err'); toast(err.message, 4000); }
+  finally{ btn.disabled = false; }
+});
+function resetForm(){
+  $('#form').reset(); $('#form').elements.start.value = ''; $('#form').elements.end.value = ''; dpSync(); dpClose(); state.editing = null; $('#formTitle').textContent='ยื่นใบลา'; $('#submitBtn').textContent='ส่งใบลา';
+  $('#cancelEdit').hidden = true; updatePreview();
+}
+$('#cancelEdit').onclick = () => { resetForm(); switchTab('list'); };
+
+/* ---- การกระทำของผู้อนุมัติ ---- */
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const r = state.all.find(x => x.key === b.dataset.key); if (!r) return;
+  const act = b.dataset.act;
+  if (act === 'edit'){
+    const f = $('#form'); state.editing = r;
+    f.elements.name.value = r.name; f.elements.team.value = r.team; f.elements.start.value = r.start; f.elements.end.value = r.end; dpSync();
+    f.elements.type.value = LEAVE_TYPES.includes(r.type) ? r.type : 'ลาพักผ่อน';
+    // ตัดช่วงวันที่และประเภทเดิมออกจากหมายเหตุ เพราะระบบจะใส่ให้ใหม่ตอนบันทึก
+    f.elements.note.value = String(r.note||'').split('·').map(x=>x.trim()).filter(x => x && !LEAVE_TYPES.includes(x) && !/^\d{1,2}\s*[ก-๙.]+\s*-\s*\d{1,2}\s*[ก-๙.]+$/.test(x)).join(' · ');
+    $('#formTitle').textContent = `แก้ไขรายการลำดับ ${r.no}`; $('#submitBtn').textContent = 'บันทึกการแก้ไข'; $('#cancelEdit').hidden = false;
+    switchTab('new'); updatePreview(); return;
+  }
+  if (act === 'status' && b.dataset.st === 'อนุมัติ') return openApprove(r);
+  if (act === 'delete' && !confirm(`ลบรายการของ ${r.name} (${r.days} ${r.month}) ออกจากชีต?`)) return;
+  b.disabled = true;
+  try{
+    await api('POST', { action: act, pin: state.admin, year: r.sheet, row: r.row, name: r.name, status: b.dataset.st });
+    sfx(act==='delete' || b.dataset.st==='ไม่อนุมัติ' ? 'no' : 'ok'); toast(act==='delete' ? 'ลบแล้ว' : `เปลี่ยนสถานะเป็น "${b.dataset.st}" แล้ว`);
+    await load(state.year);
+  }catch(err){ sfx('err'); toast(err.message, 4000); if (/รหัส/.test(err.message)) logout(); b.disabled = false; }
+});
+
+/* ---- อนุมัติพร้อมยืนยันจำนวนวัน ---- */
+function openApprove(r){
+  state.apTarget = r;
+  const f = $('#apForm');
+  const allDays = r.dates.length, work = r.dates.filter(isWorkday).length;
+  f.elements.td.value = numOrNull(r.td) ?? allDays;
+  f.elements.wd.value = numOrNull(r.wd) ?? work;
+  $('#apHead').innerHTML = `<b>${esc(r.name)}</b> ${teamPill(r.team)}<br><span class="muted">${rangeText(r)} · ${esc(r.type)}${r.typeAssumed ? ' (ไม่ระบุในชีต)' : ''} · ปีงบฯ ${esc(r.fy)}</span><br><span class="src">ระบบคำนวณ: รวม ${allDays} วัน · วันทำการ ${work} วัน (ไม่รวมเสาร์-อาทิตย์และวันหยุดราชการ) แก้ได้ถ้าไม่ตรง</span>`;
+  apCalc(); apDlg.showModal();
+  setTimeout(() => f.elements.wd.select(), 50);
+}
+function apCalc(){
+  const r = state.apTarget, f = $('#apForm');
+  const td = Number(f.elements.td.value || 0), wd = Number(f.elements.wd.value || 0);
+  const use = usesWorkdays(r.type) ? wd : td;
+  let h = `จะหักวันลา <b>${use} วัน</b> <span class="muted">(${usesWorkdays(r.type) ? 'นับวันทำการ' : 'นับวันรวม'} ตามประเภท ${esc(r.type)})</span>`;
+  if (wd > td) h += `<br><span style="color:var(--bad)">วันทำการมากกว่าวันรวม ตรวจตัวเลขอีกครั้ง</span>`;
+  if (r.type === 'ลาพักผ่อน'){
+    const k = pkey(r.name), e = entitlementFor(k, r.fy), before = vacUsed(k, r.fy, r.key);
+    const total = e.annual + e.carry, a = splitUse(e, before), b = splitUse(e, before + use);
+    const fromAnnual = b.annual - a.annual, fromCarry = b.carry - a.carry, left = total - before - use;
+    h += `<br>หักจากวันลาพักผ่อน <b>ประจำปี ${fromAnnual}</b> วัน · <b>สะสม ${fromCarry}</b> วัน`;
+    h += `<br>คงเหลือหลังอนุมัติ: ประจำปี ${e.annual - b.annual} · สะสม ${e.carry - b.carry} · รวม <b style="${left < 0 ? 'color:var(--bad)' : ''}">${left}</b> / ${total} วัน${left < 0 ? ' (เกินสิทธิ์)' : ''}`;
+  }
+  $('#apCalc').innerHTML = h;
+}
+$('#apForm').addEventListener('input', apCalc);
+$('#apForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const r = state.apTarget, f = e.target, btn = $('#apOk');
+  btn.disabled = true;
+  try{
+    await api('POST', { action: 'status', pin: state.admin, year: r.sheet, row: r.row, name: r.name, status: 'อนุมัติ', td: f.elements.td.value, wd: f.elements.wd.value });
+    apDlg.close(); sfx('ok'); toast(`อนุมัติแล้ว · หัก ${usesWorkdays(r.type) ? f.elements.wd.value : f.elements.td.value} วัน`);
+    await load(state.year);
+  }catch(err){ sfx('err'); toast(err.message, 4000); if (/รหัส/.test(err.message)) { apDlg.close(); logout(); } }
+  finally{ btn.disabled = false; }
+});
+
+/* ---- โหมดผู้อนุมัติ ---- */
+/* หน้าต่างสำเร็จ: โชว์เครื่องหมายถูก แล้วปิดเองใน ~1.8 วินาที (คลิกเพื่อปิดก่อนได้) */
+function successPop(title, sub, ms = 1800){
+  const el = $('#okPop'); $('#okTitle').textContent = title; $('#okSub').textContent = sub;
+  clearTimeout(el._h); el.classList.remove('out'); el.hidden = false;
+  const tick = el.querySelector('.tick'); tick.style.animation = 'none'; void tick.offsetWidth; tick.style.animation = '';
+  const close = () => { el.classList.add('out'); setTimeout(() => { el.hidden = true; el.classList.remove('out'); }, 250); };
+  el.onclick = () => { clearTimeout(el._h); close(); };
+  el._h = setTimeout(close, ms);
+}
+function logout(){ state.admin=''; sessionStorage.removeItem('pin'); renderAll(); startWatch(); }
+$('#adminBtn').onclick = () => { if (state.admin) return logout(); $('#pinInput').value=''; pinDlg.showModal(); };
+$('#pinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pin = $('#pinInput').value;
+  try{ await api('POST', { action:'login', pin }); state.admin = pin; sessionStorage.setItem('pin', pin); pinDlg.close(); renderAll(); startWatch(); const n = seenWaiting ? seenWaiting.size : 0; sfx('login'); successPop('เข้าสู่ระบบสำเร็จ', n ? `มีใบลารอดำเนินการ ${n} รายการ · กำลังเข้าสู่โหมดผู้อนุมัติ…` : 'กำลังเข้าสู่โหมดผู้อนุมัติ…'); }
+  catch(err){ sfx('err'); toast(err.message, 3500); }
+});
+
+/* ---- ส่งออก CSV ---- */
+$('#exportBtn').onclick = () => {
+  const head = ['ลำดับในปีงบฯ','ลำดับเดิมในชีต','ชื่อ','วันที่ลา','เดือน','ชุดปฏิบัติการที่','ปีงบประมาณ','การดำเนินการ','หมายเหตุ','วันเริ่ม','วันสิ้นสุด','จำนวนวัน','ประเภทการลา'];
+  const q = v => `"${String(v??'').replace(/"/g,'""')}"`;
+  const lines = [head, ...filtered().map(r => [r.seq,r.no,r.name,r.days,r.month,r.team,r.fy,r.status,r.note,r.start,r.end,r.count,r.type + (r.typeAssumed ? ' (ไม่ระบุ)' : '')])].map(a=>a.map(q).join(','));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `คุมลา-${state.year}.csv` });
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+/* ---- วันลาคงเหลือ ---- */
+const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
+const vacUsed = (k, fy, exceptKey) => state.all.filter(r => r.fy === fy && deducts(r) && r.type === 'ลาพักผ่อน' && pkey(r.name) === k && r.key !== exceptKey).reduce((s, r) => s + r.count, 0);
+const blank = v => v === '' || v === null || v === undefined;
+const fyStartIso = fy => `${Number(fy) - 544}-10-01`, fyEndIso = fy => `${Number(fy) - 543}-09-30`;
+/** วันเริ่มรับราชการ (ค.ศ.) ที่กรอกไว้ในแท็บสิทธิ์ลา — ใช้ค่าล่าสุดที่มี */
+const personStart = k => (CFG.entitlements.filter(x => pkey(x.name) === k && /^\d{4}-\d{2}-\d{2}$/.test(String(x.start||''))).sort((a,b) => String(b.fy).localeCompare(String(a.fy)))[0] || {}).start || '';
+function monthsBetween(aIso, bIso){ const a = fromIso(aIso), b = fromIso(bIso); return (b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth()) - (b.getDate() < a.getDate() ? 1 : 0); }
+/** สิทธิ์ตามระเบียบของบุคคลในปีงบฯ (ก่อนกรอกค่าเอง) */
+const RANKS = ['ส.ต.ต.','ส.ต.ท.','ส.ต.อ.','จ.ส.ต.','ด.ต.','ร.ต.ต.','ร.ต.ท.','ร.ต.อ.','พ.ต.ต.','พ.ต.ท.','พ.ต.อ.','พล.ต.ต.','พล.ต.ท.','พล.ต.อ.'];
+/** ลำดับยศของชื่อ (-1 = ไม่รู้) */
+function rankIdx(name){
+  const n = String(name||'').replace(/\s+/g,'').replace(/\.{2,}/g,'.');
+  let best = -1, len = 0;
+  RANKS.forEach((r, i) => { if (n.startsWith(r) && r.length > len) { best = i; len = r.length; } });
+  return best;
+}
+/** ชื่อล่าสุดของบุคคล (ใช้ดูยศปัจจุบัน) */
+function latestName(k){
+  const rows = state.all.filter(r => pkey(r.name) === k).sort((a,b) => (b.start||'').localeCompare(a.start||''));
+  return rows.length ? rows[0].name : ((CFG.entitlements.find(x => pkey(x.name) === k) || {}).name || '');
+}
+const isSenior = k => !!CFG.seniorRank && rankIdx(latestName(k)) >= RANKS.indexOf(CFG.seniorRank);
+function ruleFor(k, fy){
+  const start = personStart(k), out = { annual: CFG.annualDays, cap: CFG.carryCap, kij: CFG.quotaKij, notes: [], start, senior: false };
+  if (!start && isSenior(k)) { out.cap = CFG.carryCap10; out.senior = true; }
+  if (start){
+    if (start > fyEndIso(fy)) { out.annual = 0; out.notes.push('ยังไม่เข้ารับราชการ'); }
+    else if (monthsBetween(start, fyEndIso(fy)) < 6) { out.annual = 0; out.notes.push('รับราชการยังไม่ครบ 6 เดือน'); }
+    if (monthsBetween(start, fyStartIso(fy)) >= 120) out.cap = CFG.carryCap10;
+    if (start >= fyStartIso(fy) && start <= fyEndIso(fy)) { out.kij = CFG.quotaKijFirst; out.notes.push('ปีแรกที่รับราชการ'); }
+  }
+  return out;
+}
+/** สิทธิ์ลาพักผ่อนของบุคคลในปีงบฯ
+ *  ประจำปี: กรอกเอง > ตามระเบียบ (10 วัน หรือ 0 ถ้ารับราชการไม่ครบ 6 เดือน)
+ *  สะสม: กรอกเอง > ปีเริ่มนับ = 0 > คำนวณจากวันที่เหลือของปีก่อน โดย ประจำปี + สะสม ≤ 20 (หรือ 30 ถ้ารับราชการ 10 ปีขึ้นไป) */
+function entitlementFor(k, fy, depth = 0){
+  const rule = ruleFor(k, fy), e = CFG.entitlements.find(x => pkey(x.name) === k && String(x.fy) === String(fy)) || {};
+  const annual = blank(e.annual) ? rule.annual : num(e.annual);
+  let carry, src;
+  if (!blank(e.carry)) { carry = num(e.carry); src = 'กรอกเอง'; }
+  else if (Number(fy) === Number(CFG.baseFy) && rule.senior && Number(CFG.seniorBaseCarry) > 0) { carry = Math.max(0, Math.min(Number(CFG.seniorBaseCarry), rule.cap - annual)); src = `ตามยศ (${CFG.seniorRank} ขึ้นไป)`; }
+  else if (Number(fy) === Number(CFG.baseFy) && !rule.senior && !rule.start && Number(CFG.juniorBaseCarry) > 0) { carry = Math.max(0, Math.min(Number(CFG.juniorBaseCarry), rule.cap - annual)); src = CFG.seniorRank ? `ตามยศ (ต่ำกว่า ${CFG.seniorRank})` : 'ตั้งต้น'; }
+  else if (Number(fy) <= Number(CFG.baseFy) || depth >= 6) { carry = 0; src = Number(fy) < Number(CFG.baseFy) ? 'ก่อนปีเริ่มนับ' : 'ยังไม่ได้กรอก'; }
+  else {
+    const prevFy = String(Number(fy) - 1), p = entitlementFor(k, prevFy, depth + 1);
+    const left = Math.max(0, p.annual + p.carry - vacUsed(k, prevFy));
+    carry = Math.max(0, Math.min(left, rule.cap - annual)); src = 'คำนวณจากปี ' + prevFy;
+  }
+  const over = annual + carry > rule.cap ? `ประจำปี+สะสมเกินเพดาน ${rule.cap} วัน` : '';
+  return { annual, carry, src, cap: rule.cap, kij: rule.kij, start: rule.start, note: [e.note, ...rule.notes, over].filter(Boolean).join(' · ') };
+}
+function balanceFor(k, fy, exceptKey){
+  if (!k) return null;
+  const e = entitlementFor(k, fy);
+  return { ...e, used: vacUsed(k, fy, exceptKey) };
+}
+function splitUse(e, used){
+  const first = CFG.useOrder === 'carry' ? 'carry' : 'annual', second = first === 'carry' ? 'annual' : 'carry';
+  const u = {}; u[first] = Math.min(used, e[first]); u[second] = Math.min(used - u[first], e[second]);
+  u.over = Math.max(0, used - e.annual - e.carry);
+  return u;
+}
+function renderBalance(){
+  const fy = state.year, q = $('#bq').value.trim().toLowerCase(), t = $('#bTeam').value;
+  document.querySelector('table.bal').classList.toggle('no-ks', String(CFG.showKijSick) !== '1');
+  const people = new Map();
+  const touch = (name, team, start) => {
+    const k = pkey(name); if (!k) return;
+    const p = people.get(k) || { k, name, team: '', last: '' };
+    if ((start || '') >= p.last){ p.name = name; if (team) p.team = team; p.last = start || p.last; }
+    else if (!p.team && team) p.team = team;
+    people.set(k, p);
+  };
+  const prevFy = String(Number(fy) - 1);
+  state.all.filter(r => r.fy === prevFy).forEach(r => touch(r.name, r.team, ''));
+  state.all.filter(r => r.fy === fy).forEach(r => touch(r.name, r.team, r.start));
+  CFG.entitlements.filter(e => String(e.fy) === fy).forEach(e => touch(e.name, '', ''));
+  const rowsFy = state.all.filter(r => r.fy === fy && deducts(r));
+  const pendFy = state.all.filter(r => r.fy === fy && (r.status === 'รออนุมัติ' || (!r.status && Number(r.fy) >= Number(CFG.baseFy))) && r.type === 'ลาพักผ่อน');
+  const assumed = rowsFy.filter(r => r.typeAssumed).length;
+  $('#balNote').textContent = `ปีงบประมาณ ${fy} · ${modeLabel()} · ใช้${CFG.useOrder==='carry'?'วันสะสม':'วันประจำปี'}ก่อน · เริ่มนับวันสะสมตั้งแต่ปีงบฯ ${CFG.baseFy}` + (assumed ? ` · มี ${assumed} รายการที่ไม่ได้ระบุประเภท ${CFG.defaultType==='ลาพักผ่อน'?'นับเป็นลาพักผ่อน':'ไม่นับเป็นลาพักผ่อน'}` : '');
+  const list = [...people.values()].filter(p => (!q || p.name.toLowerCase().includes(q)) && (!t || p.team === t))
+    .sort((a, b) => teamSort(a.team || 'ฮ', b.team || 'ฮ') || a.name.localeCompare(b.name, 'th'));
+  const typeUsed = (k, type) => rowsFy.filter(r => pkey(r.name) === k && r.type === type).reduce((s, r) => s + r.count, 0);
+  const otherText = k => {
+    const m = new Map();
+    rowsFy.filter(r => pkey(r.name) === k && !['ลาพักผ่อน','ลากิจ','ลาป่วย','ลาคลอดบุตร'].includes(r.type)).forEach(r => m.set(r.type, (m.get(r.type)||0) + r.count));
+    if (!m.size) return '<span class="muted">–</span>';
+    const lim = { 'ลาคลอดบุตร': CFG.quotaMat, 'ลาช่วยภริยาคลอด': CFG.quotaPat, 'ลาบวช': 120 };
+    return [...m].map(([t, n]) => `${esc(t)} <b>${n}</b>${lim[t] ? ` <span class="muted">/ ${lim[t]}</span>` : ''}`).join('<br>');
+  };
+  const cell = (used, cap) => { const left = cap - used; return `<div class="q"><span class="muted">เหลือ</span> <b class="${left<0?'neg':''}">${left}</b><small>ใช้ ${used} / ${cap}</small></div>`; };
+  $('#btbody').innerHTML = list.map(p => {
+    const b = balanceFor(p.k, fy), u = splitUse(b, b.used), total = b.annual + b.carry, left = total - b.used;
+    // วันลาสะสมที่จะยกไปปีหน้า = วันที่เหลือ แต่ประจำปี(ปีหน้า) + สะสม ต้องไม่เกินเพดาน 20/30 วัน
+    const nx = ruleFor(p.k, String(Number(fy) + 1)), nxMax = Math.max(0, nx.cap - nx.annual), carryNext = Math.max(0, Math.min(left, nxMax));
+    const open = state.balOpen === p.k;
+    const mine = open ? state.all.filter(r => r.fy === fy && pkey(r.name) === p.k).sort((a,c)=>a.start.localeCompare(c.start)) : [];
+    return `<tr class="pr" data-bal="${esc(p.k)}"><td><b>${esc(p.name)}</b>${b.note?`<div class="src">${esc(b.note)}</div>`:''}</td><td>${teamPill(p.team)}</td>
+      <td>${cell(u.annual, b.annual)}</td>
+      <td>${cell(u.carry, b.carry)}${b.src && !String(b.src).startsWith('ตามยศ') ? `<div class="src">${b.src}</div>` : ''}</td>
+      <td><div class="q"><b class="${left<0?'neg':''}">${left}</b> <span class="muted">/ ${total}</span>${u.over?`<small class="neg">เกินสิทธิ์ ${u.over} วัน</small>`:''}${(pv => pv ? `<small style="color:var(--warn)">รออนุมัติอีก ${pv} วัน</small>` : '')(pendFy.filter(x => pkey(x.name) === p.k).reduce((a, x) => a + x.count, 0))}</div><div class="bar" style="margin-top:4px"><i style="width:${total?Math.max(0,Math.min(100,left/total*100)):0}%"></i></div></td>
+      <td><div class="q"${Number(fy) + 1 <= Number(CFG.baseFy) ? ` title="ปีงบฯ ${Number(fy)+1} เป็นปีเริ่มนับใหม่ ตัวเลขนี้ยังไม่ยกไปอัตโนมัติ ใช้กรอกเป็นวันสะสมยกมาของปี ${Number(fy)+1} ได้ที่ปุ่มแก้สิทธิ์"` : ''}><b>${carryNext}</b> <span class="muted">/ ${nxMax}</span>${Number(fy) + 1 <= Number(CFG.baseFy) ? ' <span class="muted">*</span>' : ''}${left > nxMax ? `<small class="neg">เกินเพดาน ${left - nxMax} วัน</small>` : ''}</div><div class="bar" style="margin-top:4px" title="ยกไป ${carryNext} จากที่ยกไปได้สูงสุด ${nxMax} วัน"><i style="width:${nxMax?Math.min(100,carryNext/nxMax*100):0}%"></i></div></td>
+      <td class="ks">${cell(typeUsed(p.k,'ลากิจ'), b.kij)}</td>
+      <td class="ks">${cell(typeUsed(p.k,'ลาป่วย'), CFG.quotaSick)}</td>
+      <td class="mat">${(mu => `<div class="q"><b>${mu}</b> <span class="muted">/ ${CFG.quotaMat}</span>${mu > CFG.quotaMat ? `<small class="neg">เกินสิทธิ์ ${mu - CFG.quotaMat} วัน</small>` : ''}</div><div class="bar" style="margin-top:4px" title="ลาคลอดบุตรไปแล้ว ${mu} จาก ${CFG.quotaMat} วัน (นับวันปฏิทิน)"><i style="width:${CFG.quotaMat ? Math.min(100, mu / CFG.quotaMat * 100) : 0}%"></i></div>`)(typeUsed(p.k,'ลาคลอดบุตร'))}</td>
+      <td class="q">${otherText(p.k)}</td>
+      ${state.admin ? `<td><button class="btn sec sm" data-ent="${esc(p.k)}">แก้สิทธิ์</button></td>` : ''}</tr>` +
+      (open ? `<tr class="det"><td colspan="${state.admin?12:11}">${mine.length ? mine.map(r => `${rangeText(r)} · ${r.count} วัน · ${esc(r.type)}${r.typeAssumed?' <span class="muted">(ไม่ระบุ)</span>':''} · ${pill(r.status)}${r.note?' · '+esc(r.note):''}`).join('<br>') : 'ไม่มีรายการลาในปีงบฯ นี้'}</td></tr>` : '');
+  }).join('') || `<tr><td colspan="12" class="empty">ไม่มีข้อมูล</td></tr>`;
+  state.balPeople = people;
+}
+document.addEventListener('click', e => {
+  const eb = e.target.closest('[data-ent]');
+  if (eb){
+    e.stopPropagation();
+    const p = state.balPeople.get(eb.dataset.ent), b = entitlementFor(p.k, state.year), f = $('#entForm');
+    const ent = CFG.entitlements.find(x => pkey(x.name) === p.k && String(x.fy) === state.year) || {};
+    state.entTarget = p;
+    $('#entTitle').textContent = `สิทธิ์ลาพักผ่อน ปีงบฯ ${state.year}`;
+    $('#entSub').textContent = p.name;
+    f.elements.start.value = b.start ? (d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()+543}`)(fromIso(b.start)) : '';
+    f.elements.carry.value = blank(ent.carry) ? '' : ent.carry;
+    f.elements.annual.value = blank(ent.annual) ? '' : ent.annual;
+    f.elements.note.value = ent.note || '';
+    $('#entCarryHint').textContent = `เว้นว่าง = ${Number(state.year) <= Number(CFG.baseFy) ? '0 (ปีเริ่มนับ)' : 'คำนวณจากปีก่อน'} · ตอนนี้ใช้ ${b.carry} วัน (${b.src}) · เพดานรวม ${b.cap} วัน`;
+    $('#entSvc').textContent = b.start ? `รับราชการ ณ 1 ต.ค. ${Number(state.year)-1}: ${Math.max(0, Math.floor(monthsBetween(b.start, fyStartIso(state.year))/12))} ปี` : 'ใช้คำนวณเพดาน 20/30 วัน สิทธิ์ 6 เดือนแรก และลากิจปีแรก';
+    entDlg.showModal(); return;
+  }
+  const tr = e.target.closest('tr[data-bal]');
+  if (tr){ state.balOpen = state.balOpen === tr.dataset.bal ? null : tr.dataset.bal; renderBalance(); }
+});
+$('#entForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, p = state.entTarget;
+  let start = '';
+  const sv = f.elements.start.value.trim();
+  if (sv){
+    const m = sv.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!m) return toast('วันเริ่มรับราชการต้องเป็นรูปแบบ วว/ดด/ปปปป เช่น 01/04/2558', 5000);
+    let y = +m[3]; if (y > 2400) y -= 543;
+    start = iso(new Date(y, +m[2]-1, +m[1]));
+  }
+  const body = { action:'saveEntitlement', pin: state.admin, name: p.name, fy: state.year, annual: f.elements.annual.value, carry: f.elements.carry.value, note: f.elements.note.value, start };
+  try{
+    await api('POST', body);
+    CFG.entitlements = CFG.entitlements.filter(x => !(pkey(x.name) === p.k && String(x.fy) === state.year)).concat([{ name: p.name, fy: state.year, annual: body.annual, carry: body.carry, note: body.note, start }]);
+    entDlg.close(); renderBalance(); sfx('ok'); toast('บันทึกสิทธิ์ลาแล้ว');
+  }catch(err){ sfx('err'); toast(err.message, 4000); }
+});
+
+/* ---- ตั้งค่า ---- */
+const holToText = m => [...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([k,n]) => { const d = fromIso(k); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()+543} ${n}`; }).join('\n');
+function textToHol(t){
+  const out = [], bad = [];
+  t.split('\n').map(l => l.trim()).filter(Boolean).forEach(l => {
+    let m = l.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(.*)$/), k = '';
+    if (m){ let y = +m[3]; if (y > 2400) y -= 543; k = iso(new Date(y, +m[2]-1, +m[1])); }
+    else if ((m = l.match(/^(\d{4})-(\d{2})-(\d{2})\s*(.*)$/))){ let y = +m[1]; if (y > 2400) y -= 543; k = iso(new Date(y, +m[2]-1, +m[3])); m[4] = m[4]; }
+    if (k) out.push([k, (m[4]||'').trim()]); else bad.push(l);
+  });
+  return { out, bad };
+}
+function fillSettings(){
+  const f = $('#setForm');
+  f.querySelectorAll('[name=countMode]').forEach(x => x.checked = x.value === CFG.countMode);
+  const by = f.elements.baseFy, cur = fyOf(new Date());
+  by.innerHTML = [...new Set([...state.years, String(cur), String(cur+1), String(CFG.baseFy)])].sort().map(y => `<option>${y}</option>`).join('');
+  SET_KEYS.forEach(k => f.elements[k].value = CFG[k] ?? '');
+  const teams = uniq(state.all.map(r => r.team)).sort(teamSort);
+  $('#capInputs').innerHTML = teams.map(t => `<label>${esc(teamLabel(t))}<input type="number" min="0" max="99" data-cap="${esc(t)}" value="${CFG.teamCaps[t] ?? ''}" placeholder="ไม่จำกัด"></label>`).join('');
+  f.elements.holidays.value = holToText(CFG.holidays);
+  $('#holCount').textContent = `${CFG.holidays.size} วัน · ${CFG.holidaysCustom ? 'ใช้รายการที่บันทึกในชีต (แท็บ "วันหยุด")' : 'ใช้รายการเริ่มต้นของระบบ (ยังไม่ได้บันทึกลงชีต)'}`;
+}
+$('#entReset').onclick = async () => {
+  if (!confirm('ล้างสิทธิ์ลาที่กำหนดรายคนทั้งหมด (วันสะสมยกมา วันประจำปี และวันเริ่มรับราชการในแท็บ "สิทธิ์ลา")?\nข้อมูลการลาไม่ถูกลบ แต่ค่าที่กรอกไว้จะหายและกู้คืนจากเว็บไม่ได้')) return;
+  try{
+    await api('POST', { action:'resetEntitlements', pin: state.admin });
+    CFG.entitlements = []; renderBalance(); toast('ล้างสิทธิ์ลาแล้ว — ทุกคนกลับไปใช้ค่าตามระเบียบ');
+  }catch(err){ sfx('err'); toast(err.message, 4000); }
+};
+$('#setReset').onclick = () => { $('#setForm').elements.holidays.value = holToText(new Map(DEFAULT_HOLIDAYS)); toast('คืนค่ารายการวันหยุดแล้ว กด "บันทึกการตั้งค่า" เพื่อบันทึก'); };
+$('#setForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, { out, bad } = textToHol(f.elements.holidays.value);
+  if (bad.length) return toast('อ่านบรรทัดวันหยุดไม่ได้: ' + bad.slice(0,3).join(' | '), 6000);
+  const settings = { countMode: f.querySelector('[name=countMode]:checked')?.value || 'law' };
+  SET_KEYS.forEach(k => settings[k] = f.elements[k].value);
+  f.querySelectorAll('[data-cap]').forEach(i => { if (i.value !== '') settings['cap:' + i.dataset.cap] = i.value; });
+  const btn = $('#setSave'); btn.disabled = true;
+  try{
+    await api('POST', { action:'saveConfig', pin: state.admin, settings, holidays: out });
+    applyConfig({ settings, holidays: out, entitlements: CFG.entitlements });
+    recount(); setYear(state.year); fillSettings();
+    sfx('ok'); toast('บันทึกการตั้งค่าแล้ว');
+  }catch(err){ sfx('err'); toast(err.message, 4000); }
+  finally{ btn.disabled = false; }
+});
+
+/* ---- กราฟสรุป ---- */
+let chartLib = null, charts = {};
+function loadChartLib(){
+  if (window.Chart) return Promise.resolve();
+  if (chartLib) return chartLib;
+  chartLib = new Promise((ok, fail) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    sc.onload = ok; sc.onerror = () => { chartLib = null; fail(new Error('โหลดไลบรารีกราฟไม่ได้')); };
+    document.head.appendChild(sc);
+  });
+  return chartLib;
+}
+const FY_MONTHS = [9,10,11,0,1,2,3,4,5,6,7,8]; // ต.ค. → ก.ย.
+function chartData(fy){
+  const st = $('#cStatus').value;
+  const rows = state.all.filter(r => r.fy === fy && (st === 'ok' ? r.status === 'อนุมัติ' : active(r)));
+  const month = Array(12).fill(0), team = new Map(), type = new Map();
+  rows.forEach(r => {
+    const counted = countedDates(r.dates, r.type);
+    counted.forEach(d => { month[FY_MONTHS.indexOf(fromIso(d).getMonth())]++; });
+    const tk = r.team || 'ไม่ระบุชุด';
+    team.set(tk, (team.get(tk) || 0) + counted.length);
+    const ty = r.typeAssumed ? (r.type === 'ลาพักผ่อน' ? 'ลาพักผ่อน (ไม่ระบุ)' : 'ไม่ระบุ') : r.type;
+    type.set(ty, (type.get(ty) || 0) + counted.length);
+  });
+  return { rows, month, team, type, total: month.reduce((a,b)=>a+b,0), people: new Set(rows.map(r=>pkey(r.name))).size };
+}
+function css(v){ return getComputedStyle(document.body).getPropertyValue(v).trim(); }
+function tableHtml(head, body){ return `<table><thead><tr>${head.map((h,i)=>`<th class="${i?'num':''}">${esc(h)}</th>`).join('')}</tr></thead><tbody>${body.map(r=>`<tr>${r.map((c,i)=>`<td class="${i?'num':''}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`; }
+async function renderCharts(){
+  const fy = state.year;
+  const sel = $('#cmpYear');
+  const opts = state.years.filter(y => y !== fy);
+  if (!state.cmpUser || !opts.includes(sel.value)){
+    sel.innerHTML = '<option value="">ไม่เทียบ</option>' + opts.map(y => `<option>${y}</option>`).join('');
+    sel.value = opts.includes(String(Number(fy)-1)) ? String(Number(fy)-1) : '';
+  }
+  sel.onchange = () => { state.cmpUser = true; };
+  const cmp = sel.value;
+  const A = chartData(fy), B = cmp ? chartData(cmp) : null;
+  $('#chartNote').textContent = modeLabel();
+  const chg = (a, b) => b ? `<div class="kchg muted">ปีงบฯ ${cmp}: ${b} ${a>=b?'▲':'▼'} ${Math.abs(Math.round((a-b)/b*100))}%</div>` : (cmp ? `<div class="kchg muted">ปีงบฯ ${cmp}: 0</div>` : '');
+  $('#cKpis').innerHTML = [
+    ['วันลารวม ปีงบฯ '+fy, A.total, B && B.total],
+    ['จำนวนครั้งที่ลา', A.rows.length, B && B.rows.length],
+    ['จำนวนคนที่ลา', A.people, B && B.people],
+    ['เฉลี่ยวันลาต่อคน', A.people ? (A.total/A.people).toFixed(1) : 0, B && B.people ? (B.total/B.people).toFixed(1) : (B ? 0 : null)]
+  ].map(([l, a, b]) => `<div class="card kpi"><div class="v">${a}</div><div class="l">${l}</div>${b!==null && b!==undefined ? chg(Number(a), Number(b)) : ''}</div>`).join('');
+  const mLabels = FY_MONTHS.map(m => MONTHS[m]);
+  const teams = [...new Set([...A.team.keys(), ...(B ? B.team.keys() : [])])].sort(teamSort);
+  const types = [...new Set([...A.type.keys(), ...(B ? B.type.keys() : [])])].sort((a,b) => (A.type.get(b)||0)-(A.type.get(a)||0));
+  const tLabel = t => /^\d+$/.test(t) ? 'ชุด ' + t : t;
+  $('#cMonthTitle').textContent = `วันลารายเดือน ปีงบฯ ${fy}` + (cmp ? ` เทียบ ${cmp}` : '');
+  $('#tMonth').innerHTML = tableHtml(['เดือน', 'ปีงบฯ '+fy, ...(B?['ปีงบฯ '+cmp]:[])], mLabels.map((m,i) => [m, A.month[i], ...(B?[B.month[i]]:[])]).concat([['รวม', A.total, ...(B?[B.total]:[])]]));
+  $('#tTeam').innerHTML = tableHtml(['ชุด', 'ปีงบฯ '+fy, ...(B?['ปีงบฯ '+cmp]:[])], teams.map(t => [tLabel(t), A.team.get(t)||0, ...(B?[B.team.get(t)||0]:[])]));
+  $('#tType').innerHTML = tableHtml(['ประเภท', 'ปีงบฯ '+fy, ...(B?['ปีงบฯ '+cmp]:[])], types.map(t => [t, A.type.get(t)||0, ...(B?[B.type.get(t)||0]:[])]));
+  try{ await loadChartLib(); }catch(err){ sfx('err'); toast(err.message + ' — ดูข้อมูลแบบตารางแทนได้', 5000); document.querySelectorAll('details.tv').forEach(d=>d.open=true); return; }
+  const cur = css('--c-cur'), prev = css('--c-prev'), ink = css('--muted'), grid = css('--line');
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+  Chart.defaults.color = ink;
+  const ds = (a, b) => [{ label: 'ปีงบฯ ' + fy, data: a, backgroundColor: cur, borderRadius: 4, borderSkipped: 'start', maxBarThickness: 28 },
+    ...(B ? [{ label: 'ปีงบฯ ' + cmp, data: b, backgroundColor: prev, borderRadius: 4, borderSkipped: 'start', maxBarThickness: 28 }] : [])];
+  const base = (horizontal) => ({
+    responsive: true, maintainAspectRatio: false, animation: false, indexAxis: horizontal ? 'y' : 'x',
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: !!B, position: 'top', align: 'start', labels: { boxWidth: 12, boxHeight: 12, useBorderRadius: true, borderRadius: 3 } },
+      tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed[horizontal?'x':'y']} วัน` } } },
+    scales: { [horizontal?'x':'y']: { beginAtZero: true, grid: { color: grid }, border: { display: false }, ticks: { precision: 0 } },
+              [horizontal?'y':'x']: { grid: { display: false }, border: { color: grid } } },
+    datasets: { bar: { categoryPercentage: .7, barPercentage: .9 } }
+  });
+  const draw = (id, cfg) => { if (charts[id]) charts[id].destroy(); charts[id] = new Chart(document.getElementById(id), cfg); };
+  draw('cMonth', { type: 'bar', data: { labels: mLabels, datasets: ds(A.month, B && B.month) }, options: base(false) });
+  draw('cTeam', { type: 'bar', data: { labels: teams.map(tLabel), datasets: ds(teams.map(t=>A.team.get(t)||0), B && teams.map(t=>B.team.get(t)||0)) }, options: base(true) });
+  draw('cType', { type: 'bar', data: { labels: types, datasets: ds(types.map(t=>A.type.get(t)||0), B && types.map(t=>B.type.get(t)||0)) }, options: base(true) });
+}
+$('#themeBtn').addEventListener('click', () => { if (state.tab === 'charts') setTimeout(renderCharts, 0); });
+
+/* ---- พิมพ์ใบลา ---- */
+const F = (v, cls='') => `<span class="f ${cls}">${v ? esc(v) : '&nbsp;'}</span>`;
+const BOX = on => `<span class="box">${on ? '✓' : ''}</span>`;
+const thDate = k => k ? thFull(fromIso(k)) : '';
+function printLeave(r){
+  const k = pkey(r.name), fy = r.fy;
+  const mine = state.all.filter(x => x.fy === fy && active(x) && pkey(x.name) === k && x.key !== r.key && x.start && x.start < r.start).sort((a,b)=>a.start.localeCompare(b.start));
+  const sumType = t => mine.filter(x => x.type === t).reduce((s,x)=>s+x.count,0);
+  const today = new Date();
+  const head = `<p class="r">เขียนที่ ${F(CFG.printPlace,'w')}</p>
+    <p class="r">วันที่ ${F(today.getDate(),'s')} เดือน ${F(MONTHS_FULL[today.getMonth()])} พ.ศ. ${F(today.getFullYear()+543,'s')}</p>`;
+  const sign = `<p class="sig" style="margin-top:8px">ขอแสดงความนับถือ</p>
+    <p class="sig" style="margin-top:22px">(ลงชื่อ) ${F('','w')}</p><p class="sig">( ${F(r.name,'w')} )</p>`;
+  const signBlock = role => `<p>(ลงชื่อ) ${F('','w')}</p><p>(${F('','w')})</p><p>ตำแหน่ง ${F('','w')}</p><p>วันที่ ${F('','w')}</p>`;
+  const tail = (statsTable) => `<div class="two small">
+      <div><p><b>สถิติการลาในปีงบประมาณ ${esc(fy)}</b> <span>(${usesWorkdays(r.type)?'วันทำการ':'วัน'})</span></p>${statsTable}
+        <p style="margin-top:14px">${signBlock()}</p><p>ผู้ตรวจสอบ</p></div>
+      <div><p><b>ความเห็นผู้บังคับบัญชา</b></p><p>${F('','xl')}</p><p>${F('','xl')}</p>${signBlock()}
+        <p style="margin-top:10px"><b>คำสั่ง</b> ${BOX(false)} อนุญาต ${BOX(false)} ไม่อนุญาต</p><p>${F('','xl')}</p>${signBlock()}</div>
+    </div>`;
+  let html;
+  if (r.type === 'ลาพักผ่อน'){
+    const b = entitlementFor(k, fy), before = sumType('ลาพักผ่อน');
+    html = `<div class="lf"><h1>แบบใบลาพักผ่อน</h1>${head}
+      <p>เรื่อง&nbsp;&nbsp;ขอลาพักผ่อน</p><p>เรียน&nbsp;&nbsp;${F(CFG.toWhom,'w')}</p>
+      <p class="ind">ข้าพเจ้า ${F(r.name,'w')} ตำแหน่ง ${F('','w')} สังกัด ${F(CFG.orgName,'xl')}
+      มีวันลาพักผ่อนสะสม ${F(b.carry,'s')} วันทำการ มีสิทธิลาพักผ่อนประจำปีนี้อีก ${F(b.annual,'s')} วันทำการ รวมเป็น ${F(b.carry + b.annual,'s')} วันทำการ
+      ขอลาพักผ่อนตั้งแต่วันที่ ${F(thDate(r.start))} ถึงวันที่ ${F(thDate(r.end))} มีกำหนด ${F(r.count,'s')} วัน
+      ในระหว่างลาจะติดต่อข้าพเจ้าได้ที่ ${F('','xl')}</p>${sign}
+      ${tail(`<table><tr><th>ลามาแล้ว</th><th>ลาครั้งนี้</th><th>รวมเป็น</th></tr><tr><td>${before}</td><td>${r.count}</td><td>${before + r.count}</td></tr></table>`)}</div>`;
+  } else if (['ลาป่วย','ลากิจ','ลาคลอดบุตร'].includes(r.type)){
+    const label = { 'ลาป่วย':'ป่วย', 'ลากิจ':'กิจส่วนตัว', 'ลาคลอดบุตร':'คลอดบุตร' };
+    const last = [...mine].reverse().find(x => ['ลาป่วย','ลากิจ','ลาคลอดบุตร'].includes(x.type));
+    const reason = String(r.note||'').split('·').map(x=>x.trim()).filter(x => x && !LEAVE_TYPES.includes(x) && !/^\d{1,2}\s*[ก-๙.]+\s*-\s*\d{1,2}\s*[ก-๙.]+$/.test(x)).join(' ');
+    const row = t => { const before = sumType(t), now = r.type === t ? r.count : 0; return `<tr><td style="text-align:left">${label[t]}</td><td>${before}</td><td>${now || ''}</td><td>${before + now}</td></tr>`; };
+    html = `<div class="lf"><h1>แบบใบลาป่วย ลาคลอดบุตร ลากิจส่วนตัว</h1>${head}
+      <p>เรื่อง&nbsp;&nbsp;ขอลา${label[r.type]}</p><p>เรียน&nbsp;&nbsp;${F(CFG.toWhom,'w')}</p>
+      <p class="ind">ข้าพเจ้า ${F(r.name,'w')} ตำแหน่ง ${F('','w')} สังกัด ${F(CFG.orgName,'xl')}</p>
+      <p>ขอลา ${BOX(r.type==='ลาป่วย')} ป่วย ${BOX(r.type==='ลากิจ')} กิจส่วนตัว ${BOX(r.type==='ลาคลอดบุตร')} คลอดบุตร เนื่องจาก ${F(reason,'xl')}</p>
+      <p>ตั้งแต่วันที่ ${F(thDate(r.start))} ถึงวันที่ ${F(thDate(r.end))} มีกำหนด ${F(r.count,'s')} วัน
+      ข้าพเจ้าได้ลา ${BOX(last&&last.type==='ลาป่วย')} ป่วย ${BOX(last&&last.type==='ลากิจ')} กิจส่วนตัว ${BOX(last&&last.type==='ลาคลอดบุตร')} คลอดบุตร
+      ครั้งสุดท้ายตั้งแต่วันที่ ${F(last?thDate(last.start):'')} ถึงวันที่ ${F(last?thDate(last.end):'')} มีกำหนด ${F(last?last.count:'','s')} วัน
+      ในระหว่างลาจะติดต่อข้าพเจ้าได้ที่ ${F('','xl')}</p>${sign}
+      ${tail(`<table><tr><th>ประเภทลา</th><th>ลามาแล้ว</th><th>ลาครั้งนี้</th><th>รวมเป็น</th></tr>${row('ลาป่วย')}${row('ลากิจ')}${row('ลาคลอดบุตร')}</table>`)}</div>`;
+  } else {
+    return toast(`ยังไม่มีแบบใบลาสำหรับ "${r.type}" — พิมพ์ได้เฉพาะลาพักผ่อน ลาป่วย ลากิจ ลาคลอดบุตร`, 5000);
+  }
+  if (!r.start) return toast('อ่านวันที่ลาของรายการนี้ไม่ได้ จึงพิมพ์ใบลาไม่ได้', 4000);
+  $('#printArea').innerHTML = html;
+  document.body.classList.add('printing');
+  const done = () => { document.body.classList.remove('printing'); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => window.print());
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-print]'); if (!b) return;
+  const r = state.all.find(x => x.key === b.dataset.print); if (r) printLeave(r);
+});
+
+/* ---- ตรวจข้อมูล ---- */
+const FM = m => (m + 3) % 12;          // ลำดับเดือนในปีงบฯ: ต.ค.=0 … ก.ย.=11
+function findIssues(){
+  const issues = { fy: [], nofy: [], type: [], team: [], dup: [], date: [] };
+  // 1) ปีงบฯ ไม่ตรงลำดับเดือน: ไล่ตามแถวในแต่ละแท็บ ถ้าเจอเดือนต้นปีงบฯ (ต.ค.–ธ.ค.) หลังจากเคยเจอเดือนท้ายปี (ก.ค.–ก.ย.) ในปีงบฯ เดียวกัน แปลว่าน่าจะเป็นปีงบฯ ถัดไป
+  const bySheet = new Map();
+  state.all.forEach(r => { if (!bySheet.has(r.sheet)) bySheet.set(r.sheet, []); bySheet.get(r.sheet).push(r); });
+  bySheet.forEach(list => {
+    list.sort((a,b) => a.row - b.row);
+    const maxFm = new Map(); let lastFy = '';
+    for (const r of list){
+      const m = monthIdx(String(r.month).split(/\s*[-–]\s*/)[0]);
+      if (!r.fy){
+        if (r.days || r.month){
+          const bump = m >= 0 && lastFy && (maxFm.get(lastFy) ?? -1) >= 9 && FM(m) <= 2;
+          issues.nofy.push({ r, fix: { fy: lastFy ? String(Number(lastFy) + (bump ? 1 : 0)) : '' }, why: lastFy ? `ต่อจากแถวปีงบฯ ${lastFy}${bump ? ' และเป็นเดือนต้นปีงบฯ ถัดไป' : ''}` : '' });
+        }
+        continue;
+      }
+      lastFy = r.fy;
+      if (m < 0) continue;
+      const seen = maxFm.get(r.fy) ?? -1;
+      if (seen >= 9 && FM(m) <= 2) issues.fy.push({ r, fix: { fy: String(Number(r.fy) + 1) }, why: `แถวนี้อยู่หลังรายการเดือน ${MONTHS[(seen + 9) % 12]} ของปีงบฯ ${r.fy} แล้ว` });
+      else maxFm.set(r.fy, Math.max(seen, FM(m)));
+    }
+  });
+  // 2) ไม่ระบุประเภท / ไม่ระบุชุด / วันที่อ่านไม่ได้
+  const teamOf = new Map();
+  state.all.forEach(r => { if (r.team){ const k = pkey(r.name); const m = teamOf.get(k) || new Map(); m.set(r.team, (m.get(r.team)||0) + 1); teamOf.set(k, m); } });
+  state.all.forEach(r => {
+    if (r.typeAssumed && r.fy) issues.type.push({ r, fix: { type: 'ลาพักผ่อน' } });
+    if (!r.team){ const m = teamOf.get(pkey(r.name)); const best = m ? [...m].sort((a,b)=>b[1]-a[1])[0][0] : ''; issues.team.push({ r, fix: { team: best }, why: best ? 'ชุดที่คนนี้ใช้บ่อยที่สุด' : '' }); }
+    if (r.fy && !r.dates.length) issues.date.push({ r });
+  });
+  // 3) รายการซ้ำ: คนเดียวกัน วันลาทับกัน ทั้งสองรายการยังไม่ถูกยกเลิก
+  const act = state.all.filter(r => active(r) && r.dates.length);
+  const byP = new Map(); act.forEach(r => { const k = pkey(r.name); if (!byP.has(k)) byP.set(k, []); byP.get(k).push(r); });
+  byP.forEach(list => {
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++){
+      const a = list[i], b = list[j];
+      if (a.start <= b.end && b.start <= a.end){
+        const keep = (a.status === 'อนุมัติ') === (b.status === 'อนุมัติ') ? (a.row <= b.row ? a : b) : (a.status === 'อนุมัติ' ? a : b);
+        issues.dup.push({ r: keep === a ? b : a, other: keep, fix: { status: 'ยกเลิก' } });
+      }
+    }
+  });
+  return issues;
+}
+const CHECKS = [
+  ['fy', 'ปีงบประมาณน่าจะไม่ตรงกับเดือน', 'รายการเดือน ต.ค.–ธ.ค. ที่ลงไว้ต่อจากรายการ ก.ค.–ก.ย. ในปีงบฯ เดียวกัน มักเป็นการลาของปีงบฯ ถัดไป (ปีงบฯ เริ่ม 1 ต.ค.)'],
+  ['nofy', 'ไม่ได้ใส่ปีงบประมาณ', 'รายการเหล่านี้ไม่ถูกนับในปีใดเลย ค่าที่แนะนำมาจากแถวก่อนหน้า'],
+  ['dup', 'รายการซ้ำ (คนเดียวกัน วันลาทับกัน)', 'แนะนำให้เปลี่ยนสถานะรายการที่ซ้ำเป็น "ยกเลิก" (ไม่ลบแถว) โดยเก็บรายการที่อนุมัติแล้ว หรือรายการที่ลงไว้ก่อน'],
+  ['team', 'ไม่ระบุชุดปฏิบัติการ', 'ใช้คำนวณเพดานกำลังพลและสรุปรายชุด'],
+  ['type', 'ไม่ระบุประเภทการลา', 'ตอนนี้ระบบถือเป็นลาพักผ่อน กดแก้เพื่อบันทึกประเภทลงหมายเหตุ'],
+  ['date', 'อ่านวันที่ลาไม่ได้', 'แก้ในชีตโดยตรง หรือกด "แก้ไข" ในหน้ารายการลา'],
+];
+function renderCheck(){
+  const all = findIssues();
+  // เลือกปีงบฯ: ค่าเริ่มต้นตามปีที่เลือกบนหัวเว็บ
+  const ys = $('#chkYear'), want = state.chkYear ?? state.year;
+  ys.innerHTML = '<option value="*">ทุกปีงบฯ</option>' + state.years.map(y => `<option>${y}</option>`).join('');
+  ys.value = [...ys.options].some(o => o.value === want) ? want : state.year;
+  const fy = ys.value;
+  // รายการที่เกี่ยวกับปีที่เลือก: ปีงบฯ ปัจจุบันของแถว หรือปีที่แนะนำให้แก้เป็น (หัวข้อปีงบฯ) หรือรายการที่ซ้ำกัน
+  const inFy = it => fy === '*' || it.r.fy === fy || (it.fix && it.fix.fy === fy) || (it.other && it.other.fy === fy);
+  const iss = {}; for (const k of Object.keys(all)) iss[k] = k === 'nofy' ? all[k] : all[k].filter(inFy);
+  state.issues = iss;
+  const total = Object.values(iss).reduce((a, l) => a + l.length, 0);
+  $('#chkSum').textContent = total ? `พบ ${total} รายการที่ควรตรวจ${fy === '*' ? '' : ' ในปีงบฯ ' + fy}` : `ไม่พบปัญหา${fy === '*' ? '' : 'ในปีงบฯ ' + fy}`;
+  const cur = r => `<b>${esc(r.name)}</b><br><span class="muted">${esc(r.days)} ${esc(r.month)} · ปีงบฯ ${esc(r.fy || '–')} · แท็บ ${esc(r.sheet)} แถว ${r.row}</span>`;
+  $('#chkBody').innerHTML = CHECKS.map(([id, title, why]) => {
+    const list = iss[id];
+    const rows = list.slice(0, 300).map((it, i) => {
+      const r = it.r; let fixCell = '', btn = '';
+      if (id === 'fy' || id === 'nofy') { fixCell = `ปีงบฯ → <input data-fix-fy="${i}" value="${esc(it.fix.fy || '')}" size="5" style="width:70px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color:var(--text)">${it.why ? `<div class="src">${esc(it.why)}</div>` : ''}`; btn = 'แก้'; }
+      if (id === 'type') { fixCell = `<select data-fix-type="${i}">${LEAVE_TYPES.map(t => `<option ${t===it.fix.type?'selected':''}>${t}</option>`).join('')}</select>`; btn = 'แก้'; }
+      if (id === 'team') { fixCell = `<input data-fix-team="${i}" value="${esc(it.fix.team || '')}" list="teams" style="width:110px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 6px;color:var(--text)">${it.why ? `<div class="src">${esc(it.why)}</div>` : ''}`; btn = 'แก้'; }
+      if (id === 'dup') { fixCell = `ซ้ำกับ: ${esc(it.other.name)} ${rangeText(it.other)} ${pill(it.other.status)}<div class="src">แท็บ ${esc(it.other.sheet)} แถว ${it.other.row}</div>`; btn = 'ยกเลิกรายการนี้'; }
+      return `<tr data-chk="${id}:${i}"><td>${cur(r)}</td><td>${r.dates.length ? rangeText(r) : '<span class="muted">–</span>'}</td><td>${teamPill(r.team)}</td><td>${fixCell}</td><td>${btn ? `<button class="btn sm ${id==='dup'?'bad':''}" data-fix="${id}:${i}">${btn}</button>` : ''}</td></tr>`;
+    }).join('');
+    return `<div class="card chk"><h2>${title} <span class="cnt ${list.length?'':'zero'}">${list.length ? list.length + ' รายการ' : 'ไม่พบปัญหา'}</span>
+      ${list.length > 1 && id !== 'date' ? `<button class="btn sec sm" data-fixall="${id}" style="margin-left:auto">แก้ทั้งหมดในหัวข้อนี้ (${list.length})</button>` : ''}</h2>
+      <p class="why">${why}</p>
+      ${list.length ? `<div class="tbl-wrap"><table><thead><tr><th>รายการ</th><th>วันที่ลา</th><th>ชุด</th><th>ค่าที่จะแก้</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>` : ''}</div>`;
+  }).join('');
+}
+function fixPayload(id, i){
+  const it = state.issues[id][i], r = it.r, tr = document.querySelector(`tr[data-chk="${id}:${i}"]`);
+  if (id === 'dup') return { action: 'status', status: 'ยกเลิก', r };
+  const base = { action: 'edit', r, name: r.name, days: r.days, month: r.month, team: r.team, fy: r.fy, status: r.status, note: r.note };
+  if (id === 'fy' || id === 'nofy'){ const v = tr.querySelector('[data-fix-fy]').value.trim(); if (!/^\d{4}$/.test(v)) throw new Error('ปีงบประมาณต้องเป็นตัวเลข 4 หลัก'); base.fy = v; }
+  if (id === 'team'){ const v = tr.querySelector('[data-fix-team]').value.trim(); if (!v) throw new Error('กรุณาระบุชุด'); base.team = v; }
+  if (id === 'type'){ const v = tr.querySelector('[data-fix-type]').value; base.note = [r.note, v].filter(Boolean).join(' · '); }
+  if (!base.days || !base.month) throw new Error('แถวนี้ไม่มีวันที่ลาหรือเดือน แก้ในชีตโดยตรง');
+  return base;
+}
+async function applyFix(p){
+  const r = p.r;
+  if (p.action === 'status') return api('POST', { action: 'status', pin: state.admin, year: r.sheet, row: r.row, name: r.name, status: p.status });
+  return api('POST', { action: 'edit', pin: state.admin, year: r.sheet, row: r.row, originalName: r.name, name: p.name, days: p.days, month: p.month, team: p.team, fy: p.fy, status: p.status, note: p.note });
+}
+document.addEventListener('click', async e => {
+  const one = e.target.closest('[data-fix]'), all = e.target.closest('[data-fixall]');
+  if (!one && !all) return;
+  const jobs = [];
+  try{
+    if (one){ const [id, i] = one.dataset.fix.split(':'); jobs.push([id, +i]); }
+    else { const id = all.dataset.fixall; state.issues[id].forEach((_, i) => jobs.push([id, i]));
+      if (!confirm(`แก้ ${jobs.length} รายการในหัวข้อนี้ตามค่าที่แสดงในตาราง และเขียนลงชีตเลย?`)) return; }
+    const payloads = jobs.map(([id, i]) => [id, i, fixPayload(id, i)]);
+    const btn = one || all; btn.disabled = true;
+    let ok = 0;
+    for (const [id, i, p] of payloads){
+      btn.textContent = `กำลังแก้ ${ok + 1}/${payloads.length}…`;
+      await applyFix(p); ok++;
+      document.querySelector(`tr[data-chk="${id}:${i}"]`)?.classList.add('done');
+    }
+    sfx('ok'); toast(`แก้แล้ว ${ok} รายการ`); await load(state.year); renderCheck();
+  }catch(err){ sfx('err'); toast(err.message, 5000); if (/รหัส/.test(err.message)) logout(); renderCheck(); }
+});
+
+/* ---- แท็บ / ตัวกรอง / ธีม ---- */
+
+/* ---- แอนิเมชันด้วย Motion (motion.dev) · ถ้าโหลดไลบรารีไม่ได้ หรือเครื่องตั้ง "ลดการเคลื่อนไหว" เว็บจะทำงานปกติแบบไม่มีแอนิเมชัน ---- */
+const MO = () => (window.Motion && !matchMedia('(prefers-reduced-motion: reduce)').matches) ? window.Motion : null;
+const SPRING = { type:'spring', stiffness:420, damping:30 };
+function animateView(t){
+  const M = MO(); if (!M) return;
+  const sec = document.querySelector(`[data-view="${t}"]`); if (!sec) return;
+  const blocks = [...sec.children].filter(el => !el.hidden && el.offsetParent !== null);
+  M.animate(blocks, { opacity:[0,1], y:[14,0] }, { duration:.35, delay:M.stagger(.05), ease:[.22,1,.36,1] });
+  const rows = [...sec.querySelectorAll('tbody tr, ul.list > li, .half li')].filter(el => el.offsetParent !== null).slice(0, 30);
+  if (rows.length) M.animate(rows, { opacity:[0,1], x:[-8,0] }, { duration:.25, delay:M.stagger(.018, { startDelay:.12 }) });
+  const bars = [...sec.querySelectorAll('.bar > i')].filter(el => el.offsetParent !== null).slice(0, 120);
+  bars.forEach(i => { const w = i.style.width; if (w) M.animate(i, { width:['0%', w] }, { duration:.7, delay:.15, ease:[.22,1,.36,1] }); });
+  if (t === 'home') countUp();
+}
+function countUp(){
+  const M = MO(); if (!M) return;
+  ['#kToday','#kPending','#kCount','#kDays'].forEach(sel => {
+    const el = $(sel), to = Number(el && el.textContent); if (!el || !to) return;
+    M.animate(0, to, { duration:.8, ease:[.22,1,.36,1], onUpdate: v => { el.textContent = Math.round(v); } });
+  });
+}
+// หน้าต่างป๊อปอัป (อนุมัติ / ใส่รหัส / แก้สิทธิ์) เด้งขึ้นนุ่ม ๆ
+{ const show = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.showModal = function(){ show.call(this); const M = MO(); if (M) M.animate(this, { opacity:[0,1], scale:[.94,1], y:[10,0] }, SPRING); }; }
+// กดปุ่มแล้วยุบลงเล็กน้อยแบบสปริง
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('button'); const M = MO(); if (!b || b.disabled || !M) return;
+  M.animate(b, { scale:.94 }, { duration:.08 });
+  const up = () => { M.animate(b, { scale:1 }, { type:'spring', stiffness:600, damping:15 }); };
+  window.addEventListener('pointerup', up, { once:true }); window.addEventListener('pointercancel', up, { once:true });
+}, true);
+function switchTab(t){
+  state.tab = t;
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===t));
+  document.querySelectorAll('[data-view]').forEach(s => s.hidden = s.dataset.view !== t);
+  if (t !== 'new' && state.editing) resetForm();
+  if (t === 'charts') renderCharts();
+  if (t === 'settings') fillSettings();
+  if (t === 'check') renderCheck();
+  animateView(t);
+}
+$('#tabs').onclick = e => { const b = e.target.closest('button'); if (b) { sfx('tab'); switchTab(b.dataset.tab); } };
+['#q','#fTeam','#fMonth','#fStatus'].forEach(s => $(s).addEventListener('input', renderList));
+['#pq','#pTeam','#pApproved'].forEach(s => $(s).addEventListener('input', renderPeople));
+$('#calTeam').addEventListener('input', renderCal);
+['#bq','#bTeam'].forEach(s => $(s).addEventListener('input', renderBalance));
+['#cmpYear','#cStatus'].forEach(s => $(s).addEventListener('input', renderCharts));
+$('#printBtn').onclick = () => window.print();
+const shiftHalf = d => { const h = state.half; h.m += d; if (h.m<0){h.m=11;h.y--;} if (h.m>11){h.m=0;h.y++;} renderHome(); };
+$('#halfPrev').onclick = () => shiftHalf(-1);
+$('#halfNext').onclick = () => shiftHalf(1);
+$('#halfNow').onclick = () => { state.half = null; renderHome(); };
+$('#calPrev').onclick = () => { const c=state.cal; c.m--; if(c.m<0){c.m=11;c.y--;} renderCal(); };
+$('#calNext').onclick = () => { const c=state.cal; c.m++; if(c.m>11){c.m=0;c.y++;} renderCal(); };
+document.querySelectorAll('th[data-sort]').forEach(th => th.onclick = () => {
+  const k = th.dataset.sort; state.sort = { k, dir: state.sort.k===k ? -state.sort.dir : 1 }; renderList();
+});
+$('#year').onchange = e => { state.cmpUser = false; state.chkYear = null; setYear(e.target.value); };
+$('#chkYear').onchange = e => { state.chkYear = e.target.value; renderCheck(); };
+$('#soundBtn').onclick = () => {
+  soundOn = !soundOn; try { localStorage.setItem('sound', soundOn ? 'on' : 'off'); } catch (err) {}
+  paintSound(); if (soundOn) sfx('ok'); toast(soundOn ? 'เปิดเสียงแล้ว' : 'ปิดเสียงแล้ว');
+};
+paintSound();
+$('#themeBtn').onclick = () => {
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
+  document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+};
+
+$('#fontSel').value = document.documentElement.dataset.font || '';
+$('#fontSel').onchange = e => {
+  const v = e.target.value;
+  if (v) document.documentElement.dataset.font = v; else delete document.documentElement.dataset.font;
+  try { v ? localStorage.setItem('font', v) : localStorage.removeItem('font'); } catch (err) {}
+  if (state.tab === 'charts') renderCharts();
+};
+$('#demoBanner').hidden = !DEMO;
+// แสดงปีงบฯ ทันที ระหว่างรอข้อมูลจาก Google Sheets (อาจใช้เวลาหลายวินาที)
+{ const cur = fyOf(new Date()); state.years = [cur-2, cur-1, cur].map(String); state.year = String(cur); renderYears(); }
+document.getElementById('sub').textContent = 'กำลังโหลดข้อมูล…';
+load().then(() => { if (state.admin) startWatch(); const go = () => animateView(state.tab); window.Motion ? go() : setTimeout(go, 400); });
+</script>
+</body>
+</html>
