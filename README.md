@@ -51,18 +51,18 @@ const API_URL = 'https://script.google.com/macros/s/xxxxxxxx/exec';
 
 ## ขั้นที่ 3 — ขึ้น GitHub Pages
 
-1. สร้าง repository ใหม่ใน GitHub เช่น `leave-system`
+1. สร้าง repository ใหม่ใน GitHub เช่น `kuamkumla-bangbo`
 2. อัปโหลด `index.html`, `logo.png` (และโฟลเดอร์ `apps-script` ถ้าต้องการเก็บไว้)
    - ผ่านเว็บ: **Add file › Upload files** แล้วลากไฟล์ใส่ → Commit
    - หรือผ่านคำสั่ง:
      ```bash
      git init && git add . && git commit -m "ระบบคุมลา"
      git branch -M main
-     git remote add origin https://github.com/<ชื่อผู้ใช้>/leave-system.git
+     git remote add origin https://github.com/<ชื่อผู้ใช้>/kuamkumla-bangbo.git
      git push -u origin main
      ```
 3. ไปที่ **Settings › Pages** → Source: **Deploy from a branch** → Branch: `main` / `(root)` → Save
-4. รอ 1–2 นาที เว็บจะอยู่ที่ `https://<ชื่อผู้ใช้>.github.io/leave-system/`
+4. รอ 1–2 นาที เว็บจะอยู่ที่ `https://<ชื่อผู้ใช้>.github.io/kuamkumla-bangbo/`
 
 ---
 
@@ -75,6 +75,8 @@ const API_URL = 'https://script.google.com/macros/s/xxxxxxxx/exec';
 - สถานะที่ใช้: `รออนุมัติ` `อนุมัติ` `ไม่อนุมัติ` `ยกเลิก` (ช่องว่างแสดงเป็น "ไม่ระบุ")
 
 ## ความปลอดภัย
+
+- **บันทึกการใช้งาน**: ทุกการยื่นลา/อนุมัติ/แก้ไข/ลบ/ตั้งค่า/เข้าโหมดผู้อนุมัติ (รวมใส่รหัสผิด) ถูกจดลงแท็บซ่อน `บันทึกการใช้งาน` ในชีต (ล่าสุดอยู่บนสุด) หน้าเว็บอ่านแท็บนี้ไม่ได้ เปิดดูได้จากชีต: ปุ่ม ≡ (ชีตทั้งหมด) มุมซ้ายล่าง
 
 - หน้าเว็บ GitHub Pages และ Apps Script ที่ตั้ง "ทุกคน" **ใครมีลิงก์ก็ดูรายชื่อและวันลาได้** อย่าเผยแพร่ลิงก์นอกหน่วย
 - ใครมีลิงก์ก็ยื่นใบลาได้ แต่อนุมัติ/แก้ไข/ลบต้องใช้รหัส ซึ่งเก็บอยู่ใน Apps Script (ไม่อยู่ใน GitHub)

@@ -482,6 +482,13 @@ button[data-ent]{white-space:nowrap}
 @keyframes okFade{from{opacity:0}}
 @keyframes okFadeOut{to{opacity:0}}
 @media (prefers-reduced-motion: reduce){ .okpop,.okcard{animation:none} .okmark .tick{animation:none;stroke-dashoffset:0} }
+
+/* ---- ตัวเลือกแบบชิป (สรุปรายบุคคล: นับเฉพาะที่อนุมัติแล้ว) ---- */
+.chip-toggle{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer;user-select:none;
+  padding:0 14px;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font-size:14.5px;transition:border-color .15s,background .15s}
+.chip-toggle:hover{border-color:#3B82F6}
+.chip-toggle input[type=checkbox]{width:18px;height:18px;min-width:18px;margin:0;padding:0;flex:none;accent-color:#3B82F6;cursor:pointer;box-shadow:none}
+.chip-toggle:has(input:checked){border-color:#3B82F6;background:rgba(59,130,246,.10);color:#2563EB;font-weight:600}
 </style>
 </head>
 <body>
@@ -580,7 +587,7 @@ button[data-ent]{white-space:nowrap}
     <div class="filters">
       <input id="pq" placeholder="ค้นหาชื่อ">
       <select id="pTeam"><option value="">ทุกชุดปฏิบัติการ</option></select>
-      <label class="muted" style="display:flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="pApproved"> นับเฉพาะที่อนุมัติแล้ว</label>
+      <label class="chip-toggle"><input type="checkbox" id="pApproved"><span>นับเฉพาะที่อนุมัติแล้ว</span></label>
     </div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>ชื่อ</th><th>ชุด</th><th class="num">ครั้ง</th><th class="num">วันลารวม</th><th></th><th>ครั้งล่าสุด</th></tr></thead>
