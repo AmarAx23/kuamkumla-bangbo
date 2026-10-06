@@ -855,6 +855,8 @@ function applyConfig(c){
   for (const k of Object.keys(DEFAULT_SETTINGS)) if (st[k] !== undefined && st[k] !== '') CFG[k] = typeof DEFAULT_SETTINGS[k] === 'number' ? Number(st[k]) : st[k];
   CFG.teamCaps = {};
   for (const k of Object.keys(st)) if (k.startsWith('cap:') && st[k] !== '') CFG.teamCaps[k.slice(4)] = Number(st[k]);
+  CFG.names = {};
+  for (const k of Object.keys(st)) if (k.startsWith('name:') && st[k] !== '') CFG.names[k.slice(5)] = String(st[k]).replace(/\s+/g,' ').trim();
   CFG.positions = {};
   for (const k of Object.keys(st)) if (k.startsWith('pos:') && st[k] !== '') CFG.positions[k.slice(4)] = st[k];
   CFG.holidaysCustom = !!(c && c.holidays);
@@ -1286,9 +1288,10 @@ function renderPeople(){
   const map = new Map();
   for (const r of state.rows){
     if (onlyOk ? r.status!=='อนุมัติ' : !active(r)) continue;
-    const p = map.get(r.name) || { name:r.name, teams:new Set(), n:0, days:0, last:'' };
+    const k = pkey(r.name) || r.name;  // รวมคนเดียวกันที่ยศเปลี่ยน ใช้ยศ-ชื่อปัจจุบัน
+    const p = map.get(k) || { name: latestName(k) || r.name, teams:new Set(), n:0, days:0, last:'' };
     p.teams.add(r.team); p.n++; p.days += r.count; if (r.start > p.last) p.last = r.start;
-    map.set(r.name, p);
+    map.set(k, p);
   }
   let ppl = [...map.values()].filter(p => (!q || p.name.toLowerCase().includes(q)) && (!t || p.teams.has(t))).sort((a,b)=>b.days-a.days || a.name.localeCompare(b.name,'th'));
   const max = Math.max(1, ...ppl.map(p=>p.days));
@@ -1554,6 +1557,7 @@ function rankIdx(name){
 }
 /** ชื่อล่าสุดของบุคคล (ใช้ดูยศปัจจุบัน) */
 function latestName(k){
+  if (CFG.names && CFG.names[k]) return CFG.names[k]; // ยศ-ชื่อปัจจุบันที่กำหนดไว้ (ตั้งค่าระบบ: name:<ชื่อ>)
   const rows = state.all.filter(r => pkey(r.name) === k).sort((a,b) => (b.start||'').localeCompare(a.start||''));
   return rows.length ? rows[0].name : ((CFG.entitlements.find(x => pkey(x.name) === k) || {}).name || '');
 }
@@ -1613,6 +1617,7 @@ function renderBalance(){
   const prevFy = String(Number(fy) - 1);
   state.all.filter(r => r.fy === prevFy).forEach(r => touch(r.name, r.team, ''));
   state.all.filter(r => r.fy === fy).forEach(r => touch(r.name, r.team, r.start));
+  people.forEach(p => { if (CFG.names && CFG.names[p.k]) p.name = CFG.names[p.k]; });
   CFG.entitlements.filter(e => String(e.fy) === fy).forEach(e => touch(e.name, '', ''));
   const rowsFy = state.all.filter(r => r.fy === fy && deducts(r));
   const pendFy = state.all.filter(r => r.fy === fy && (r.status === 'รออนุมัติ' || (!r.status && Number(r.fy) >= Number(CFG.baseFy))) && r.type === 'ลาพักผ่อน');
@@ -1736,6 +1741,7 @@ $('#setForm').addEventListener('submit', async e => {
   SET_KEYS.forEach(k => settings[k] = f.elements[k].value);
   f.querySelectorAll('[data-cap]').forEach(i => { if (i.value !== '') settings['cap:' + i.dataset.cap] = i.value; });
   f.querySelectorAll('[data-pos]').forEach(i => { if (i.value.trim() !== '') settings['pos:' + i.dataset.pos] = i.value.trim(); });
+  Object.entries(CFG.names || {}).forEach(([k, v]) => { settings['name:' + k] = v; }); // คงยศ-ชื่อปัจจุบันไว้
   const btn = $('#setSave'); btn.disabled = true;
   try{
     await api('POST', { action:'saveConfig', pin: state.admin, settings, holidays: out });
@@ -1850,7 +1856,7 @@ function printLeave(r){
   const head = `<p class="r">เขียนที่ ${F(CFG.printPlace,'w')}</p>
     <p class="r">วันที่ ${F(today.getDate(),'s')} เดือน ${F(MONTHS_FULL[today.getMonth()])} พ.ศ. ${F(today.getFullYear()+543,'s')}</p>`;
   const sign = `<p class="sig" style="margin-top:8px">ขอแสดงความนับถือ</p>
-    <p class="sig" style="margin-top:22px">(ลงชื่อ) ${F('','w')}</p><p class="sig">( ${F(r.name,'w')} )</p>`;
+    <p class="sig" style="margin-top:22px">(ลงชื่อ) ${F('','w')}</p><p class="sig">( ${F(latestName(k) || r.name,'w')} )</p>`;
   const signBlock = role => `<p>(ลงชื่อ) ${F('','w')}</p><p>(${F('','w')})</p><p>ตำแหน่ง ${F('','w')}</p><p>วันที่ ${F('','w')}</p>`;
   const tail = (statsTable) => `<div class="two small">
       <div><p><b>สถิติการลาในปีงบประมาณ ${esc(fy)}</b> <span>(${usesWorkdays(r.type)?'วันทำการ':'วัน'})</span></p>${statsTable}
@@ -1862,7 +1868,7 @@ function printLeave(r){
   if (r.type === 'ลาพักผ่อน'){
     // แบบใบลาพักผ่อนของ สภ.บางบ่อ (ตามแบบฟอร์มกระดาษที่ใช้จริง)
     const b = entitlementFor(k, fy), before = sumType('ลาพักผ่อน');
-    const plain = String(r.name).replace(/\s+/g,' ').trim(), bare = plain.replace(/^(พล\.ต\.[ตทอ]\.|[พร]\.ต\.[ตทอ]\.|ด\.ต\.|จ\.ส\.ต\.|ส\.ต\.[ตทอ]\.)\.?\s*/, '');
+    const plain = String(latestName(k) || r.name).replace(/\s+/g,' ').trim(), bare = plain.replace(/^(พล\.ต\.[ตทอ]\.|[พร]\.ต\.[ตทอ]\.|ด\.ต\.|จ\.ส\.ต\.|ส\.ต\.[ตทอ]\.)\.?\s*/, '');
     const D = d => d ? thShort(fromIso(d)) : '';
     const dateLine = `<p class="dl">${F('','d')} / ${F('','d')} / ${F('','d')}</p>`;
     const sgn = (pre, val='') => `<p>(${pre}) ${F(val,'grow')}</p>`;
@@ -1909,7 +1915,7 @@ function printLeave(r){
     const row = t => { const before = sumType(t), now = r.type === t ? r.count : 0; return `<tr><td style="text-align:left">${label[t]}</td><td>${before}</td><td>${now || ''}</td><td>${before + now}</td></tr>`; };
     html = `<div class="lf"><h1>แบบใบลาป่วย ลาคลอดบุตร ลากิจส่วนตัว</h1>${head}
       <p>เรื่อง&nbsp;&nbsp;ขอลา${label[r.type]}</p><p>เรียน&nbsp;&nbsp;${F(CFG.toWhom,'w')}</p>
-      <p class="ind">ข้าพเจ้า ${F(r.name,'w')} ตำแหน่ง ${F(posFor(k),'w')} สังกัด ${F(CFG.orgName,'xl')}</p>
+      <p class="ind">ข้าพเจ้า ${F(latestName(k) || r.name,'w')} ตำแหน่ง ${F(posFor(k),'w')} สังกัด ${F(CFG.orgName,'xl')}</p>
       <p>ขอลา ${BOX(r.type==='ลาป่วย')} ป่วย ${BOX(r.type==='ลากิจ')} กิจส่วนตัว ${BOX(r.type==='ลาคลอดบุตร')} คลอดบุตร เนื่องจาก ${F(reason,'xl')}</p>
       <p>ตั้งแต่วันที่ ${F(thDate(r.start))} ถึงวันที่ ${F(thDate(r.end))} มีกำหนด ${F(r.count,'s')} วัน
       ข้าพเจ้าได้ลา ${BOX(last&&last.type==='ลาป่วย')} ป่วย ${BOX(last&&last.type==='ลากิจ')} กิจส่วนตัว ${BOX(last&&last.type==='ลาคลอดบุตร')} คลอดบุตร
