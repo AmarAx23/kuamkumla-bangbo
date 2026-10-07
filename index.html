@@ -1911,8 +1911,8 @@ function printLeave(r){
           <p>(ตำแหน่ง) ${F(junior ? 'ผบ.หมู่(ป.)สภ.บางบ่อ' : '','grow')}</p>${dateLine}
           <table class="st"><tr><th>ลามาแล้ว<br>(วันทำการ)</th><th>ลาครั้งนี้<br>(วันทำการ)</th><th>รวมเป็น<br>(วันทำการ)</th></tr>
             <tr><td>${before || '-'}</td><td>${r.count}</td><td>${before + r.count}</td></tr></table>
-          <p style="margin-top:14px">ลงชื่อ ${F('','grow')} ผู้ตรวจสอบ</p>
-          <p>ตำแหน่ง ${F('','grow')}</p>${dateLine}
+          <p style="margin-top:14px">(ลงชื่อ) ส.ต.ท. ${F('','grow')} ผู้ตรวจสอบ</p>
+          <p>(ตำแหน่ง) ${F('ผบ.หมู่.คฝ.กก.สส.ภ.จว.สป.','grow')}</p>${dateLine}
           <p class="c" style="margin-top:10px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(2)}
           <p>(ลงชื่อ) ส.ต.ท. ${F('','grow')}</p>
           <p>(ตำแหน่ง) ${F('ผบ.หมู่.คฝ.กก.สส.ภ.จว.สป.','grow')}</p>
@@ -1982,8 +1982,8 @@ function printLeave(r){
           <table class="st st3"><tr><th rowspan="2">ประเภทลา</th><th colspan="2">ลามาแล้ว</th><th colspan="2">ลาครั้งนี้</th><th colspan="2">รวมเป็น</th></tr>
             <tr><th>วัน</th><th>วัน<br>ทำการ</th><th>วัน</th><th>วัน<br>ทำการ</th><th>วัน</th><th>วัน<br>ทำการ</th></tr>
             ${row('ลาป่วย')}${row('ลากิจ')}${row('ลาคลอดบุตร')}</table>
-          <p>(ลงชื่อ) ${F('','grow')} ผู้ตรวจสอบ</p>
-          <p>(ตำแหน่ง) ${F('','grow')}</p>${dateLine}
+          <p>(ลงชื่อ) ส.ต.ท. ${F('','grow')} ผู้ตรวจสอบ</p>
+          <p>(ตำแหน่ง) ${F('ผบ.หมู่.คฝ.กก.สส.ภ.จว.สป.','grow')}</p>${dateLine}
           <p class="c" style="margin-top:6px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(2)}
           <p>(ลงชื่อ) ส.ต.ท. ${F('','grow')}</p>
           <p>(ตำแหน่ง) ${F('ผบ.หมู่.คฝ.กก.สส.ภ.จว.สป.','grow')}</p>
