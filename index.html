@@ -1906,14 +1906,16 @@ function printLeave(r){
       <p>ในระหว่างลาติดต่อข้าพเจ้าได้ที่ ${F('','grow')}</p>${lines(1)}
       <div class="cols">
         <div>
-          <p class="c" style="margin-top:14px">ทราบการลา</p>
-          ${sgn('ลงชื่อ')}${sgn('ตำแหน่ง')}${dateLine}
+          <p class="c" style="margin-top:14px"><b>ทราบการลา</b></p>
+          <p>(ลงชื่อ) ${junior ? 'ส.ต.อ. ' : ''}${F('','grow')}</p>
+          <p>(ตำแหน่ง) ${F(junior ? 'ผบ.หมู่(ป.)สภ.บางบ่อ' : '','grow')}</p>${dateLine}
           <table class="st"><tr><th>ลามาแล้ว<br>(วันทำการ)</th><th>ลาครั้งนี้<br>(วันทำการ)</th><th>รวมเป็น<br>(วันทำการ)</th></tr>
             <tr><td>${before || '-'}</td><td>${r.count}</td><td>${before + r.count}</td></tr></table>
           <p style="margin-top:14px">ลงชื่อ ${F('','grow')} ผู้ตรวจสอบ</p>
           <p>ตำแหน่ง ${F('','grow')}</p>${dateLine}
-          <p class="c" style="margin-top:10px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(3)}
-          <p>ลงชื่อ ${F('','grow')}</p>
+          <p class="c" style="margin-top:10px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(2)}
+          <p>(ลงชื่อ) ส.ต.ท. ${F('','grow')}</p>
+          <p>(ตำแหน่ง) ${F('ผบ.หมู่.คฝ.กก.สส.ภ.จว.สป.','grow')}</p>
           <p class="c"><b>เจ้าหน้าที่งานกำลังพล</b></p>${dateLine}
         </div>
         <div>
