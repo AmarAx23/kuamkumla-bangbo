@@ -1936,7 +1936,7 @@ function printLeave(r){
     const dateLine = `<p class="dl">${F('','d')} / ${F('','d')} / ${F('','d')}</p>`;
     const lines = n => Array.from({length:n}, () => `<p>${F('','grow')}</p>`).join('');
     const junior = rankIdx(plain) >= 0 && rankIdx(plain) < RANKS.indexOf('พ.ต.ต.');
-    const cmdBlock = (rk, pos) => `<p class="c" style="margin-top:6px"><b>ความเห็นของผู้บังคับบัญชา</b></p>${lines(1)}
+    const cmdBlock = (rk, pos, title = 'ความเห็นของผู้บังคับบัญชา') => `<p class="c" style="margin-top:6px"><b>${title}</b></p>${lines(1)}
           <p>(ลงชื่อ) ${junior && rk ? esc(rk) + ' ' : ''}${F('','grow')}</p>
           <p>(ตำแหน่ง) ${F(junior && pos ? pos : '','grow')}</p>${dateLine}`;
     // วัน (ปฏิทิน) / วันทำการ ของแต่ละรายการ — ถ้าผู้อนุมัติกรอกไว้ใช้ค่าที่กรอก
@@ -1972,7 +1972,7 @@ function printLeave(r){
         </div>
       </div>
       <div class="cols">
-        <div>${cmdBlock('', '')}</div>
+        <div>${cmdBlock('', '', 'ทราบการลา')}</div>
         <div>${cmdBlock(CFG.cmd1Rank, CFG.cmd1Pos)}</div>
       </div>
       <div class="cols">
@@ -1982,8 +1982,8 @@ function printLeave(r){
             ${row('ลาป่วย')}${row('ลากิจ')}${row('ลาคลอดบุตร')}</table>
           <p>(ลงชื่อ) ${F('','grow')} ผู้ตรวจสอบ</p>
           <p>(ตำแหน่ง) ${F('','grow')}</p>${dateLine}
-          <p style="margin-top:6px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(3)}
-          <p>(ลงชื่อ) ด.ต. ${F('','grow')}</p>
+          <p class="c" style="margin-top:6px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(3)}
+          <p>(ลงชื่อ) ส.ต.ต. ${F('','grow')}</p>
           <p class="c">จนท.กำลังพล</p>
         </div>
         <div>
