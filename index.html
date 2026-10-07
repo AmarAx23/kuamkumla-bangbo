@@ -326,6 +326,21 @@ details.tv table{margin-top:8px;font-size:13px}
 .lf.lf-fb h1{font-size:14pt}
 .lf.lf-fb th,.lf.lf-fb td,.lf.lf-fb table,.lf.lf-fb .small,.lf.lf-fb table.st td{font-size:12.5pt}
 .lf2.lf-fb{line-height:2.15}
+
+/* ใบลากิจ/ป่วย/คลอด แบบ สภ.บางบ่อ */
+.lf3 .chk3{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:6px 12px;padding-left:1.4cm}
+.lf3 .chk3 .opts p{min-height:1.5em}
+.lf3 .box.bx{width:18px;height:18px;line-height:17px;font-size:14px;margin:0 8px 0 0}
+.lf3 table.st3{font-size:14pt;line-height:1.15;margin:4px 0 6px}
+.lf3 table.st3 th{font-size:14pt;padding:2px 1px}
+.lf3 table.st3 td{height:auto;font-size:15pt;padding:3px 2px}
+.lf3 table.st3 td.lt{text-align:left;white-space:nowrap}
+.lf3 .cols{gap:1cm}
+.lf3{line-height:1.2}
+.lf3 p{min-height:1.36em}
+.lf3 h1{line-height:1.3;margin:0 0 6px;padding:0;min-height:0}
+.lf3 .cols{margin-top:0}
+
 /* ===== ชั้นตกแต่ง: ฟอนต์ + หัวเว็บ + กระดานตัวเลข ===== */
 :root[data-font="modern"]{ --f-body:"Anuphan",system-ui,sans-serif; --f-head:"Bai Jamjuree","Anuphan",system-ui,sans-serif; }
 :root[data-font="looped"]{ --f-body:"Noto Sans Thai Looped",system-ui,sans-serif; --f-head:"Noto Sans Thai Looped",system-ui,sans-serif; }
@@ -1915,16 +1930,70 @@ function printLeave(r){
     const label = { 'ลาป่วย':'ป่วย', 'ลากิจ':'กิจส่วนตัว', 'ลาคลอดบุตร':'คลอดบุตร' };
     const last = [...mine].reverse().find(x => ['ลาป่วย','ลากิจ','ลาคลอดบุตร'].includes(x.type));
     const reason = String(r.note||'').split('·').map(x=>x.trim()).filter(x => x && !LEAVE_TYPES.includes(x) && !/^\d{1,2}\s*[ก-๙.]+\s*-\s*\d{1,2}\s*[ก-๙.]+$/.test(x)).join(' ');
-    const row = t => { const before = sumType(t), now = r.type === t ? r.count : 0; return `<tr><td style="text-align:left">${label[t]}</td><td>${before}</td><td>${now || ''}</td><td>${before + now}</td></tr>`; };
-    html = `<div class="lf"><h1>แบบใบลาป่วย ลาคลอดบุตร ลากิจส่วนตัว</h1>${head}
-      <p>เรื่อง&nbsp;&nbsp;ขอลา${label[r.type]}</p><p>เรียน&nbsp;&nbsp;${F(CFG.toWhom,'w')}</p>
-      <p class="ind">ข้าพเจ้า ${F(latestName(k) || r.name,'w')} ตำแหน่ง ${F(posFor(k),'w')} สังกัด ${F(CFG.orgName,'xl')}</p>
-      <p>ขอลา ${BOX(r.type==='ลาป่วย')} ป่วย ${BOX(r.type==='ลากิจ')} กิจส่วนตัว ${BOX(r.type==='ลาคลอดบุตร')} คลอดบุตร เนื่องจาก ${F(reason,'xl')}</p>
-      <p>ตั้งแต่วันที่ ${F(thDate(r.start))} ถึงวันที่ ${F(thDate(r.end))} มีกำหนด ${F(r.count,'s')} วัน
-      ข้าพเจ้าได้ลา ${BOX(last&&last.type==='ลาป่วย')} ป่วย ${BOX(last&&last.type==='ลากิจ')} กิจส่วนตัว ${BOX(last&&last.type==='ลาคลอดบุตร')} คลอดบุตร
-      ครั้งสุดท้ายตั้งแต่วันที่ ${F(last?thDate(last.start):'')} ถึงวันที่ ${F(last?thDate(last.end):'')} มีกำหนด ${F(last?last.count:'','s')} วัน
-      ในระหว่างลาจะติดต่อข้าพเจ้าได้ที่ ${F('','xl')}</p>${sign}
-      ${tail(`<table><tr><th>ประเภทลา</th><th>ลามาแล้ว</th><th>ลาครั้งนี้</th><th>รวมเป็น</th></tr>${row('ลาป่วย')}${row('ลากิจ')}${row('ลาคลอดบุตร')}</table>`)}</div>`;
+    // แบบใบลากิจส่วนตัว ลาป่วย ลาคลอดบุตร ของ สภ.บางบ่อ (ตามแบบฟอร์มกระดาษที่ใช้จริง)
+    const plain = String(latestName(k) || r.name).replace(/\s+/g,' ').trim(), bare = plain.replace(/^(พล\.ต\.[ตทอ]\.|[พร]\.ต\.[ตทอ]\.|ด\.ต\.|จ\.ส\.ต\.|ส\.ต\.[ตทอ]\.)\.?\s*/, '');
+    const D = d => d ? thShort(fromIso(d)) : '';
+    const dateLine = `<p class="dl">${F('','d')} / ${F('','d')} / ${F('','d')}</p>`;
+    const lines = n => Array.from({length:n}, () => `<p>${F('','grow')}</p>`).join('');
+    const junior = rankIdx(plain) >= 0 && rankIdx(plain) < RANKS.indexOf('พ.ต.ต.');
+    const cmdBlock = (rk, pos) => `<p class="c" style="margin-top:6px"><b>ความเห็นของผู้บังคับบัญชา</b></p>${lines(1)}
+          <p>(ลงชื่อ) ${junior && rk ? esc(rk) + ' ' : ''}${F('','grow')}</p>
+          <p>(ตำแหน่ง) ${F(junior && pos ? pos : '','grow')}</p>${dateLine}`;
+    // วัน (ปฏิทิน) / วันทำการ ของแต่ละรายการ — ถ้าผู้อนุมัติกรอกไว้ใช้ค่าที่กรอก
+    const tw = x => { const a = x.status === 'อนุมัติ' ? numOrNull(x.td) : null, b2 = x.status === 'อนุมัติ' ? numOrNull(x.wd) : null;
+      return [a !== null ? a : x.dates.length, b2 !== null ? b2 : x.dates.filter(isWorkday).length]; };
+    const sum2 = list => list.reduce((s2, x) => { const [a1, b1] = tw(x); return [s2[0] + a1, s2[1] + b1]; }, [0, 0]);
+    const cell = v => `<td>${v ? v : ''}</td>`;
+    const row = t => { const pre = sum2(mine.filter(x => x.type === t)), now = r.type === t ? tw(r) : [0, 0];
+      return `<tr><td class="lt">${label[t]}</td>${cell(pre[0])}${cell(pre[1])}${cell(now[0])}${cell(now[1])}${cell(pre[0]+now[0])}${cell(pre[1]+now[1])}</tr>`; };
+    const BOXB = on => `<span class="box bx">${on ? '✓' : ''}</span>`;
+    html = `<div class="lf lf2 lf3"><h1>แบบใบลากิจส่วนตัว ลาป่วย ลาคลอดบุตร</h1>
+      <p class="r">${esc(CFG.printPlaceFull || 'สถานีตำรวจภูธรบางบ่อ')}</p>
+      <p class="r">วันที่ ${F(today.getDate(),'d')} เดือน ${F(MONTHS_FULL[today.getMonth()],'w')} พ.ศ. ${F(today.getFullYear()+543,'d')}</p>
+      <p><b>เรื่อง</b>&nbsp;&nbsp;ขออนุญาตลา ${r.type==='ลากิจ'?'<u>กิจส่วนตัว</u>':'กิจส่วนตัว'} / ${r.type==='ลาป่วย'?'<u>ลาป่วย</u>':'ลาป่วย'} / ${r.type==='ลาคลอดบุตร'?'<u>ลาคลอดบุตร</u>':'ลาคลอดบุตร'}</p>
+      <p><b>เรียน</b>&nbsp;&nbsp;${esc(CFG.toWhom || '')}</p>
+      <p class="ind">ข้าพเจ้า ${F(plain,'grow')} ตำแหน่ง ${F(posFor(k),'grow')}</p>${lines(1)}
+      <div class="chk3">
+        <div class="lbl">ขออนุญาตลา</div>
+        <div class="opts">
+          <p>${BOXB(r.type==='ลาป่วย')} ป่วย${r.type==='ลาป่วย' ? ` &nbsp;เนื่องจาก ${F(reason,'grow')}` : ''}</p>
+          <p>${BOXB(r.type==='ลากิจ')} กิจส่วนตัว &nbsp;เนื่องจาก ${F(r.type==='ลากิจ' ? reason : '','grow')}</p>
+          <p>${BOXB(r.type==='ลาคลอดบุตร')} คลอดบุตร</p>
+        </div>
+      </div>
+      <p>ตั้งแต่วันที่ ${F(D(r.start),'grow')} ถึงวันที่ ${F(D(r.end),'grow')} มีกำหนด ${F(r.count,'s')} วัน</p>
+      <p>ในระหว่างลาติดต่อข้าพเจ้าได้ที่ ${F('','grow')}</p>
+      <div class="cols">
+        <div></div>
+        <div>
+          <p class="c"><b>ขอแสดงความนับถือ</b></p>
+          <p>(ลงชื่อ) ${F('','grow')}</p>
+          <p class="c">( ${F(bare,'w')} )</p>
+        </div>
+      </div>
+      <div class="cols">
+        <div>${cmdBlock('', '')}</div>
+        <div>${cmdBlock(CFG.cmd1Rank, CFG.cmd1Pos)}</div>
+      </div>
+      <div class="cols">
+        <div>
+          <table class="st st3"><tr><th rowspan="2">ประเภทลา</th><th colspan="2">ลามาแล้ว</th><th colspan="2">ลาครั้งนี้</th><th colspan="2">รวมเป็น</th></tr>
+            <tr><th>วัน</th><th>วัน<br>ทำการ</th><th>วัน</th><th>วัน<br>ทำการ</th><th>วัน</th><th>วัน<br>ทำการ</th></tr>
+            ${row('ลาป่วย')}${row('ลากิจ')}${row('ลาคลอดบุตร')}</table>
+          <p>(ลงชื่อ) ${F('','grow')} ผู้ตรวจสอบ</p>
+          <p>(ตำแหน่ง) ${F('','grow')}</p>${dateLine}
+          <p style="margin-top:6px"><b>ความเห็นของเจ้าหน้าที่กำลังพล</b></p>${lines(3)}
+          <p>(ลงชื่อ) ด.ต. ${F('','grow')}</p>
+          <p class="c">จนท.กำลังพล</p>
+        </div>
+        <div>
+          ${cmdBlock(CFG.cmd2Rank, CFG.cmd2Pos)}
+          <p style="margin-top:6px"><b>คำสั่ง</b></p>
+          <p class="c">○ อนุญาต &nbsp;&nbsp;&nbsp; ○ ไม่อนุญาต</p>
+          <p>(ลงชื่อ) พ.ต.อ. ${F('','grow')}</p>
+          <p>(ตำแหน่ง) ${F(CFG.toWhomShort || 'ผกก.สภ.บางบ่อ','grow')}</p>${dateLine}
+        </div>
+      </div></div>`;
   } else {
     return toast(`ยังไม่มีแบบใบลาสำหรับ "${r.type}" — พิมพ์ได้เฉพาะลาพักผ่อน ลาป่วย ลากิจ ลาคลอดบุตร`, 5000);
   }
