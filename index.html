@@ -612,25 +612,33 @@ header{background:var(--surface);color:var(--text);border-bottom:1px solid var(-
 body.is-admin .top .admin-mini{background:#2563eb;color:#fff;border-color:#2563eb}
 @media (max-width:640px){ .top .brand .logo{height:42px} .top h1{font-size:16px} }
 
-/* แท็บ: ปุ่มกลมไล่สีแบบเดียวกับหน้ารถหาย (selfish-kangaroo-64 by kirzin, Uiverse.io, MIT) */
-nav.tabs{gap:12px;padding:6px 4px 14px;overflow-x:auto;scroll-padding:4px}
+/* แท็บ: ขอบนีออนเขียว + แสงวิ่งผ่านเมื่อชี้ — "ugly-robin-41" by adamgiebl, Uiverse.io (MIT)
+   ปรับสีตัวหนังสือให้เข้มขึ้นเพื่อให้อ่านได้บนหัวเว็บสีขาว · แท็บที่เปิดอยู่ทึบกว่าและแสงเข้มกว่า */
+nav.tabs{gap:12px;padding:10px 6px 14px;overflow-x:auto;scroll-padding:6px}
 nav.tabs button{
-  --g:linear-gradient(90deg,#ffffff 0%,#ffffff 34%,#dbeafe 50%,#ffffff 66%,#e0e7ff 83%,#ffffff 100%);
-  --halo:linear-gradient(90deg,#e2e8f0,#bfdbfe,#e0e7ff,#cbd5e1,#e2e8f0);
-  position:relative;z-index:1;flex:none;font-family:'Prompt',sans-serif;font-size:15px;font-weight:600;padding:.55em 1.6em;
-  border:none;border-radius:30px;color:#111;background:transparent;opacity:1;box-shadow:none;transition:color .2s;margin:3px 0}
-nav.tabs button::after{content:'';display:block;position:absolute;inset:0;left:0;right:0;bottom:0;height:auto;z-index:-1;border-radius:30px;background:var(--g);background-size:300%}
-nav.tabs button::before{content:'';position:absolute;inset:-3px;z-index:-2;border-radius:33px;background:var(--halo);background-size:400%;transition:filter 1s,opacity 1s;opacity:.55}
-nav.tabs button:hover{background:transparent;color:#111;border:none}
-nav.tabs button:hover::before,nav.tabs button.on::before{opacity:.9}
-nav.tabs button:hover::after{animation:kTabFlow 8s linear infinite}
-nav.tabs button:hover::before{filter:blur(10px);animation:kTabFlow 8s linear infinite}
-@keyframes kTabFlow{0%{background-position:0%}100%{background-position:400%}}
-nav.tabs button:active{background:transparent}
-nav.tabs button.on{--g:linear-gradient(90deg,#2563eb 0%,#2563eb 34%,#60a5fa 50%,#1d4ed8 66%,#3b82f6 83%,#2563eb 100%);--halo:linear-gradient(90deg,#2563eb,#60a5fa,#1d4ed8,#93c5fd,#2563eb);color:#fff;background:transparent;border:none}
-nav.tabs button.on::after{display:block}
-nav.tabs button:focus-visible{outline:3px solid #3b82f6;outline-offset:4px;box-shadow:none}
-@media (max-width:480px){ nav.tabs{gap:10px} nav.tabs button{padding:.55em 1.2em} }
+  --green:#1BFD9C;
+  flex:none;font-size:15px;padding:.55em 2em;letter-spacing:.06em;position:relative;font-family:'Prompt',sans-serif;font-weight:600;
+  border-radius:.6em;overflow:hidden;transition:all .3s;line-height:1.4em;opacity:1;margin:0;
+  border:2px solid var(--green);
+  background:linear-gradient(to right,rgba(27,253,156,.1) 1%,transparent 40%,transparent 60%,rgba(27,253,156,.1) 100%);
+  color:#0a8a55;
+  box-shadow:inset 0 0 10px rgba(27,253,156,.4),0 0 9px 3px rgba(27,253,156,.1)}
+nav.tabs button:hover{color:#06663f;border-color:var(--green);
+  background:linear-gradient(to right,rgba(27,253,156,.1) 1%,transparent 40%,transparent 60%,rgba(27,253,156,.1) 100%);
+  box-shadow:inset 0 0 10px rgba(27,253,156,.6),0 0 9px 3px rgba(27,253,156,.2)}
+nav.tabs button::before{content:"";display:block;position:absolute;left:-4em;width:4em;height:100%;top:0;bottom:auto;right:auto;border-radius:0;opacity:1;filter:none;z-index:0;
+  transition:transform .4s ease-in-out;
+  background:linear-gradient(to right,transparent 1%,rgba(27,253,156,.1) 40%,rgba(27,253,156,.1) 60%,transparent 100%);animation:none}
+nav.tabs button:hover::before{transform:translateX(15em)}
+nav.tabs button::after{display:none!important;content:none}
+nav.tabs button:active{background:rgba(27,253,156,.25)}
+nav.tabs button.on{color:#05502f;font-weight:700;border-color:var(--green);
+  background:linear-gradient(to right,rgba(27,253,156,.35) 1%,rgba(27,253,156,.18) 40%,rgba(27,253,156,.18) 60%,rgba(27,253,156,.35) 100%);
+  box-shadow:inset 0 0 12px rgba(27,253,156,.7),0 0 12px 3px rgba(27,253,156,.35)}
+nav.tabs button:focus-visible{outline:3px solid #10b981;outline-offset:3px}
+@media (max-width:480px){ nav.tabs{gap:10px} nav.tabs button{padding:.55em 1.3em} }
+:root[data-theme="dark"] nav.tabs button{color:var(--green)} :root[data-theme="dark"] nav.tabs button:hover{color:#82ffc9} :root[data-theme="dark"] nav.tabs button.on{color:#d6ffe9}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) nav.tabs button{color:var(--green)} :root:not([data-theme="light"]) nav.tabs button:hover{color:#82ffc9} :root:not([data-theme="light"]) nav.tabs button.on{color:#d6ffe9} }
 
 /* เนื้อหา */
 main.wrap{padding-top:22px}
@@ -664,6 +672,46 @@ th{background:var(--surface-2);color:var(--muted);font-size:13px;font-weight:700
 .tbl-wrap{border-radius:14px}
 .cal .d.today{outline-color:#2563eb}
 .list .who small{font-size:12.5px}
+
+/* ===== สวิตช์โหมดสว่าง/มืด — "jolly-chicken-91" by RiccardoRapelli, Uiverse.io (MIT) · ย่อขนาดให้พอดีมุมขวาบน ===== */
+.theme-switch{position:relative;display:inline-block;width:60px;height:34px;zoom:.62;flex:none;cursor:pointer;vertical-align:middle}
+.theme-switch input{opacity:0;width:0;height:0;position:absolute}
+.theme-switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#2196f3;transition:.4s;z-index:0;overflow:hidden}
+.theme-switch .sun-moon{position:absolute;content:"";height:26px;width:26px;left:4px;bottom:4px;background-color:yellow;transition:.4s}
+.theme-switch input:checked + .slider{background-color:black}
+.theme-switch input:focus-visible + .slider{box-shadow:0 0 0 3px rgba(37,99,235,.45)}
+.theme-switch input:checked + .slider .sun-moon{transform:translateX(26px);background-color:white;animation:ts-rotate-center .6s ease-in-out both}
+@keyframes ts-rotate-center{0%{transform:translateX(26px) rotate(0)}100%{transform:translateX(26px) rotate(360deg)}}
+.theme-switch .moon-dot{opacity:0;transition:.4s;fill:gray}
+.theme-switch input:checked + .slider .sun-moon .moon-dot{opacity:1}
+.theme-switch .slider.round{border-radius:34px}
+.theme-switch .slider.round .sun-moon{border-radius:50%}
+.theme-switch #moon-dot-1{left:10px;top:3px;position:absolute;width:6px;height:6px;z-index:4}
+.theme-switch #moon-dot-2{left:2px;top:10px;position:absolute;width:10px;height:10px;z-index:4}
+.theme-switch #moon-dot-3{left:16px;top:18px;position:absolute;width:3px;height:3px;z-index:4}
+.theme-switch #light-ray-1{left:-8px;top:-8px;position:absolute;width:43px;height:43px;z-index:-1;fill:white;opacity:10%}
+.theme-switch #light-ray-2{left:-50%;top:-50%;position:absolute;width:55px;height:55px;z-index:-1;fill:white;opacity:10%}
+.theme-switch #light-ray-3{left:-18px;top:-18px;position:absolute;width:60px;height:60px;z-index:-1;fill:white;opacity:10%}
+.theme-switch .cloud-light{position:absolute;fill:#eee;animation:ts-cloud-move 6s infinite}
+.theme-switch .cloud-dark{position:absolute;fill:#ccc;animation:ts-cloud-move 6s infinite;animation-delay:1s}
+.theme-switch #cloud-1{left:30px;top:15px;width:40px}
+.theme-switch #cloud-2{left:44px;top:10px;width:20px}
+.theme-switch #cloud-3{left:18px;top:24px;width:30px}
+.theme-switch #cloud-4{left:36px;top:18px;width:40px}
+.theme-switch #cloud-5{left:48px;top:14px;width:20px}
+.theme-switch #cloud-6{left:22px;top:26px;width:30px}
+@keyframes ts-cloud-move{0%{transform:translateX(0)}40%{transform:translateX(4px)}80%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+.theme-switch .stars{transform:translateY(-32px);opacity:0;transition:.4s}
+.theme-switch .star{fill:white;position:absolute;transition:.4s;animation:ts-star-twinkle 2s infinite}
+.theme-switch input:checked + .slider .stars{transform:translateY(0);opacity:1}
+.theme-switch #star-1{width:20px;top:2px;left:3px;animation-delay:.3s}
+.theme-switch #star-2{width:6px;top:16px;left:3px}
+.theme-switch #star-3{width:12px;top:20px;left:10px;animation-delay:.6s}
+.theme-switch #star-4{width:18px;top:0px;left:18px;animation-delay:1.3s}
+@keyframes ts-star-twinkle{0%{transform:scale(1)}40%{transform:scale(1.2)}80%{transform:scale(.8)}100%{transform:scale(1)}}
+.top .corner .row2{align-items:center}
+@media print{ .theme-switch{display:none!important} }
+@media (prefers-reduced-motion: reduce){ .theme-switch *{animation:none!important} }
 </style>
 </head>
 <body>
@@ -684,7 +732,7 @@ th{background:var(--surface-2);color:var(--muted);font-size:13px;font-weight:700
       </select>
       <div class="corner">
         <button class="btn-ghost admin-mini" id="adminBtn" title="เข้าสู่โหมดผู้อนุมัติ">ผู้อนุมัติ</button>
-        <div class="row2"><button class="btn-ghost theme-mini" id="themeBtn" title="สลับโหมดสว่าง/มืด" aria-label="สลับโหมดสว่าง/มืด">◐</button><button class="btn-ghost sound-mini" id="soundBtn" title="เปิด/ปิดเสียง" aria-label="เปิด/ปิดเสียง">🔔</button></div>
+        <div class="row2"><label class="switch theme-switch" title="สลับโหมดสว่าง/มืด"><input id="themeBtn" type="checkbox" aria-label="โหมดมืด"><div class="slider round"><div class="sun-moon"><svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg><svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"></circle></svg></div><div class="stars"><svg id="star-1" class="star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg><svg id="star-2" class="star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg><svg id="star-3" class="star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg><svg id="star-4" class="star" viewBox="0 0 20 20"><path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path></svg></div></div></label><button class="btn-ghost sound-mini" id="soundBtn" title="เปิด/ปิดเสียง" aria-label="เปิด/ปิดเสียง">🔔</button></div>
       </div>
     </div>
     <nav class="tabs" id="tabs">
@@ -1149,18 +1197,50 @@ const STATUS_OK = ['อนุมัติ','รออนุมัติ','ไม
 const active = r => r.status !== 'ยกเลิก' && r.status !== 'ไม่อนุมัติ';
 
 /* โหลดทุกแท็บปี แล้วแบ่งตาม "ปีงบประมาณ" ในคอลัมน์ F (ไม่ใช่ชื่อแท็บ) */
-async function load(fy){
-  document.getElementById('main').classList.add('loading');
+/* แคชข้อมูลล่าสุดไว้ในเครื่อง: เปิดหน้าครั้งต่อไปแสดงทันที แล้วค่อยอัปเดตจากชีตตามหลัง */
+const CACHE_KEY = 'kuam-cache-v1';
+function readCache(){ try { const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return c && Array.isArray(c.list) ? c : null; } catch (e) { return null; } }
+function writeCache(c){ try { localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch (e) {} }
+
+async function load(fy, onPaint){
+  const main = document.getElementById('main');
+  let painted = false;
+  const paint = () => { if (!painted){ painted = true; if (onPaint) onPaint(); } };
+  const cached = DEMO ? null : readCache();
+  if (cached && !(state.all && state.all.length)){
+    try { applyConfig(cached.cfg); applyData(cached.list, fy, cached.tabs); document.getElementById('sub').textContent = 'กำลังอัปเดตข้อมูล…'; paint(); }
+    catch (e) { console.warn('cache', e); }
+  }
+  if (!painted) main.classList.add('loading');
   try{
-    const [cfg, first] = await Promise.all([
+    // ดึงทุกแท็บพร้อมกันรอบเดียว (เดารายชื่อแท็บจากแคช) แทนการรอ 2 รอบ
+    const guess = cached ? (cached.tabs || []).filter(t => t !== cached.firstYear) : [];
+    const [cfg, first, ...pre] = await Promise.all([
       api('GET', { action: 'config' }).catch(() => null),   // Apps Script เวอร์ชันเก่าไม่มี config → ใช้ค่าเริ่มต้น
-      api('GET', { year: '' })
+      api('GET', { year: '' }),
+      ...guess.map(t => api('GET', { year: t }).catch(() => null))
     ]);
-    applyConfig(cfg);
     const tabs = first.years || [];
-    const others = await Promise.all(tabs.filter(t => t !== first.year).map(t => api('GET', { year: t })));
+    const got = new Map(); guess.forEach((t, i) => { if (pre[i]) got.set(t, pre[i]); });
+    const need = tabs.filter(t => t !== first.year && !got.has(t));
+    (await Promise.all(need.map(t => api('GET', { year: t })))).forEach((j, i) => got.set(need[i], j));
+    const list = [first, ...tabs.filter(t => t !== first.year).map(t => got.get(t)).filter(Boolean)];
+    applyConfig(cfg);
+    applyData(list, fy, tabs);
+    writeCache({ cfg, list, tabs, firstYear: first.year, t: Date.now() });
+    document.getElementById('sub').textContent = DEMO ? 'โหมดตัวอย่าง' : `อัปเดต ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`;
+    paint();
+  }catch(e){
+    toast('โหลดข้อมูลไม่สำเร็จ: ' + e.message, 8000);
+    document.getElementById('sub').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message + ' (กด F5 เพื่อลองใหม่)';
+    paint();
+  }
+  finally{ main.classList.remove('loading'); }
+}
+
+function applyData(list, fy, tabs){
     state.tabs = tabs;
-    const all = [first, ...others].flatMap(j => (j.rows||[]).map(r => enrich({ ...r, sheet: j.year, key: j.year + ':' + r.row })));
+    const all = list.flatMap(j => (j.rows||[]).map(r => enrich({ ...r, sheet: j.year, key: j.year + ':' + r.row })));
     // รายการเดียวกันที่อยู่ทั้งแท็บปีและแท็บอื่น (เช่น ต้นฉบับ) นับครั้งเดียว โดยใช้แถวในแท็บปี
     const sig = r => [r.name.replace(/\s+|\.+/g,''), r.start, r.end].join('|');
     const seen = new Set(all.filter(r => /^\d{4}$/.test(r.sheet)).map(sig));
@@ -1174,12 +1254,6 @@ async function load(fy){
     if (fy) state.year = String(fy);
     if (!state.years.includes(state.year)) state.year = String(cur);
     setYear(state.year);
-    document.getElementById('sub').textContent = DEMO ? 'โหมดตัวอย่าง' : `อัปเดต ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`;
-  }catch(e){
-    toast('โหลดข้อมูลไม่สำเร็จ: ' + e.message, 8000);
-    document.getElementById('sub').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message + ' (กด F5 เพื่อลองใหม่)';
-  }
-  finally{ document.getElementById('main').classList.remove('loading'); }
 }
 
 function setYear(y){
@@ -2334,11 +2408,9 @@ $('#soundBtn').onclick = () => {
   paintSound(); if (soundOn) sfx('ok'); toast(soundOn ? 'เปิดเสียงแล้ว' : 'ปิดเสียงแล้ว');
 };
 paintSound();
-$('#themeBtn').onclick = () => {
-  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
-  const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
-  document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
-};
+// สวิตช์พระอาทิตย์/พระจันทร์: ติ๊ก = โหมดมืด
+$('#themeBtn').checked = (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+$('#themeBtn').onchange = e => { document.documentElement.dataset.theme = e.target.checked ? 'dark' : 'light'; };
 
 $('#fontSel').value = document.documentElement.dataset.font || '';
 $('#fontSel').onchange = e => {
@@ -2351,7 +2423,7 @@ $('#demoBanner').hidden = !DEMO;
 // แสดงปีงบฯ ทันที ระหว่างรอข้อมูลจาก Google Sheets (อาจใช้เวลาหลายวินาที)
 { const cur = fyOf(new Date()); state.years = [cur-2, cur-1, cur].map(String); state.year = String(cur); renderYears(); }
 document.getElementById('sub').textContent = 'กำลังโหลดข้อมูล…';
-load().then(() => { if (state.admin) startWatch(); const go = () => animateView(state.tab); window.Motion ? go() : setTimeout(go, 400); });
+load(undefined, () => { const go = () => animateView(state.tab); window.Motion ? go() : setTimeout(go, 400); }).then(() => { if (state.admin) startWatch(); });
 </script>
 </body>
 </html>
