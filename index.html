@@ -60,7 +60,11 @@ main{padding:20px 0 60px}
 .kpi .l{color:var(--muted);font-size:13px}
 h2{font-size:16px;margin:0 0 12px}
 .two{grid-template-columns:1fr 1fr}
-@media (max-width:800px){.two{grid-template-columns:1fr}}
+.two.home-split{grid-template-columns:minmax(0,1fr) minmax(0,3fr)}
+#pendList.cols{display:grid;grid-template-rows:repeat(var(--rows),auto);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);column-gap:28px}
+#pendList.cols li.col-top{border-top:0}
+@media (max-width:800px){.two,.two.home-split{grid-template-columns:1fr}
+  #pendList.cols{display:block}#pendList.cols li.col-top{border-top:1px solid var(--line)}#pendList.cols li:first-child{border-top:0}}
 .list{list-style:none;margin:0;padding:0}
 .list li{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
 .list li:first-child{border-top:0}
@@ -619,7 +623,7 @@ button[data-ent]{white-space:nowrap}
       <div class="card kpi"><div class="v" id="kCount">–</div><div class="l">รายการลาในปีงบฯ</div></div>
       <div class="card kpi"><div class="v" id="kDays">–</div><div class="l">วันลารวมในปีงบฯ</div></div>
     </div>
-    <div class="grid two" style="margin-top:14px">
+    <div class="grid two home-split" style="margin-top:14px">
       <div class="card"><h2>ลาวันนี้ <span class="muted" id="todayLabel" style="font-weight:400"></span></h2><ul class="list" id="todayList"></ul></div>
       <div class="card"><h2>รออนุมัติ</h2><ul class="list" id="pendList"></ul></div>
     </div>
@@ -1290,6 +1294,10 @@ function renderHome(){
   const oc = overCap();
   const causes = r => r.dates.some(k => (oc.get(k) || []).some(o => o.team === r.team));
   $('#pendList').innerHTML = pend.map(r=>liRow({ ...r, name: r.name }, (causes(r) ? '<span class="warn-tag">⚠ เกินเพดาน</span> ' : '') + (state.admin ? statusBtns(r) : pill(r.status)))).join('') || '<li class="empty">ไม่มีรายการรออนุมัติ</li>';
+  // เกิน 4 คน → แยกเป็น 2 คอลัมน์ (คอลัมน์ละอย่างน้อย 4 คน)
+  { const pl = $('#pendList'), rows = Math.max(4, Math.ceil(pend.length / 2));
+    pl.classList.toggle('cols', pend.length > 4); pl.style.setProperty('--rows', rows);
+    [...pl.children].forEach((li, i) => li.classList.toggle('col-top', pend.length > 4 && i % rows === 0)); }
   const lim = iso(addDays(new Date(), 60)), up = [...oc.entries()].filter(([k]) => k >= today && k <= lim).sort((a,b)=>a[0].localeCompare(b[0]));
   $('#capCard').hidden = !up.length;
   $('#capList').innerHTML = up.slice(0, 20).map(([k, list]) => list.map(o => `<li><div class="who">${thFull(fromIso(k))} ${teamPill(o.team)}<small>ลา ${o.n} คน (เพดาน ${o.cap}): ${o.names.map(esc).join(', ')}</small></div><span class="warn-tag">เกิน ${o.n - o.cap}</span></li>`).join('')).join('') + (up.length > 20 ? `<li class="empty">และอีก ${up.length-20} วัน</li>` : '');
