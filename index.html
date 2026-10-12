@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <script src="https://cdn.jsdelivr.net/npm/motion@14.0.0/dist/motion.js" async></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Bai+Jamjuree:wght@500;600;700&family=Sarabun:wght@400;500;600;700&family=Noto+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Anuphan:wght@400;500;600;700&family=Bai+Jamjuree:wght@500;600;700&family=Sarabun:wght@400;500;600;700&family=Noto+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
   /* ===== ตั้งค่า: วาง URL ของ Apps Script Web App (ลงท้าย /exec) ตรงนี้ =====
      ถ้าเว้นว่าง หน้าเว็บจะเปิดในโหมดตัวอย่าง (ข้อมูลสมมติ ไม่บันทึกจริง) */
@@ -575,6 +575,95 @@ button[data-ent]{white-space:nowrap}
 @keyframes lgRun{0%{left:-100%}50%,100%{left:100%}}
 #pinDlg .login-box.shake{animation:lgShake .4s}
 @keyframes lgShake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ===== ชั้นให้เข้าชุดกับหน้ารถหาย / ตู้แดง (BangboCar): ฟอนต์ Prompt · โทน slate · หัวเว็บขาว · การ์ดขอบ 14px ===== */
+:root,:root[data-font="modern"],:root[data-font="looped"]{ --f-body:"Prompt",system-ui,sans-serif; --f-head:"Prompt",system-ui,sans-serif; }
+:root{
+  --bg:#f1f5f9; --surface:#fff; --surface-2:#f8fafc; --line:#e2e8f0; --line-2:#cbd5e1;
+  --text:#1e293b; --text-strong:#0f172a; --muted:#64748b; --faint:#94a3b8;
+  --brand:#1d4ed8; --brand-2:#2563eb; --accent:#2563eb; --gold:#2563eb;
+  --ring:0 0 0 3px rgba(37,99,235,.28); --shadow:0 1px 3px rgba(0,0,0,.04); --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0b1220; --surface:#111a2e; --surface-2:#0f172a; --line:#1e293b; --line-2:#334155;
+  --text:#e2e8f0; --text-strong:#f8fafc; --muted:#94a3b8; --faint:#64748b;
+  --brand:#2563eb; --brand-2:#3b82f6; --accent:#3b82f6; --gold:#3b82f6; --shadow:none; } }
+:root[data-theme="dark"]{
+  --bg:#0b1220; --surface:#111a2e; --surface-2:#0f172a; --line:#1e293b; --line-2:#334155;
+  --text:#e2e8f0; --text-strong:#f8fafc; --muted:#94a3b8; --faint:#64748b;
+  --brand:#2563eb; --brand-2:#3b82f6; --accent:#3b82f6; --gold:#3b82f6; --shadow:none; }
+body,:root[data-font="modern"] body,:root[data-font="looped"] body{font-family:'Prompt',sans-serif;font-size:15px;background:var(--bg)}
+::selection{background:rgba(37,99,235,.22)}
+
+/* หัวเว็บ: แถบขาวเหมือนหน้ารถหาย */
+header{background:var(--surface);color:var(--text);border-bottom:1px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.top{padding:14px 0 10px}
+.top .brand .logo{height:51px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.top h1{font-size:17px;font-weight:700;color:var(--text-strong);line-height:1.3}
+.top h1 .org{font-size:13px;font-weight:400;color:var(--muted);opacity:1;margin-top:2px}
+.top .sub{font-size:12px;color:var(--faint);opacity:1}
+.top .yearbox{font-size:14px;font-weight:600;color:var(--muted)}
+.top .yearbox select{height:40px;font-size:17px;font-weight:700;font-family:'Prompt',sans-serif;background:var(--surface-2);border:1px solid var(--line-2);color:var(--text);border-radius:8px}
+.top .yearbox select option{color:var(--text);background:var(--surface)}
+.top select,.top .btn-ghost{background:var(--surface-2);border:1px solid var(--line-2);color:var(--muted)}
+.top .btn-ghost:hover,.top select:hover{background:var(--line);color:var(--text)}
+.top .corner{border-left-color:var(--line);height:44px}
+.top .corner .btn-ghost{opacity:1;font-weight:600}
+body.is-admin .top .admin-mini{background:#2563eb;color:#fff;border-color:#2563eb}
+@media (max-width:640px){ .top .brand .logo{height:42px} .top h1{font-size:16px} }
+
+/* แท็บ: ปุ่มกลมไล่สีแบบเดียวกับหน้ารถหาย (selfish-kangaroo-64 by kirzin, Uiverse.io, MIT) */
+nav.tabs{gap:12px;padding:6px 4px 14px;overflow-x:auto;scroll-padding:4px}
+nav.tabs button{
+  --g:linear-gradient(90deg,#ffffff 0%,#ffffff 34%,#dbeafe 50%,#ffffff 66%,#e0e7ff 83%,#ffffff 100%);
+  --halo:linear-gradient(90deg,#e2e8f0,#bfdbfe,#e0e7ff,#cbd5e1,#e2e8f0);
+  position:relative;z-index:1;flex:none;font-family:'Prompt',sans-serif;font-size:15px;font-weight:600;padding:.55em 1.6em;
+  border:none;border-radius:30px;color:#111;background:transparent;opacity:1;box-shadow:none;transition:color .2s;margin:3px 0}
+nav.tabs button::after{content:'';display:block;position:absolute;inset:0;left:0;right:0;bottom:0;height:auto;z-index:-1;border-radius:30px;background:var(--g);background-size:300%}
+nav.tabs button::before{content:'';position:absolute;inset:-3px;z-index:-2;border-radius:33px;background:var(--halo);background-size:400%;transition:filter 1s,opacity 1s;opacity:.55}
+nav.tabs button:hover{background:transparent;color:#111;border:none}
+nav.tabs button:hover::before,nav.tabs button.on::before{opacity:.9}
+nav.tabs button:hover::after{animation:kTabFlow 8s linear infinite}
+nav.tabs button:hover::before{filter:blur(10px);animation:kTabFlow 8s linear infinite}
+@keyframes kTabFlow{0%{background-position:0%}100%{background-position:400%}}
+nav.tabs button:active{background:transparent}
+nav.tabs button.on{--g:linear-gradient(90deg,#2563eb 0%,#2563eb 34%,#60a5fa 50%,#1d4ed8 66%,#3b82f6 83%,#2563eb 100%);--halo:linear-gradient(90deg,#2563eb,#60a5fa,#1d4ed8,#93c5fd,#2563eb);color:#fff;background:transparent;border:none}
+nav.tabs button.on::after{display:block}
+nav.tabs button:focus-visible{outline:3px solid #3b82f6;outline-offset:4px;box-shadow:none}
+@media (max-width:480px){ nav.tabs{gap:10px} nav.tabs button{padding:.55em 1.2em} }
+
+/* เนื้อหา */
+main.wrap{padding-top:22px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.card > h2:first-child,.card > .h2row h2{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:14px}
+h2{font-family:'Prompt',sans-serif}
+/* ตัวเลขด้านบน: การ์ดแยกเหมือนหน้ารถหาย */
+section[data-view="home"] > .kpis{gap:12px;background:none;border:0;box-shadow:none;overflow:visible}
+section[data-view="home"] > .kpis .kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+section[data-view="home"] > .kpis .kpi:first-child{background:var(--surface);border-left:1px solid var(--line)}
+@media (max-width:700px){ section[data-view="home"] > .kpis .kpi:nth-child(n+3){border-top:1px solid var(--line)} }
+.kpi .v{font-size:30px;font-weight:700;color:var(--text-strong);letter-spacing:0;line-height:1}
+.kpi .l{font-size:13px;color:var(--muted);margin-top:6px}
+section[data-view="home"] > .kpis .kpi:first-child .v{color:var(--text-strong)}
+/* ขอบไล่สีเขียว-น้ำเงินเมื่อชี้ (cuddly-catfish-6 by Tiagoadag, Uiverse.io, MIT) — เหมือนหน้ารถหาย */
+.card,.kpi{position:relative;transition:box-shadow .3s ease}
+.card::after,.kpi::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;z-index:2;
+  background:linear-gradient(163deg,#00ff75 0%,#3700ff 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s ease}
+.card:hover,.kpi:hover{box-shadow:0 0 30px 1px rgba(0,255,117,.3)}
+.card:hover::after,.kpi:hover::after{opacity:1}
+@media print{ .card::after,.kpi::after{display:none} .card,.kpi{box-shadow:none!important} }
+/* ปุ่ม + ช่องกรอก */
+.btn{background:#1d4ed8;border-radius:8px;font-family:'Prompt',sans-serif;box-shadow:none}
+.btn:hover{background:#2563eb}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--line-2)}
+.btn.sec:hover{background:var(--surface-2)}
+.filters input,.filters select,.f input,.f select,.f textarea,.set input,.set select,.set textarea,.dp-show{border-color:var(--line-2);border-radius:8px;background:var(--surface-2)}
+.filters input:focus,.filters select:focus,.f input:focus,.f select:focus,.set input:focus,.set select:focus,.set textarea:focus,.dp-show:focus{border-color:#2563eb;box-shadow:var(--ring)}
+th{background:var(--surface-2);color:var(--muted);font-size:13px;font-weight:700;letter-spacing:.3px}
+.tbl-wrap{border-radius:14px}
+.cal .d.today{outline-color:#2563eb}
+.list .who small{font-size:12.5px}
 </style>
 </head>
 <body>
