@@ -550,8 +550,27 @@ button[data-ent]{white-space:nowrap}
 .posgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,470px),1fr));gap:8px 28px}
 .posrow{display:grid!important;grid-template-columns:200px 1fr;align-items:center;gap:10px}
 .posrow span{font-size:14px;white-space:nowrap}
-/* phones: no room in the header row, the logo already links back to the home page */
-@media (max-width:600px){ .top .home-link{display:none} }
+
+/* ===== กล่องรหัสผู้อนุมัติ (โทนขาว) ===== */
+#pinDlg{padding:0;border:none;background:transparent;box-shadow:none;width:min(400px,92vw);overflow:visible}
+#pinDlg::backdrop{background:rgba(15,23,42,.45);backdrop-filter:blur(4px)}
+#pinDlg .login-box{position:relative;padding:40px;background:#fff;box-sizing:border-box;box-shadow:0 20px 45px rgba(15,23,42,.25);border:1px solid #e2e8f0;border-radius:10px;text-align:left}
+#pinDlg .lg-title{color:#0f172a;font-size:20px;font-weight:700;margin-bottom:4px}
+#pinDlg .lg-sub{color:#64748b;font-size:13px;margin-bottom:34px;line-height:1.5}
+#pinDlg .lg-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer}
+#pinDlg .lg-close:hover{color:#0f172a}
+#pinDlg .user-box{position:relative}
+#pinDlg .user-box input{width:100%;padding:10px 0;font-size:16px;color:#0f172a;margin-bottom:24px;border:none;border-bottom:1px solid #94a3b8;outline:none;background:transparent;font-family:inherit;letter-spacing:3px;border-radius:0;box-shadow:none}
+#pinDlg .user-box label{position:absolute;top:0;left:0;padding:10px 0;font-size:16px;color:#64748b;pointer-events:none;transition:.5s}
+#pinDlg .user-box input:focus~label,#pinDlg .user-box input:valid~label{top:-20px;left:0;color:#2563eb;font-size:12px}
+#pinDlg .lg-err{min-height:20px;color:#dc2626;font-size:13px}
+#pinDlg .lg-send{position:relative;display:inline-block;padding:10px 22px;color:#0f172a;font-size:16px;font-weight:600;font-family:inherit;background:transparent;border:none;cursor:pointer;overflow:hidden;transition:.5s;margin-top:18px;letter-spacing:1px}
+#pinDlg .lg-send:hover,#pinDlg .lg-send:focus-visible{background:#16a34a;color:#fff;border-radius:5px;outline:none;box-shadow:0 0 5px #22c55e,0 0 20px rgba(34,197,94,.6),0 0 40px rgba(34,197,94,.35)}
+#pinDlg .lg-send:disabled{opacity:.6;cursor:progress}
+#pinDlg .lg-send span{position:absolute;display:block;bottom:2px;left:-100%;width:100%;height:2px;background:linear-gradient(90deg,transparent,#16a34a);animation:lgRun 2s linear infinite}
+@keyframes lgRun{0%{left:-100%}50%,100%{left:100%}}
+#pinDlg .login-box.shake{animation:lgShake .4s}
+@keyframes lgShake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 </style>
 </head>
 <body>
@@ -566,7 +585,6 @@ button[data-ent]{white-space:nowrap}
         </div>
       </div>
       <div class="sp"></div>
-      <a class="btn-ghost home-link" href="https://amarax23.github.io/BangboCar/" title="กลับหน้าแรก (เลือกระบบ)" style="text-decoration:none;white-space:nowrap">🏠<span class="hl-t"> หน้าแรก</span></a>
       <label class="yearbox">ปีงบประมาณ <select id="year"></select></label>
       <select id="fontSel" class="fontsel" title="เลือกแบบตัวอักษร" aria-label="แบบตัวอักษร" hidden>
         <option value="">Aa ทางการ</option><option value="modern">Aa ทันสมัย</option><option value="looped">Aa มีหัว</option>
@@ -578,10 +596,10 @@ button[data-ent]{white-space:nowrap}
     </div>
     <nav class="tabs" id="tabs">
       <button data-tab="home" class="on">ภาพรวม</button>
-      <button data-tab="cal">ปฏิทิน</button>
-      <button data-tab="list">รายการลา</button>
-      <button data-tab="people">สรุปรายบุคคล</button>
-      <button data-tab="balance">วันลาคงเหลือ</button>
+      <button data-tab="cal" class="adm-tab" hidden>ปฏิทิน</button>
+      <button data-tab="list" class="adm-tab" hidden>รายการลา</button>
+      <button data-tab="people" class="adm-tab" hidden>สรุปรายบุคคล</button>
+      <button data-tab="balance" class="adm-tab" hidden>วันลาคงเหลือ</button>
       <button data-tab="charts">กราฟสรุป</button>
       <button data-tab="new">ยื่นใบลา</button>
       <button data-tab="check" class="adm-tab" hidden>ตรวจข้อมูล</button>
@@ -808,15 +826,20 @@ button[data-ent]{white-space:nowrap}
   </div>
 </div>
 <dialog id="pinDlg">
-  <form method="dialog" id="pinForm" style="display:grid;gap:12px">
-    <h2 style="margin:0">โหมดผู้อนุมัติ</h2>
-    <p class="muted" style="margin:0;font-size:14px">ใส่รหัสผู้อนุมัติเพื่ออนุมัติ แก้ไข หรือลบรายการ</p>
-    <input type="password" id="pinInput" inputmode="numeric" placeholder="รหัส" class="f" style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface)">
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn sec" value="cancel" type="button" onclick="pinDlg.close()">ยกเลิก</button>
-      <button class="btn" id="pinOk" type="submit">ยืนยัน</button>
-    </div>
-  </form>
+  <!-- กล่องใส่รหัสผู้อนุมัติ: ดัดแปลงจาก "warm-mule-6" by guilhermeyohan on Uiverse.io (MIT) -->
+  <div class="login-box">
+    <button type="button" class="lg-close" onclick="pinDlg.close()" aria-label="ปิด">✕</button>
+    <div class="lg-title">🔒 โหมดผู้อนุมัติ</div>
+    <div class="lg-sub">ใส่รหัสผู้อนุมัติเพื่อดูปฏิทิน รายการลา สรุปรายบุคคล วันลาคงเหลือ และอนุมัติ แก้ไข หรือลบรายการ</div>
+    <form method="dialog" id="pinForm" autocomplete="off">
+      <div class="user-box">
+        <input type="password" id="pinInput" inputmode="numeric" required autocomplete="off">
+        <label for="pinInput">รหัสผ่าน</label>
+      </div>
+      <div class="lg-err" id="pinErr" role="alert"></div>
+      <div style="text-align:center"><button class="lg-send" id="pinOk" type="submit">เข้าสู่ระบบ<span></span></button></div>
+    </form>
+  </div>
 </dialog>
 <dialog id="entDlg">
   <form id="entForm" style="display:grid;gap:12px">
@@ -1197,7 +1220,8 @@ function renderAll(){
   $('#adminBtn').textContent = state.admin ? '✓ ผู้อนุมัติ' : 'ผู้อนุมัติ';
   $('#adminBtn').title = state.admin ? 'กำลังอยู่ในโหมดผู้อนุมัติ — กดเพื่อออก' : 'เข้าสู่โหมดผู้อนุมัติ';
   document.querySelectorAll('.adm,.adm-tab').forEach(e => e.hidden = !state.admin);
-  if (!state.admin && (state.tab === 'settings' || state.tab === 'check')) switchTab('home');
+  // แท็บที่มี class adm-tab (ปฏิทิน รายการลา สรุปรายบุคคล วันลาคงเหลือ ตรวจข้อมูล ตั้งค่า) เห็นเฉพาะผู้อนุมัติ
+  if (!state.admin && isAdmTab(state.tab)) switchTab('home');
   fillSelects(); renderHome(); renderList(); renderPeople(); renderCal(); renderBalance();
   if (state.tab === 'charts') renderCharts();
   if (state.tab === 'settings') fillSettings();
@@ -1541,12 +1565,19 @@ function successPop(title, sub, ms = 1800){
   el._h = setTimeout(close, ms);
 }
 function logout(){ state.admin=''; sessionStorage.removeItem('pin'); renderAll(); startWatch(); }
-$('#adminBtn').onclick = () => { if (state.admin) return logout(); $('#pinInput').value=''; pinDlg.showModal(); };
+$('#adminBtn').onclick = () => { if (state.admin) return logout(); $('#pinInput').value=''; $('#pinErr').textContent=''; pinDlg.showModal(); setTimeout(()=>$('#pinInput').focus(), 60); };
 $('#pinForm').addEventListener('submit', async e => {
   e.preventDefault();
   const pin = $('#pinInput').value;
+  $('#pinOk').disabled = true; $('#pinErr').textContent = 'กำลังตรวจสอบรหัส...';
   try{ await api('POST', { action:'login', pin }); state.admin = pin; sessionStorage.setItem('pin', pin); pinDlg.close(); renderAll(); startWatch(); const n = seenWaiting ? seenWaiting.size : 0; sfx('login'); successPop('เข้าสู่ระบบสำเร็จ', n ? `มีใบลารอดำเนินการ ${n} รายการ · กำลังเข้าสู่โหมดผู้อนุมัติ…` : 'กำลังเข้าสู่โหมดผู้อนุมัติ…'); }
-  catch(err){ sfx('err'); toast(err.message, 3500); }
+  catch(err){
+    sfx('err');
+    $('#pinErr').textContent = /fetch|network/i.test(err.message) ? 'เชื่อมต่อระบบไม่ได้ ลองใหม่อีกครั้ง' : 'รหัสไม่ถูกต้อง';
+    const box = document.querySelector('#pinDlg .login-box'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
+    $('#pinInput').select();
+  }
+  finally{ $('#pinOk').disabled = false; }
 });
 
 /* ---- ส่งออก CSV ---- */
@@ -2171,7 +2202,9 @@ document.addEventListener('pointerdown', e => {
   const up = () => { M.animate(b, { scale:1 }, { type:'spring', stiffness:600, damping:15 }); };
   window.addEventListener('pointerup', up, { once:true }); window.addEventListener('pointercancel', up, { once:true });
 }, true);
+function isAdmTab(t){ const b = document.querySelector(`#tabs button[data-tab="${t}"]`); return !!(b && b.classList.contains('adm-tab')); }
 function switchTab(t){
+  if (!state.admin && isAdmTab(t)) t = 'home';   // คนทั่วไปเปิดแท็บของผู้อนุมัติไม่ได้
   state.tab = t;
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab===t));
   document.querySelectorAll('[data-view]').forEach(s => s.hidden = s.dataset.view !== t);
