@@ -712,6 +712,16 @@ th{background:var(--surface-2);color:var(--muted);font-size:13px;font-weight:700
 .top .corner .row2{align-items:center}
 @media print{ .theme-switch{display:none!important} }
 @media (prefers-reduced-motion: reduce){ .theme-switch *{animation:none!important} }
+.list .who small .seg{display:inline-block;max-width:100%}
+
+/* ===== รายการให้เลือก (ชื่อ / ชุด) แบบเดียวกับดรอปดาวน์หน้ารถหาย แทนกล่อง datalist ของเบราว์เซอร์ ===== */
+input[data-list]{padding-right:38px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%2364748b' d='M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 14px center!important;background-size:12px!important}
+.ac-pop{position:fixed;z-index:1200;display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:#fff;border:1px solid #e3e8ef;border-radius:6px;padding:5px;
+  box-shadow:0 10px 24px rgba(0,0,0,.14);font-family:'Prompt',sans-serif;opacity:0;visibility:hidden;transform:translateY(-14px);transition:opacity .3s,transform .3s,visibility .3s}
+.ac-pop.open{opacity:1;visibility:visible;transform:none}
+.ac-opt{border-radius:5px;padding:6px 8px;font-size:14px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:background-color .3s;flex:none}
+.ac-opt:hover,.ac-opt.act{background:#eef2f7}
+@media print{ .ac-pop{display:none!important} }
 </style>
 </head>
 <body>
@@ -1426,7 +1436,9 @@ function overCap(){
 
 /* ---- ภาพรวม ---- */
 function liRow(r, extra=''){
-  return `<li><div class="who">${esc(r.name)} ${teamPill(r.team)}<small>${rangeText(r)} · ${r.countText || (r.dates.length ? r.count : '?')} วัน${r.note?' · '+esc(r.note):''}</small></div>${extra || pill(r.status)}</li>`;
+  // แต่ละช่วง (วันที่ · จำนวนวัน · หมายเหตุ) เป็นก้อนเดียว ถ้าไม่พอบรรทัดจะยกทั้งก้อนลงบรรทัดใหม่ ไม่ตัดกลางคำ
+  const segs = [rangeText(r), `${r.countText || (r.dates.length ? r.count : '?')} วัน`].concat(r.note ? String(r.note).split(/\s*·\s*/).filter(Boolean).map(esc) : []);
+  return `<li><div class="who">${esc(r.name)} ${teamPill(r.team)}<small>${segs.map(x => `<span class="seg">${x}</span>`).join('<span class="dot"> · </span>')}</small></div>${extra || pill(r.status)}</li>`;
 }
 function renderHome(){
   const today = iso(new Date());
@@ -2419,6 +2431,62 @@ $('#fontSel').onchange = e => {
   try { v ? localStorage.setItem('font', v) : localStorage.removeItem('font'); } catch (err) {}
   if (state.tab === 'charts') renderCharts();
 };
+/* ===== ช่องที่มีรายการให้เลือก (เคยใช้ datalist): แสดงเป็นดรอปดาวน์สีขาวแบบเดียวกับหน้ารถหาย ===== */
+const AC = { pop: null, inp: null, idx: -1, items: [] };
+function acPrep(inp){ if (inp.hasAttribute('list')){ inp.dataset.list = inp.getAttribute('list'); inp.removeAttribute('list'); inp.setAttribute('autocomplete','off'); } }
+function acPop(){
+  if (!AC.pop){
+    AC.pop = document.createElement('div'); AC.pop.className = 'ac-pop'; AC.pop.setAttribute('role','listbox');
+    AC.pop.addEventListener('mousedown', e => e.preventDefault());   // ไม่ให้ช่องกรอกเสียโฟกัสตอนคลิกตัวเลือก
+    AC.pop.addEventListener('click', e => { const o = e.target.closest('.ac-opt'); if (o) acPick(AC.items[+o.dataset.i]); });
+    document.body.appendChild(AC.pop);
+  }
+  return AC.pop;
+}
+function acPlace(){
+  if (!AC.inp || !AC.pop) return;
+  const r = AC.inp.getBoundingClientRect(), pop = AC.pop;
+  pop.style.minWidth = Math.max(r.width, 150) + 'px'; pop.style.maxWidth = Math.max(r.width, 260) + 'px'; pop.style.left = r.left + 'px';
+  const below = innerHeight - r.bottom;
+  if (below < 200 && r.top > below){ pop.style.top = 'auto'; pop.style.bottom = (innerHeight - r.top + 3) + 'px'; pop.style.maxHeight = Math.min(300, r.top - 10) + 'px'; }
+  else { pop.style.bottom = 'auto'; pop.style.top = (r.bottom + 3) + 'px'; pop.style.maxHeight = Math.min(300, below - 10) + 'px'; }
+}
+function acShow(inp){
+  const dl = document.getElementById(inp.dataset.list); if (!dl) return acHide();
+  const all = [...dl.options].map(o => o.value).filter(Boolean);
+  const q = inp.value.trim().toLowerCase().replace(/\s+/g, '');
+  let items = q ? all.filter(v => v.toLowerCase().replace(/\s+/g, '').includes(q)) : all;
+  if (items.length === 1 && items[0] === inp.value) items = [];   // พิมพ์ตรงแล้ว ไม่ต้องโชว์
+  AC.inp = inp; AC.items = items; AC.idx = -1;
+  const pop = acPop();
+  if (!items.length){ pop.classList.remove('open'); return; }
+  pop.innerHTML = items.map((v, i) => `<div class="ac-opt" role="option" data-i="${i}">${esc(v)}</div>`).join('');
+  pop.scrollTop = 0; acPlace(); pop.classList.add('open');
+}
+function acHide(){ if (AC.pop) AC.pop.classList.remove('open'); AC.idx = -1; }
+function acPick(v){
+  const inp = AC.inp; if (!inp || v == null) return;
+  inp.value = v; acHide();
+  inp.dispatchEvent(new Event('input', { bubbles: true })); inp.dispatchEvent(new Event('change', { bubbles: true }));
+  acHide();
+}
+document.querySelectorAll('input[list]').forEach(acPrep);
+document.addEventListener('focusin', e => { const t = e.target; if (t.matches && t.matches('input[list], input[data-list]')){ acPrep(t); acShow(t); } });
+document.addEventListener('input', e => { const t = e.target; if (t.dataset && t.dataset.list && t === document.activeElement) acShow(t); });
+document.addEventListener('focusout', e => { if (e.target === AC.inp) setTimeout(() => { if (document.activeElement !== AC.inp) acHide(); }, 120); });
+document.addEventListener('mousedown', e => { if (AC.inp && e.target === AC.inp && AC.pop && !AC.pop.classList.contains('open')) acShow(AC.inp); });
+document.addEventListener('keydown', e => {
+  if (!AC.pop || !AC.pop.classList.contains('open') || e.target !== AC.inp) return;
+  const opts = AC.pop.children;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    AC.idx = (AC.idx + (e.key === 'ArrowDown' ? 1 : -1) + opts.length) % opts.length;
+    [...opts].forEach((o, i) => o.classList.toggle('act', i === AC.idx)); opts[AC.idx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter' && AC.idx >= 0){ e.preventDefault(); acPick(AC.items[AC.idx]); }
+  else if (e.key === 'Escape'){ acHide(); }
+});
+addEventListener('scroll', () => { if (AC.pop && AC.pop.classList.contains('open')) acPlace(); }, true);
+addEventListener('resize', () => { if (AC.pop && AC.pop.classList.contains('open')) acPlace(); });
 $('#demoBanner').hidden = !DEMO;
 // แสดงปีงบฯ ทันที ระหว่างรอข้อมูลจาก Google Sheets (อาจใช้เวลาหลายวินาที)
 { const cur = fyOf(new Date()); state.years = [cur-2, cur-1, cur].map(String); state.year = String(cur); renderYears(); }
