@@ -550,6 +550,8 @@ button[data-ent]{white-space:nowrap}
 .posgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,470px),1fr));gap:8px 28px}
 .posrow{display:grid!important;grid-template-columns:200px 1fr;align-items:center;gap:10px}
 .posrow span{font-size:14px;white-space:nowrap}
+/* phones: no room in the header row, the logo already links back to the home page */
+@media (max-width:600px){ .top .home-link{display:none} }
 </style>
 </head>
 <body>
@@ -557,13 +559,14 @@ button[data-ent]{white-space:nowrap}
   <div class="wrap">
     <div class="top">
       <div class="brand">
-        <img class="logo" src="logo.png" alt="ตราสถานีตำรวจภูธรบางบ่อ" width="58" height="67">
+        <a href="https://amarax23.github.io/BangboCar/" title="กลับหน้าแรก"><img class="logo" src="logo.png" alt="ตราสถานีตำรวจภูธรบางบ่อ" width="58" height="67"></a>
         <div>
           <h1>ระบบควบคุมการลา <span class="org">งานป้องกันปราบปราม สถานีตำรวจภูธรบางบ่อ</span></h1>
           <div class="sub" id="sub">กำลังโหลดข้อมูล…</div>
         </div>
       </div>
       <div class="sp"></div>
+      <a class="btn-ghost home-link" href="https://amarax23.github.io/BangboCar/" title="กลับหน้าแรก (เลือกระบบ)" style="text-decoration:none;white-space:nowrap">🏠<span class="hl-t"> หน้าแรก</span></a>
       <label class="yearbox">ปีงบประมาณ <select id="year"></select></label>
       <select id="fontSel" class="fontsel" title="เลือกแบบตัวอักษร" aria-label="แบบตัวอักษร" hidden>
         <option value="">Aa ทางการ</option><option value="modern">Aa ทันสมัย</option><option value="looped">Aa มีหัว</option>
