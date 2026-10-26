@@ -727,6 +727,15 @@ input[data-list]{padding-right:38px!important;background-image:url("data:image/s
 html.tabbed [id^="panel"]:not([hidden]),html.tabbed [id^="view"]:not([hidden]){animation:tabFade .28s ease both}
 @keyframes tabFade{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}html.tabbed [id^="panel"]:not([hidden]),html.tabbed [id^="view"]:not([hidden]){animation:none}}
+/* ---------- Skeleton loading (โหลดครั้งแรก) ---------- */
+:root{--skg:linear-gradient(90deg,var(--line) 25%,color-mix(in srgb,var(--line),#fff 45%) 45%,var(--line) 65%)}
+:root[data-theme="dark"]{--skg:linear-gradient(90deg,var(--line) 25%,color-mix(in srgb,var(--line),#fff 12%) 45%,var(--line) 65%)}
+.skb{display:block;height:12px;border-radius:8px;background:var(--line);background:var(--skg);background-size:300% 100%;animation:skSh 1.4s linear infinite}
+@keyframes skSh{from{background-position:100% 0}to{background-position:-100% 0}}
+.kpi .v .skb{height:28px;width:52%;margin:2px 0}
+li.sk-li{list-style:none;display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding:9px 0;border-bottom:1px solid var(--line);text-align:left}
+li.sk-li:last-child{border-bottom:0}
+@media (prefers-reduced-motion:reduce){.skb{animation:none}}
 </style>
 </head>
 <body>
@@ -1226,7 +1235,7 @@ async function load(fy, onPaint){
     try { applyConfig(cached.cfg); applyData(cached.list, fy, cached.tabs); document.getElementById('sub').textContent = 'กำลังอัปเดตข้อมูล…'; paint(); }
     catch (e) { console.warn('cache', e); }
   }
-  if (!painted) main.classList.add('loading');
+  if (!painted){ main.classList.add('loading'); skelOn(); }
   try{
     // ดึงทุกแท็บพร้อมกันรอบเดียว (เดารายชื่อแท็บจากแคช) แทนการรอ 2 รอบ
     const guess = cached ? (cached.tabs || []).filter(t => t !== cached.firstYear) : [];
@@ -1250,7 +1259,7 @@ async function load(fy, onPaint){
     document.getElementById('sub').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message + ' (กด F5 เพื่อลองใหม่)';
     paint();
   }
-  finally{ main.classList.remove('loading'); }
+  finally{ main.classList.remove('loading'); skelOff(); }
 }
 
 function applyData(list, fy, tabs){
@@ -1300,7 +1309,34 @@ function rangeText(r){
   if (r.dates.length !== rangeDays(a,b).length) return r.dates.map(d=>fromIso(d).getDate()).join(', ') + ' ' + MONTHS[a.getMonth()] + ' ' + String(a.getFullYear()+543).slice(2);
   return (a.getMonth()===b.getMonth() ? a.getDate() : `${a.getDate()} ${MONTHS[a.getMonth()]}`) + ` – ${thShort(b)}`;
 }
-function sfx(){}   // ตัดเสียงทั้งหมดออกแล้ว (เดิมมีเสียงคลิก/เสียงแจ้งเตือนใบลาใหม่)
+/* ---------- มือถือสั่นเบาๆ (haptic) ----------
+   Android: Vibration API · iPhone (iOS 18 ขึ้นไป): กดสวิตช์ซ่อนเพื่อให้เครื่องสั่น (iPhone ไม่รองรับ Vibration API)
+   ok = บันทึก/ยืนยันสำเร็จ (สั่นสั้น 2 ที) · err = ผิดพลาด/กรอกไม่ครบ (สั่น 3 ที) */
+const HAPTIC = (()=>{
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let lbl = null;
+  const iosTap = ()=>{
+    if(!lbl){ lbl = document.createElement('label'); lbl.setAttribute('aria-hidden', 'true');
+      lbl.style.cssText = 'position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+      const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1; lbl.appendChild(i); document.body.appendChild(lbl); }
+    lbl.click(); };
+  const VIB = {tap:10, ok:[14,60,20], err:[35,60,35,60,35]}, IOS = {tap:[0], ok:[0,110], err:[0,120,240]};
+  return kind=>{ try{
+    if(navigator.vibrate) navigator.vibrate(VIB[kind] || 10);
+    else if(ios) (IOS[kind] || [0]).forEach(t=>setTimeout(iosTap, t));
+  }catch(_){} };
+})();
+function sfx(n){ const k = {ok:'ok', login:'ok', err:'err'}[n]; if(k) HAPTIC(k); }   // เดิมเป็นเสียง → เปลี่ยนเป็นมือถือสั่นเบาๆ (ตัดเสียงออกแล้ว)
+/* ---------- Skeleton loading ---------- */
+const SK_LISTS = ['todayList', 'pendList', 'half1', 'half2'], SK_KPI = ['kToday', 'kPending', 'kCount', 'kDays'];
+function skelOn(){
+  SK_KPI.forEach(id=>{ const e = document.getElementById(id); if(e) e.innerHTML = '<span class="skb"></span>'; });
+  SK_LISTS.forEach(id=>{ const e = document.getElementById(id); if(e) e.innerHTML = [70,52,64].map(w=>`<li class="sk-li"><span class="skb" style="width:${w}%"></span><span class="skb" style="width:${w-24}%;height:9px"></span></li>`).join(''); });
+}
+function skelOff(){
+  SK_KPI.forEach(id=>{ const e = document.getElementById(id); if(e && e.querySelector('.skb')) e.textContent = '–'; });
+  SK_LISTS.forEach(id=>{ const e = document.getElementById(id); if(e && e.querySelector('.skb')) e.innerHTML = ''; });
+}
 
 /* ---- แจ้งเตือนผู้อนุมัติ: ตรวจใบลาใหม่ทุก 60 วินาทีขณะอยู่ในโหมดผู้อนุมัติ ---- */
 const isWaiting = r => r.status === 'รออนุมัติ' || (!r.status && Number(r.fy) >= Number(CFG.baseFy));
