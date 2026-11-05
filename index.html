@@ -1410,6 +1410,16 @@ function startWatch(){
 
 function toast(msg, ms=2500){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); { const M = MO(); if (M) M.animate(t, { scale:[.85,1] }, { type:'spring', stiffness:500, damping:22 }); } clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), ms); }
 const uniq = a => [...new Set(a.filter(Boolean))];
+/* รายชื่อกำลังพลจากระบบสถานภาพกำลังพล (ชื่ออย่างเดียว · จำไว้ในเครื่องให้ขึ้นทันที แล้วอัปเดตทุกครั้งที่เปิด) */
+const PERS_API = 'https://script.google.com/macros/s/AKfycbzug7pnFa_Zwsra4mf9ZERpKPxh58tKyIiocdhsQTblc9R9QbsGQgksT4yprGgsm7yLmg/exec';
+let STAFF_NAMES = []; try{ STAFF_NAMES = JSON.parse(localStorage.getItem('kl-staff') || '[]'); }catch(_){}
+fetch(PERS_API + '?t=' + Date.now()).then(r=>r.json()).then(j=>{
+  if(!j || !j.ok || !Array.isArray(j.rows)) return;
+  const n = j.rows.map(r=>r.name).filter(Boolean); if(!n.length) return;
+  const changed = JSON.stringify(n) !== JSON.stringify(STAFF_NAMES); STAFF_NAMES = n;
+  try{ localStorage.setItem('kl-staff', JSON.stringify(n)); }catch(_){}
+  if(changed && typeof state !== 'undefined' && state.all) try{ fillSelects(); }catch(_){}
+}).catch(()=>{});
 const teamSort = (a,b) => { const na=/^\d+$/.test(a), nb=/^\d+$/.test(b); return na&&nb ? a-b : na ? -1 : nb ? 1 : a.localeCompare(b,'th'); };
 
 function renderYears(){
@@ -1419,7 +1429,10 @@ function renderYears(){
 
 function fillSelects(){
   const teams = uniq(state.all.map(r=>r.team)).sort(teamSort);
-  const names = uniq(state.all.map(r=>r.name)).sort((a,b)=>a.localeCompare(b,'th'));
+  // รายชื่อ = คนที่เคยลา + รายชื่อกำลังพลทั้งหมด (คนใหม่ขึ้นทันทีที่เพิ่มในชีตกำลังพล) · ชื่อซ้ำที่ต่างกันแค่จุด/ช่องว่าง → แสดงครั้งเดียว
+  const nk = n => String(n||'').replace(/\.{2,}/g,'.').replace(/\s+/g,' ').trim(), seen = new Set(), names = [];
+  STAFF_NAMES.concat(state.all.map(r=>r.name)).forEach(n=>{ const k = nk(n); if(k && !seen.has(k)){ seen.add(k); names.push(k); } });
+  names.sort((a,b)=>a.localeCompare(b,'th'));
   for (const id of ['#fTeam','#pTeam','#calTeam','#bTeam']){
     const el = $(id), v = el.value, first = el.options[0].outerHTML;
     el.innerHTML = first + teams.map(t=>`<option value="${esc(t)}">${/^\d+$/.test(t)?'ชุด '+esc(t):esc(t)}</option>`).join('');
