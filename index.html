@@ -237,6 +237,8 @@ body.is-admin .lst th:nth-child(6),body.is-admin .lst td:nth-child(6){width:10%}
 body.is-admin .lst .acts{gap:4px}
 body.is-admin .lst .acts .btn.sm{padding:4px 8px;font-size:13px;white-space:nowrap}
 .lst td{vertical-align:middle}
+/* จอแคบ: ไม่บีบคอลัมน์จนตัวหนังสือซ้อนกัน → ให้ตารางกว้างตามเนื้อหาแล้วปัดซ้าย-ขวาได้ */
+@media (max-width:1100px){ .lst{min-width:880px} body.is-admin .lst{min-width:1120px} }
 /* ความกว้างคอลัมน์หน้าวันลาคงเหลือ: ชื่อพอดีชื่อ ช่องตัวเลขกว้างเท่ากัน */
 .bal th,.bal td{padding:12px 14px}
 .bal th:first-child,.bal td:first-child{width:19%;min-width:180px}
