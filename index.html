@@ -175,6 +175,9 @@ tr:last-child td{border-bottom:0}
 .dp-grid button.r{background:var(--surface-2)}
 .dp-grid button:disabled{opacity:.25;cursor:default}
 .dp-grid button.bf{opacity:.55}
+/* มือถือ/แท็บเล็ต: ใช้ตัวเลือกวันที่ของเครื่อง (วางโปร่งใสทับปุ่ม) กดติดแน่นอนทุกเบราว์เซอร์ รวมถึงเบราว์เซอร์ใน LINE */
+.dp{position:relative}
+.dp-native{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;margin:0;padding:0;cursor:pointer;z-index:2;-webkit-appearance:none;appearance:none;font-size:16px}
 .dp-foot{display:flex;justify-content:space-between;margin-top:6px}
 .dp-foot button{background:none;border:0;color:var(--brand-2);cursor:pointer;font-weight:600;padding:4px 6px}
 @media (max-width:600px){.f{grid-template-columns:1fr}}
@@ -1618,9 +1621,16 @@ function renderCal(){
 /* ---- ปฏิทินเลือกวันที่ภาษาไทย ---- */
 const thFull = d => `${d.getDate()} ${MONTHS_FULL[d.getMonth()]} ${d.getFullYear()+543}`;
 let dpOpen = null;
+const DP_NATIVE = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+if (DP_NATIVE) document.querySelectorAll('.dp').forEach(dp => {
+  const n = document.createElement('input'); n.type = 'date'; n.className = 'dp-native'; n.setAttribute('aria-label', dp.dataset.name === 'end' ? 'ถึงวันที่' : 'ตั้งแต่วันที่');
+  n.addEventListener('change', () => { dpSet(dp, n.value); });
+  dp.appendChild(n);
+});
 function dpSync(){
   document.querySelectorAll('.dp').forEach(dp => {
-    const v = dp.querySelector('input').value, b = dp.querySelector('.dp-show');
+    const v = dp.querySelector('input').value, b = dp.querySelector('.dp-show'), n = dp.querySelector('.dp-native');
+    if (n && n.value !== v) n.value = v;
     b.textContent = v ? thFull(fromIso(v)) : 'เลือกวันที่';
     b.classList.toggle('empty', !v);
   });
