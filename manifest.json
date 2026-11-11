@@ -2,7 +2,7 @@
  "name": "ระบบควบคุมการลา สภ.บางบ่อ",
  "short_name": "ระบบลา",
  "start_url": "./",
- "scope": "./",
+ "scope": "/",
  "display": "standalone",
  "background_color": "#0b1b3a",
  "theme_color": "#0b1b3a",
