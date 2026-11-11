@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>/* เริ่มโหมดกลางวันเสมอ (ไม่ตามโหมดมืดของเครื่อง) · จำค่าที่กดสลับไว้ ใช้ร่วมกับหน้าอื่นของ BangboCar */(function(){ var t='light'; try{ if(localStorage.getItem('bangbo-theme')==='dark') t='dark'; }catch(e){} document.documentElement.setAttribute('data-theme',t); })();</script>
 <title>ระบบควบคุมการลา งานป้องกันปราบปราม สภ.บางบ่อ</title>
 <link rel="icon" type="image/png" href="logo.png">
 <!-- เพิ่มไปยังหน้าจอโฮม → เปิดเต็มจอเหมือนแอป (ไม่มีแถบเบราว์เซอร์) -->
@@ -2497,7 +2498,7 @@ $('#year').onchange = e => { state.cmpUser = false; state.chkYear = null; setYea
 $('#chkYear').onchange = e => { state.chkYear = e.target.value; renderCheck(); };
 // สวิตช์พระอาทิตย์/พระจันทร์: ติ๊ก = โหมดมืด
 $('#themeBtn').checked = (document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
-$('#themeBtn').onchange = e => { document.documentElement.dataset.theme = e.target.checked ? 'dark' : 'light'; };
+$('#themeBtn').onchange = e => { const t = e.target.checked ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try{ localStorage.setItem('bangbo-theme', t); }catch(_){} };
 
 $('#fontSel').value = document.documentElement.dataset.font || '';
 $('#fontSel').onchange = e => {
