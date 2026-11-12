@@ -223,8 +223,9 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .lst th:nth-child(6),.lst td:nth-child(6){width:14%;text-align:center}
 .lst td:nth-child(7){color:var(--muted);font-size:14px;line-height:1.45}
 .lst .nt{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lst th:nth-child(8),.lst td:nth-child(8){width:132px;text-align:center}
-body.is-admin .lst th:nth-child(8),body.is-admin .lst td:nth-child(8){width:340px;text-align:right}
+.lst th:nth-child(8),.lst td:nth-child(8){width:200px;text-align:center}
+.lst .btn.wd{color:#2b579a;border-color:#2b579a55}.lst .btn.wd:hover{background:#2b579a;color:#fff}
+body.is-admin .lst th:nth-child(8),body.is-admin .lst td:nth-child(8){width:400px;text-align:right}
 .lst td:nth-child(2){font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lst .acts{flex-wrap:nowrap;justify-content:center}
 body.is-admin .lst .acts{justify-content:flex-end}
@@ -239,7 +240,7 @@ body.is-admin .lst .acts{gap:4px}
 body.is-admin .lst .acts .btn.sm{padding:4px 8px;font-size:13px;white-space:nowrap}
 .lst td{vertical-align:middle}
 /* จอแคบ: ไม่บีบคอลัมน์จนตัวหนังสือซ้อนกัน → ให้ตารางกว้างตามเนื้อหาแล้วปัดซ้าย-ขวาได้ */
-@media (max-width:1100px){ .lst{min-width:880px} body.is-admin .lst{min-width:1120px} }
+@media (max-width:1100px){ .lst{min-width:950px} body.is-admin .lst{min-width:1180px} }
 /* ความกว้างคอลัมน์หน้าวันลาคงเหลือ: ชื่อพอดีชื่อ ช่องตัวเลขกว้างเท่ากัน */
 .bal th,.bal td{padding:12px 14px}
 .bal th:first-child,.bal td:first-child{width:19%;min-width:180px}
@@ -1569,7 +1570,7 @@ function renderList(){
     <td class="num muted" title="แท็บ ${esc(r.sheet)} ลำดับเดิม ${esc(r.no)}">${r.seq}</td><td>${esc(r.name)}</td><td style="white-space:nowrap">${rangeText(r)}</td>
     <td class="num" title="${r.confirmed ? `ผู้อนุมัติยืนยัน: รวม ${esc(r.td)} วัน · วันทำการ ${esc(r.wd)} วัน` : 'คำนวณจากวันที่ลา'}">${r.confirmed ? '<span class="cf" aria-label="ผู้อนุมัติยืนยันแล้ว">✓</span>' : ''}${r.dates.length ? (r.count || `<span class="muted" title="ตรงกับวันหยุดทั้งหมด จึงไม่นับเป็นวันทำการ">0</span>`) : '<span class="muted" title="อ่านวันที่ลาไม่ได้">?</span>'}</td><td>${teamPill(r.team)}</td><td>${pill(r.status)}</td>
     <td class="muted">${noteHtml(r.note)}</td>
-    <td><span class="acts"><button class="btn sec sm" data-print="${esc(r.key)}" title="พิมพ์ใบลา">พิมพ์ใบลา</button>${state.admin ? `${r.status!=='อนุมัติ'?`<button class="btn ok sm" data-act="status" data-st="อนุมัติ" data-key="${esc(r.key)}">อนุมัติ</button>`:''}
+    <td><span class="acts"><button class="btn sec sm" data-print="${esc(r.key)}" title="พิมพ์ใบลา">พิมพ์ใบลา</button><button class="btn sec sm wd" data-word="${esc(r.key)}" title="ดาวน์โหลดใบลาเป็นไฟล์ Word (.docx)">Word</button>${state.admin ? `${r.status!=='อนุมัติ'?`<button class="btn ok sm" data-act="status" data-st="อนุมัติ" data-key="${esc(r.key)}">อนุมัติ</button>`:''}
       ${r.status!=='ไม่อนุมัติ'?`<button class="btn sec sm" data-act="status" data-st="ไม่อนุมัติ" data-key="${esc(r.key)}">ไม่อนุมัติ</button>`:''}
       <button class="btn sec sm" data-act="edit" data-key="${esc(r.key)}">แก้ไข</button>
       <button class="btn bad sm" data-act="delete" data-key="${esc(r.key)}">ลบ</button>` : ''}</span></td>
@@ -2310,6 +2311,69 @@ function printLeave(r){
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-print]'); if (!b) return;
   const r = state.all.find(x => x.key === b.dataset.print); if (r) printLeave(r);
+});
+
+/* ---- ใบลาเป็นไฟล์ Word (.docx): เติมข้อมูลลงแม่แบบใน templates/ ด้วย docxtemplater (โหลดเมื่อกดครั้งแรก) ---- */
+let _docxLibs;
+function loadDocxLibs(){
+  const add = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('โหลดตัวสร้างไฟล์ Word ไม่สำเร็จ')); document.head.appendChild(s); });
+  return _docxLibs ||= add('https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js').then(() => add('https://cdn.jsdelivr.net/npm/docxtemplater@3.47.4/build/docxtemplater.js')).catch(e => { _docxLibs = null; throw e; });
+}
+function wordData(r){
+  const k = pkey(r.name), fy = r.fy, today = new Date();
+  const mine = state.all.filter(x => x.fy === fy && active(x) && pkey(x.name) === k && x.key !== r.key && x.start && x.start < r.start);
+  const plain = String(latestName(k) || r.name).replace(/\s+/g,' ').trim(), bare = plain.replace(/^(พล\.ต\.[ตทอ]\.|[พร]\.ต\.[ตทอ]\.|ด\.ต\.|จ\.ส\.ต\.|ส\.ต\.[ตทอ]\.)\.?\s*/, '');
+  const junior = rankIdx(plain) >= 0 && rankIdx(plain) < RANKS.indexOf('พ.ต.ต.');
+  const D = d => d ? thShort(fromIso(d)) : '';
+  const base = { place: CFG.printPlace || '', placeFull: CFG.printPlaceFull || 'สถานีตำรวจภูธรบางบ่อ', toWhom: CFG.toWhom || '', toWhomShort: CFG.toWhomShort || 'ผกก.สภ.บางบ่อ',
+    d: String(today.getDate()), m: MONTHS[today.getMonth()], month: MONTHS_FULL[today.getMonth()], yy: String(today.getFullYear()+543).slice(2), year: String(today.getFullYear()+543),
+    name: plain, bare, pos: posFor(k), start: D(r.start), end: D(r.end), count: String(r.count), contact: '',
+    r1: junior ? 'ส.ต.อ.' : '', p1: junior ? 'ผบ.หมู่(ป.)สภ.บางบ่อ' : '',
+    c1r: junior ? (CFG.cmd1Rank || '') : '', c1p: junior ? (CFG.cmd1Pos || '') : '', c2r: junior ? (CFG.cmd2Rank || '') : '', c2p: junior ? (CFG.cmd2Pos || '') : '' };
+  if (r.type === 'ลาพักผ่อน'){
+    const b = entitlementFor(k, fy), before = mine.filter(x => x.type === 'ลาพักผ่อน').reduce((s2,x)=>s2+x.count,0);
+    return { tpl: 'leave-vacation.docx', data: Object.assign(base, { carry: String(b.carry), annual: String(b.annual), total: String(b.carry + b.annual), before: before ? String(before) : '-', sum: String(before + r.count) }) };
+  }
+  if (['ลาป่วย','ลากิจ','ลาคลอดบุตร'].includes(r.type)){
+    const reason = String(r.note||'').split('·').map(x=>x.trim()).filter(x => x && !LEAVE_TYPES.includes(x) && !/^\d{1,2}\s*[ก-๙.]+\s*-\s*\d{1,2}\s*[ก-๙.]+$/.test(x)).join(' ');
+    const tw = x => { const a = x.status === 'อนุมัติ' ? numOrNull(x.td) : null, b2 = x.status === 'อนุมัติ' ? numOrNull(x.wd) : null;
+      return [a !== null ? a : x.dates.length, b2 !== null ? b2 : x.dates.filter(isWorkday).length]; };
+    const sum2 = list => list.reduce((s2, x) => { const [a1, b1] = tw(x); return [s2[0] + a1, s2[1] + b1]; }, [0, 0]);
+    const rowv = (t, pre) => { const p0 = sum2(mine.filter(x => x.type === t)), n = r.type === t ? tw(r) : [0, 0], v = [p0[0], p0[1], n[0], n[1], p0[0]+n[0], p0[1]+n[1]];
+      const o = {}; v.forEach((x, i) => o[pre + i] = x ? String(x) : ''); return o; };
+    return { tpl: 'leave-personal.docx', data: Object.assign(base, rowv('ลาป่วย','s'), rowv('ลากิจ','g'), rowv('ลาคลอดบุตร','k'), {
+      kSick: r.type === 'ลาป่วย', kBiz: r.type === 'ลากิจ', kBirth: r.type === 'ลาคลอดบุตร',
+      b1: r.type === 'ลาป่วย' ? '☒' : '☐', b2: r.type === 'ลากิจ' ? '☒' : '☐', b3: r.type === 'ลาคลอดบุตร' ? '☒' : '☐',
+      whySick: r.type === 'ลาป่วย' ? reason : '', whyBiz: r.type === 'ลากิจ' ? reason : '' }) };
+  }
+  return null;
+}
+async function wordLeave(r, btn){
+  const w = wordData(r);
+  if (!w) return toast(`ยังไม่มีแบบใบลาสำหรับ "${r.type}" — ทำไฟล์ Word ได้เฉพาะลาพักผ่อน ลาป่วย ลากิจ ลาคลอดบุตร`, 5000);
+  if (!r.start) return toast('อ่านวันที่ลาของรายการนี้ไม่ได้ จึงทำไฟล์ Word ไม่ได้', 4000);
+  const old = btn && btn.textContent; if (btn){ btn.disabled = true; btn.textContent = '⏳'; }
+  try{
+    const [buf] = await Promise.all([fetch('templates/' + w.tpl, {cache:'no-cache'}).then(x => { if (!x.ok) throw new Error('ไม่พบแม่แบบใบลา'); return x.arrayBuffer(); }), loadDocxLibs()]);
+    const doc = new window.docxtemplater(new window.PizZip(buf), { paragraphLoop: true, linebreaks: true, nullGetter: () => '' });
+    doc.render(w.data);
+    const blob = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const fname = `ใบ${r.type}_${String(w.data.bare || w.data.name).replace(/[\\/:*?"<>|]/g,'')}_${r.start}.docx`;
+    // มือถือ: เปิดเมนูแชร์ (บันทึกลงไฟล์ / ส่ง LINE / เปิดใน Word) · คอม: ดาวน์โหลดตรง
+    const file = typeof File === 'function' ? new File([blob], fname, { type: blob.type }) : null;
+    if (file && DP_NATIVE && navigator.canShare && navigator.canShare({ files: [file] })){
+      try{ await navigator.share({ files: [file], title: fname }); return; }
+      catch(err){ if (err && err.name === 'AbortError') return; }
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    toast('ดาวน์โหลดใบลาเป็นไฟล์ Word แล้ว');
+  }catch(e){ toast('ทำไฟล์ Word ไม่สำเร็จ: ' + (e.message || e), 5000); }
+  finally{ if (btn){ btn.disabled = false; btn.textContent = old; } }
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-word]'); if (!b) return;
+  const r = state.all.find(x => x.key === b.dataset.word); if (r) wordLeave(r, b);
 });
 
 /* ---- ตรวจข้อมูล ---- */
